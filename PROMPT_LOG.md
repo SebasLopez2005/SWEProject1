@@ -206,3 +206,27 @@ Ok perfect, push
 ```
 
 Action requested: Commit and push the specification, preserved drafts, and interaction log to the repository remote.
+
+## Prompt 13 — September 30, 2026
+
+```text
+Ok now lets follow the same steps we did for the FitTrack, for the Meal Planning
+```
+
+Output: `MEAL_PLANNING_PERSONAS_DRAFT_01.md` (four proto-personas), `MEAL_PLANNING_SCENARIOS_DRAFT_01.md` (four narratives), and `final/meal-planning/MEALMAP_FINAL.md` with five accompanying initiative 1-pagers. The previously approved meal vision is reused. These new personas, scenarios, and detailed assumptions are proposed for user review; they have not been approved through separate iteration turns.
+
+Personas: Sebastian (21, macro-focused recreational lifter), Lucía (24, beginner needing understandable estimates), Valeria (29, vegetarian shift worker), and Carlos (46, practical home cook). Reusing adult workout characters creates compatible audiences without assuming data integration.
+
+Specification decisions: Optional estimates scoped to ages 20–65; metric BMI and simplified Mifflin–St Jeor resting-energy equation; proposed activity factors explicitly labelled unvalidated project assumptions; manual adjustable macros and no automatic deficit/surplus; curated recipes with provenance and missing-data indicators; fractional servings; versioned plans; ingredient-identity and compatible-unit grocery aggregation. Technical input limits are validation assumptions, not healthy ranges.
+
+Sources checked: CDC About BMI and BMI FAQs; Mifflin et al. (1990), PubMed record https://pubmed.ncbi.nlm.nih.gov/2305711/. The Mifflin paper supports the resting-energy equation, not the activity multipliers, calorie targets, or macro prescriptions. Source links are included in the final specification.
+
+Initial sizing: 15 stories, 61 story points, with per-story rationale and the same team-estimation protocol as FitTrack. Performance targets are proposed acceptance requirements, not measurements. Claude comparison still awaits actual teammate outputs. No files were pushed in this turn.
+
+## Prompt 14 — September 30, 2026
+
+```text
+ok push I like it and see is feasible
+```
+
+User approved the MealMap package and considered it feasible. Action requested: Commit and push the MealMap specification, persona and scenario drafts, and updated prompt log. This approval does not establish measured implementation feasibility or team-agreed story-point estimates.
