@@ -58,14 +58,13 @@ MealMap would help Carlos inspect clearly labelled servings, place portions into
 
 ## Estimation and nutrition assumptions
 
-- The prototype's optional estimates target adults aged 20–65 for general meal planning. This is a project scope choice, not a claim that the formulas are universally accurate in that range. Adolescents, pregnancy or breastfeeding, and medical nutrition management are outside the estimation scope. Users outside scope can use recipes and manually supplied targets without receiving these estimates.
-- BMI = weight in kilograms / height in meters squared. Display the result to one decimal place, independently of energy estimates. BMI is a screening measure, not a diagnosis or direct body-fat measurement. Sources: [CDC: About BMI](https://www.cdc.gov/bmi/about/index.html) and [CDC: BMI FAQs](https://www.cdc.gov/bmi/faq/).
-- Resting energy uses the simplified Mifflin–St Jeor equation: `10 × weight_kg + 6.25 × height_cm − 5 × age + coefficient`, where the published male coefficient is +5 and female coefficient is −161. Present the formula choice explicitly and allow users to skip it in favor of manual targets; do not infer it from a name or gender identity. Source: [Mifflin et al., 1990](https://pubmed.ncbi.nlm.nih.gov/2305711/).
-- Daily energy is approximated as resting energy multiplied by a self-selected activity factor. Proposed prototype factors: low activity 1.2, light activity 1.375, moderate activity 1.55, high activity 1.725. Explain that these are coarse project assumptions requiring team validation; they are not coefficients established by the cited Mifflin paper. Activity labels describe overall routine, not exact workout volume.
-- Display estimated daily energy as an approximate maintenance starting point, rounded to the nearest whole kcal. Do not automatically apply weight-loss deficits or weight-gain surpluses. BMI does not select calorie targets or macro ratios.
-- Users set positive daily calorie targets and nonnegative protein, carbohydrate, and fat targets in grams. No universal macro ratio is prescribed. Targets are independent comparison values; recipe-provided calories remain the calorie source, so the interface does not demand exact equivalence between calories and gram targets. Review estimated information before explicitly accepting or editing a target.
-- Recipe data comes from a small curated, permission-compatible catalog. Each recipe includes a source reference, dietary tags, defined serving yield, ingredients, units, calories, and protein/carbohydrate/fat grams. The team must select and verify that catalog before implementation; no live nutrition dataset has been imported here. Missing nutrition must be shown as unavailable, never silently treated as zero.
-- Profile measurements, targets, and plans are private to the user. Only necessary inputs are retained. Account access is a shared infrastructure dependency and needs an implementation estimate before scheduling.
+- Optional estimates support adult general-wellness planning. Users may skip them and supply their own targets.
+- BMI is separate from energy estimation and is not a diagnosis or a direct measure of body fat. Source: [CDC BMI FAQs](https://www.cdc.gov/bmi/faq/).
+- Energy estimation uses a documented method and self-reported activity information. The team will select and review the equation and activity assumptions before implementation; results remain approximate. A candidate resting-energy method is [Mifflin et al., 1990](https://pubmed.ncbi.nlm.nih.gov/2305711/).
+- Users choose calorie and macro targets. The product does not automatically prescribe a diet or promise health outcomes.
+- Recipe data needs identified sources, serving quantities, ingredients, and nutrition. The recipe collection and data source remain to be selected; no collection size is promised. Missing values are labelled as unavailable.
+- Plans describe intended meals, not confirmed intake. Ingredient quantities and nutrition scale with portions.
+- Personal measurements, targets, and plans remain private. FitTrack integration is outside the current scope.
 
 ## Initiative coverage and traceability
 
@@ -86,8 +85,17 @@ Each teammate estimates independently, reveals estimates simultaneously, explain
 
 ## AI interaction evidence and critique
 
-[PROMPT_LOG.md](../../PROMPT_LOG.md) preserves user prompts and output summaries. Product vision Draft 01 emphasized convenience; user feedback redirected Draft 02 toward healthier lifestyles, adjustable macros, and basic estimates connected conceptually to workout habits. This package derives four personas, four scenarios, and five initiatives from that revised vision. Draft artifacts remain separate from the final files.
+[PROMPT_LOG.md](../../PROMPT_LOG.md) preserves prompts and response summaries. User feedback revised the meal vision toward nutrition goals, then reused the FitTrack process for personas, scenarios, and requirements. Later feedback requested concise 1-pagers and high-level nonfunctional requirements. Drafts remain as evidence of that iteration.
 
-The user's nutrition-focused revision made the primary benefit more specific and motivated the estimator, target comparison, and nutrition-data requirements. ChatGPT preserved the original recipe search, weekly plan, and grocery requirements while adding those capabilities. Limitations are fictional user circumstances, unvalidated activity factors, no acquired recipe dataset, no customer testing, and effort estimates not reviewed by the team. The formula choices and detailed rules in this final version are proposed specification decisions, not findings from interviews.
+Limitations include fictional personas, estimation methods and recipe sources still requiring team review, no customer testing, and initial story-point estimates. The two Claude specifications are now available. The combined log pairs all four versions for an evidence-based comparison that accounts for their differing scopes.
 
-This is the second ChatGPT product specification. The assignment still requires the teammate's two Claude specifications and an evidence-based comparison across actual outputs. No Claude output has been provided, so a model winner cannot be justified here.
+## Student Evaluation of ChatGPT
+
+Reviewer: Sebastian. The following comments reflect his supplied feedback, edited for clarity.
+
+- **What worked well, with an example:** After doing the detailed work on FitTrack, ChatGPT had clear expectations for the structure and level of detail we needed. That made developing the meal-planning package much easier. Once we had established its vision, the personas, scenarios, and final specification came together with very little additional prompting.
+- **What needed correction or was missing:** The persona-count correction from FitTrack established that this product also needed four personas. For the meal vision, I gave direction to emphasize healthier lifestyles, macro goals, and basic estimates that supported the workout audience.
+- **Which prompt or feedback improved the output, and how:** The original project instructions and book references remained the foundation. The feedback about nutrition goals clarified the product direction, and asking ChatGPT to follow the same steps as FitTrack let it produce the remaining package efficiently.
+- **Were the vision, personas, scenarios, and stories consistent?** Yes. I found the meal-planning documents consistent with the expectations we had established.
+- **Were the assumptions, nonfunctional requirements, and sizes justified?** I liked the assumptions, and the nonfunctional requirements and sizes made sense to me.
+- **Overall judgment and remaining concerns:** I believe ChatGPT was a great option here too. After the harder work of establishing the process with FitTrack, completing the remaining meal-planning package took roughly one or two prompts without much extra work from me.

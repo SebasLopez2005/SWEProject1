@@ -87,8 +87,19 @@ The total is a backlog estimate, not a schedule. No sprint velocity has been mea
 
 ## AI interaction evidence and review
 
-The verbatim prompts and response summaries are in [PROMPT_LOG.md](../../PROMPT_LOG.md). Earlier visions, personas, and scenarios remain in the repository as draft evidence. User feedback approved the workout direction, supplied two persona concepts, required four personas per product, and approved the scenarios. Finalization adds explicit assumptions, measurable acceptance details, and proposed sizing; these additions still require normal team review.
+[PROMPT_LOG.md](../../PROMPT_LOG.md) records the prompts and response summaries. Earlier visions, personas, and scenarios remain as draft evidence. User feedback supplied the initial persona concepts, clarified that four were required, and approved the scenarios. A later review requested high-level nonfunctional requirements and shorter 1-pagers; the current version reflects that correction.
 
-ChatGPT initially produced only two workout personas; the user clarified that four were required. The revised set adds different scheduling and technology needs rather than changing only names and ages. Contextual feedback helped keep the portraits connected to the product. The scenarios then exposed concrete needs for correction, partial sessions, readable history, and graph interpretation. Limitations include invented persona circumstances, no observed usability evidence, and estimates unvalidated by the team. The formulas and measurement boundaries added during finalization are specification choices, not customer findings.
+ChatGPT initially provided only two workout personas. The revised set adds distinct scheduling and technology needs. Iteration connected those portraits to scenarios and stories. Remaining limitations include fictional circumstances, no customer testing, and initial estimates requiring team review.
 
-This file is **one of the four required model/product specifications**. The other three are the ChatGPT meal-planning version and the two Claude versions. Claude outputs have not been supplied, so no evidence-based model winner can be declared. A final cross-model critique must compare actual outputs, prompts, revisions, requirement coverage, assumptions, specificity, and sizing rationale. The team's final submission must include that comparison and all four visions.
+This is the ChatGPT workout specification. Both Claude versions are now in the final folder. The combined prompt log pairs all four versions for a comparison that accounts for different scope choices.
+
+## Student Evaluation of ChatGPT
+
+Reviewer: Sebastian. The following comments reflect his supplied feedback, edited for clarity.
+
+- **What worked well, with an example:** ChatGPT understood the project requirements, kept a prompt log in the repository, and worked through product decisions with me. We developed the vision, personas, scenarios, and final requirements step by step, preserving the drafts as we went.
+- **What needed correction or was missing:** I had to clarify that we needed four personas per product. The first workout persona draft included only two, and ChatGPT added the other two after my correction.
+- **Which prompt or feedback improved the output, and how:** I believe the starting instructions were the most useful: the project description, what I needed to produce, and the book references I supplied afterward. Those inputs established the expectations for the work. My later feedback helped refine individual decisions, including the required number of personas.
+- **Were the vision, personas, scenarios, and stories consistent?** Yes. I found the documents consistent, and the later requirements followed the direction we had developed together.
+- **Were the assumptions, nonfunctional requirements, and sizes justified?** I liked the assumptions, and the nonfunctional requirements and story sizes made sense to me.
+- **Overall judgment and remaining concerns:** I believe ChatGPT was a great option for this project. Its main strength was understanding the requirements and iterating with me on the decisions we needed to make. The persona count was the correction I identified.
