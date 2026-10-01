@@ -1654,3 +1654,29 @@ Do NOT fabricate textbook quotations.
 Do NOT invent information that is not supported by the product concept or clearly identified as an assumption.
 
 Produce the polished final Fitness & Workout Log App document now.
+
+---
+
+## Prompt 3: Concise 1-pagers
+
+```text
+I need you to create another version of the document, the 1 pagers are very long and that cant be that way. The 1 pagers should be at most a page and a half currently they are 4 pages. The template to follow is the same one: [Initiative Name] 1-pager PROBLEM One to two paragraph description of the initiative. This should roughly match what Sommerville refers to as Scenarios in Chapter 3 of Engineering Software Products ASSUMPTIONS Since the product vision is not complete, the team will need to define here all assumptions they had to make to complement the base requirements sketched in the vision. FUNCTIONAL REQUIREMENTS * As a [persona], I want to [perform task] so that I can/in order to [description] * Possible detail A * Possible detail B (repeated for 3 stories) NON-FUNCTIONAL REQUIREMENTS E.g. SLAs, performance, security levels REQUIREMENTS SIZING Select one type of metric to assess effort and provide an initial estimate for each of the stories in the functional requirements. Explain the rational to assign each size ///// but it shuld be more narrowed down with the complete description of the requirments with details but more to the point. One pagers should be easy to read and follow and a base for the rest of the project. Also give a short description at the end of why you assigned that sizing.
+```
+
+---
+
+## Prompt 4: Four visions and four personas (options)
+
+```text
+i need 4 product visions and 4 personas as requested in the rubric. The last persona could be about what options give me several options so i can choose.
+```
+
+---
+
+## Prompt 5: Rubric check and fourth persona (Tomás)
+
+The user pasted the project overview and rubric (not reproduced here) together with the following instruction.
+
+```text
+In the following message I will give you the rubric and instructions so you can check it where it says specificly 4 visions and 4 personas. So review it, make those changes and add: the following persona could work as the fourth one: Tomás Vargas, 46, returning lifter. He is an office administrator who uses a paper notebook and rarely installs apps. His handwriting is hard to read, and he wants large text and simple summaries.he adds a type of user the other three don't cover (low tech comfort, readability). ///// Also add this prompt into the prompts document for the fitness app in the repo and give me this new verson with the 4th persona.
+```
