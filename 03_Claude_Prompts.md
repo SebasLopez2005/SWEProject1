@@ -1680,3 +1680,13 @@ The user pasted the project overview and rubric (not reproduced here) together w
 ```text
 In the following message I will give you the rubric and instructions so you can check it where it says specificly 4 visions and 4 personas. So review it, make those changes and add: the following persona could work as the fourth one: Tomás Vargas, 46, returning lifter. He is an office administrator who uses a paper notebook and rarely installs apps. His handwriting is hard to read, and he wants large text and simple summaries.he adds a type of user the other three don't cover (low tech comfort, readability). ///// Also add this prompt into the prompts document for the fitness app in the repo and give me this new verson with the 4th persona.
 ```
+
+---
+
+## Prompt 6: Weight-unit tracking for the fourth persona
+
+The user attached the current Word version of the document (with their own edits) and wrote:
+
+```text
+continue with the following version you should also add in the 4th persona the trackability of weights since in different gyms they use kg or lbs so sometimes the fourth persona gets confused and doesnt know what his actual weight he needs due to the conversion between kg and lbs so that should also be part of it. Add this in the following version and put this prompt in the prompt document for fitness. Replace the one in the repo about prompts with the new one and add this version of the document.
+```
