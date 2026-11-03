@@ -1,0 +1,18 @@
+sequenceDiagram
+    title FW-18: Delete a finished workout
+    actor U as Elena
+    participant C as HistoryController
+    participant S as HistoryService
+    participant R as WorkoutRepository
+    U->>C: Delete finished workout
+    C-->>U: Confirm workout date and set count
+    alt Cancel
+     C-->>U: Keep workout unchanged
+    else Confirm
+     C->>S: deleteWorkout(id)
+     S->>R: deleteAndEnqueue(tombstone)
+     R-->>S: Local commit
+     S-->>C: Deleted locally -  upload pending if offline
+     C-->>U: Remove from history, previous performance and all graphs
+    end
+    Note over S,R: No user-facing recycle bin. Keep sync tombstone so cloud deletion propagates and cannot be resurrected by a stale pull.
