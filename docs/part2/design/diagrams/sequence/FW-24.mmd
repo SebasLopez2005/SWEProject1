@@ -1,0 +1,19 @@
+sequenceDiagram
+    title FW-24: Select a point, open workout
+    actor U as Marcus
+    participant C as ProgressController
+    participant S as ProgressService
+    participant R as WorkoutRepository
+    U->>C: Select chart point or equivalent table row
+    C->>S: contributingWorkouts(pointId)
+    S->>R: Resolve current nondeleted workout IDs behind point
+    R-->>S: Contributing records
+    S-->>C: Date/value and source records
+    alt Exercise point
+     C-->>U: Open workout detail
+    else Weekly point with workouts
+     C-->>U: List contributing workouts -  choose one to open
+    else Empty week / removed source
+     C-->>U: Explain no contributing workout -  refresh series
+    end
+    Note over C,S: Accessible table selection supports same drill-down. Do not route by displayed date alone.
