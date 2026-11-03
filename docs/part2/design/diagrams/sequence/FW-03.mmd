@@ -1,0 +1,21 @@
+sequenceDiagram
+    title FW-03: Set form matches exercise type
+    actor U as Elena
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as ExerciseRepository
+    U->>C: Select an exercise
+    C->>S: Read exercise type
+    S->>R: get(exerciseId)
+    R-->>S: weight_reps, reps_only or seconds
+    S-->>C: Matching field schema
+    alt weight_reps
+     C-->>U: Weight + kg/lb + reps
+    else reps_only
+     C-->>U: Reps only
+    else seconds
+     C-->>U: Whole seconds only
+    end
+    U->>C: Record set
+    C->>S: recordSet(typed input)
+    Note over C,S: Reject irrelevant fields -  require positive whole reps/seconds. Confirm via atomic WorkoutRepository mutation as FW-02.
