@@ -1,0 +1,18 @@
+sequenceDiagram
+    title FW-19: Filter history
+    actor U as Priya
+    participant C as HistoryController
+    participant S as HistoryService
+    participant R as WorkoutRepository
+    U->>C: Select date range and/or exercise
+    C->>S: list(combined filter, reset cursor)
+    alt Reversed or invalid date range
+     S-->>C: Explain -  do not issue invalid query
+    else Valid
+     S->>R: Finished workouts matching both optional filters
+     R-->>S: Paged rows or none
+     S-->>C: Results or no-matches message
+    end
+    U->>C: Clear filters
+    C->>S: list(empty filter, reset cursor)
+    Note over C,R: Exercise comparison uses stable ID. Dates inclusive. Filters compose, not replace each other.
