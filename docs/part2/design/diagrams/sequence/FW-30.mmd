@@ -1,0 +1,15 @@
+sequenceDiagram
+    title FW-30: See both units
+    actor U as Tomas
+    participant C as SettingsController
+    participant S as SettingsService
+    participant R as SettingsRepository
+    participant P as UnitConverter
+    U->>C: Enable or disable equivalent weight display
+    C->>S: update(showEquivalent)
+    S->>R: mutateAndEnqueue(settings)
+    R-->>S: Local commit
+    S-->>C: Updated presentation preference
+    C->>P: formatPrimaryAndEquivalent(set, settings)
+    P-->>U: For example 60 kg (132.3 lb), or primary value only
+    Note over C,P: Weighted set rows, previous performance and summaries use same formatter. Factor 2.20462 -  display one decimal -  no stored value changes.
