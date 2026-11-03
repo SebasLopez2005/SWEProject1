@@ -1,0 +1,17 @@
+sequenceDiagram
+    title FW-08: Record a workout on an earlier date
+    actor U as Elena
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Start or edit workout with earlier calendar date
+    C->>S: Validate selected YYYY-MM-DD in device timezone
+    alt Future date
+     S-->>C: Explain -  preserve existing date
+    else Today or earlier
+     S->>R: mutateAndEnqueue(workout with selected date)
+     R-->>S: Local commit
+     S-->>C: Date accepted
+     C-->>U: History and graphs use selected date, not upload time
+    end
+    Note over S,R: Preserve calendar date across timezones. Creation/finish timestamps are separate -  do not invent backdated duration.
