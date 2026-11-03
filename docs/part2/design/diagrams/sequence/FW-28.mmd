@@ -1,0 +1,17 @@
+sequenceDiagram
+    title FW-28: Delete a template
+    actor U as Marcus
+    participant C as TemplateController
+    participant S as TemplateService
+    participant R as TemplateRepository
+    U->>C: Delete a saved template
+    C-->>U: Confirmation with template name
+    alt Cancel
+     C-->>U: Template unchanged
+    else Confirm
+     C->>S: delete(templateId)
+     S->>R: deleteAndEnqueue(template tombstone)
+     R-->>S: Local commit
+     S-->>C: Template removed from list
+    end
+    Note over S,R: Existing active and finished workouts are independent and unchanged. Tombstone uploads through the same durable queue.
