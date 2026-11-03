@@ -1,0 +1,23 @@
+sequenceDiagram
+    title Supporting flow: preserve and explicitly resolve a sync conflict
+    actor U as User
+    participant C as SyncController
+    participant S as SyncCoordinator
+    participant R as SyncStore
+    participant D as LocalDatabase
+    U->>C: Open needs-attention record
+    C->>R: Read preserved local and remote snapshots
+    R-->>C: Both versions and conflict reason
+    C-->>U: Review -  choose explicit resolution
+    alt Workout: keep local as independent copy
+      C->>S: resolve(id, copyLocal)
+      S->>D: Transaction: preserve remote, copy local to new UUID, enqueue copy
+      Note over S,D: If both active, require finish/discard of local active first. No silent loss or two active workouts.
+    else Keep remote / reviewed rebase of catalog-template-settings
+      C->>S: resolve(id, reviewedChoice)
+      S->>D: Transaction: validate references/name/type -  apply reviewed choice and requeue if needed
+    end
+    D-->>S: Local commit -  clear conflict only after successful resolution
+    S->>R: Unblock or explicitly rebase dependent operations
+    S-->>C: Updated state -  continue sync
+    Note over C,D: Cancel preserves conflict and both snapshots. Never drop pending dependent workout/template references.
