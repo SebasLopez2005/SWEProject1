@@ -1,0 +1,21 @@
+sequenceDiagram
+    title FW-31: Enter a set in either unit
+    actor U as Tomas
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    participant P as UnitConverter
+    U->>C: Open weighted-set form
+    C-->>U: Unit defaults to preferred account unit
+    U->>C: Choose kg or lb and enter value
+    opt Switch unit after entering a value
+     C->>P: convertPrefill(value, old unit, new unit)
+     P-->>C: Converted value -  explicit confirmation, no silent relabel
+    end
+    C->>S: recordSet(enteredWeight, enteredUnit, reps)
+    S->>S: Validate bounds in entered unit and typed fields
+    S->>R: mutateAndEnqueue(set with original decimal and unit)
+    R-->>S: Local commit
+    S-->>C: Confirm set
+    C-->>U: Preferred-unit value plus optional equivalent
+    Note over S,R: Prefill converts when source unit differs. History/graphs convert at read time. Switching display preference never rewrites originals.
