@@ -1,0 +1,23 @@
+sequenceDiagram
+    title FW-07: Resume an unfinished workout
+    actor U as Priya
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Relaunch after phone lock / process restart
+    C->>S: resume()
+    S->>R: active() in restored owner partition
+    R-->>S: Durable active workout or none
+    alt Active exists
+     S-->>C: Offer resume or discard
+     U->>C: Choose resume
+     C-->>U: Restore ordered entries and confirmed sets
+     opt User instead confirms discard
+      C->>S: discard()
+      S->>R: deleteAndEnqueue(active id)
+      R-->>C: Local commit -  no active session
+     end
+    else None
+     C-->>U: Start workout screen
+    end
+    Note over S,R: Every confirmed set and its outbox were committed together before the original UI confirmation.
