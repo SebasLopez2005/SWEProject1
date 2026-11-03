@@ -1,0 +1,16 @@
+sequenceDiagram
+    title FW-20: Per-exercise volume graph
+    actor U as Marcus
+    participant C as ProgressController
+    participant S as ProgressService
+    participant R as WorkoutRepository
+    participant V as VolumeCalculator
+    U->>C: Open weighted exercise graph
+    C->>S: exerciseSeries(exerciseId, period)
+    S->>R: Current finished workouts and matching weighted sets
+    R-->>S: Entered weights, units, reps and dates
+    S->>V: Convert unrounded weights -  sum weight times reps per workout
+    V-->>S: Points with workout IDs and metric unit
+    S-->>C: Series and source references
+    C-->>U: Dated unit-labelled chart + accessible table + explanation
+    Note over C,V: Fewer than two workouts shows sparse-data message. Do not infer strength or health. Timed exercises have no graph.
