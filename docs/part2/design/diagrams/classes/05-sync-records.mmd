@@ -1,0 +1,63 @@
+classDiagram
+    direction TB
+    class OutboxOperation {
+      +UUID operationId
+      +UUID ownerId
+      +UUID aggregateId
+      +String aggregateKind
+      +int localSequence
+      +int baseRevision
+      +String immutablePayload
+      +String payloadHash
+      +String timezone
+      +int schemaVersion
+    }
+    class SyncConflict {
+      +UUID id
+      +UUID ownerId
+      +UUID aggregateId
+      +String localSnapshot
+      +String remoteSnapshot
+      +String reason
+    }
+    class SyncCheckpoint {
+      +UUID ownerId
+      +BigInt lastCursor
+    }
+    class MutationReceipt {
+      +UUID operationId
+      +UUID ownerId
+      +String payloadHash
+      +int resultingRevision
+    }
+    class ChangeEvent {
+      +BigInt cursor
+      +UUID ownerId
+      +UUID aggregateId
+      +String aggregateKind
+      +int revision
+      +String snapshotOrTombstone
+    }
+    class SyncStore {
+      +nextReadyOperation()
+      +ackAndRebase(receipt)
+      +preserveConflict(local, remote)
+      +applyPageAndCheckpoint(page)
+    }
+    class MutationHandler {
+      +apply_mutation(operation, jwt)
+    }
+    class ChangeFeedHandler {
+      +pull_changes(cursor, jwt)
+    }
+    SyncStore --> OutboxOperation
+    SyncStore --> SyncConflict
+    SyncStore --> SyncCheckpoint
+    SyncStore --> MutationReceipt
+    SyncStore --> ChangeEvent
+    MutationHandler --> OutboxOperation
+    MutationHandler --> MutationReceipt
+    MutationHandler --> ChangeEvent
+    ChangeFeedHandler --> ChangeEvent
+    note for MutationReceipt "Server uniqueness is ownerId plus operationId. Same payload retries<br/>return original result; different payload is rejected."
+    note for ChangeEvent "Server ordered feed includes tombstones. Pull captures a high-water<br/>cursor; local page and checkpoint commit together."
