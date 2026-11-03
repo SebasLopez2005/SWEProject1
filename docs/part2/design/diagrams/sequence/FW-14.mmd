@@ -1,0 +1,17 @@
+sequenceDiagram
+    title FW-14: List finished workouts
+    actor U as Tomas
+    participant C as HistoryController
+    participant S as HistoryService
+    participant R as WorkoutRepository
+    U->>C: Open history / scroll for older rows
+    C->>S: list(filter, cursor)
+    S->>R: Finished nondeleted workouts ordered date DESC, ID DESC
+    R-->>S: Page and stable next cursor
+    S-->>C: Date, first three exercise names, and N more, set count
+    alt Empty history
+     C-->>U: Explain how to log first workout
+    else Rows exist
+     C-->>U: Readable dated list using saved text scale
+    end
+    Note over C,R: Include locally finished pending uploads. Pagination uses date plus ID -  source three-name row layout is a display rule, not a capacity promise.
