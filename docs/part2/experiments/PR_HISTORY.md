@@ -49,6 +49,7 @@ The source design was prepared locally in commit `8d2e633` on November 2. Splitt
 | 40 | Design 40: FW-29: Larger text size | [PR #42](https://github.com/SebasLopez2005/SWEProject1/pull/42) | `codex/p2-39-sequence-fw-28` | `f54615e` |
 | 41 | Design 41: FW-30: See both units | [PR #43](https://github.com/SebasLopez2005/SWEProject1/pull/43) | `codex/p2-40-sequence-fw-29` | `9c624d2` |
 | 42 | Design 42: FW-31: Enter a set in either unit | [PR #44](https://github.com/SebasLopez2005/SWEProject1/pull/44) | `codex/p2-41-sequence-fw-30` | `a511656` |
+| 43 | Part 2 documentation: coverage, generation protocol and PR index | [PR #45](https://github.com/SebasLopez2005/SWEProject1/pull/45) | `codex/p2-42-sequence-fw-31` | `028222a` |
 
 ## How to record a real one-shot iteration
 
