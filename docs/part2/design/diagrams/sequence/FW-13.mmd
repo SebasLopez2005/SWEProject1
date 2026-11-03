@@ -1,0 +1,17 @@
+sequenceDiagram
+    title FW-13: Rename or archive a custom exercise
+    actor U as Marcus
+    participant C as ExerciseController
+    participant S as ExerciseService
+    participant R as ExerciseRepository
+    U->>C: Rename, archive or restore custom exercise
+    C->>S: rename / archiveOrRestore(id)
+    S->>R: Read owner and shared/custom state
+    alt Shared exercise or name invalid/duplicate
+     S-->>C: Reject -  preserve existing exercise
+    else Own custom exercise
+     S->>R: mutateAndEnqueue(same ID, changed name/archive flag)
+     R-->>S: Local commit
+     S-->>C: Search refreshed -  history and graphs resolve current name
+    end
+    Note over S,R: Archive hides picker entry but preserves sets and template references. Restore is available. Used exercises cannot be deleted or change type.
