@@ -1,0 +1,108 @@
+classDiagram
+    direction TB
+    class WorkoutRepository {
+      <<interface>>
+      +active()
+      +get(id)
+      +list(filter, cursor)
+      +latestPerformance(exerciseId)
+      +mutateAndEnqueue(snapshot)
+      +deleteAndEnqueue(id)
+    }
+    class ExerciseRepository {
+      <<interface>>
+      +search(text, muscle)
+      +get(id)
+      +mutateAndEnqueue(snapshot)
+    }
+    class TemplateRepository {
+      <<interface>>
+      +list()
+      +get(id)
+      +mutateAndEnqueue(snapshot)
+      +deleteAndEnqueue(id)
+    }
+    class SettingsRepository {
+      <<interface>>
+      +get()
+      +mutateAndEnqueue(snapshot)
+    }
+    class SqliteRepositories {
+      +ownerId
+      +read(query)
+      +mutateAndEnqueue(snapshot)
+      +deleteAndEnqueue(id)
+    }
+    class LocalDatabase {
+      +openForOwner(ownerId)
+      +migrate()
+      +transaction(work)
+      +emitChanged()
+    }
+    class OutboxOperation {
+      +UUID operationId
+      +UUID aggregateId
+      +String aggregateKind
+      +int localSequence
+      +int baseRevision
+      +String immutablePayload
+      +String payloadHash
+      +String timezone
+      +int schemaVersion
+    }
+    class SyncStore {
+      +nextReadyOperation()
+      +ackAndRebase(receipt)
+      +applyPageAndCheckpoint(page)
+      +preserveConflict(local, remote)
+      +resolveConflict(id, choice)
+    }
+    class SyncCoordinator {
+      +onForegroundOrReconnect()
+      +sync()
+      +retry()
+      +status()
+      +resolve(id, choice)
+      +hasPendingOrConflicts()
+    }
+    class SyncGateway {
+      <<interface>>
+      +applyMutation(operation)
+      +pullChanges(cursor)
+    }
+    class SupabaseSyncGateway {
+      +applyMutation(operation)
+      +pullChanges(cursor)
+    }
+    class MutationHandler {
+      +apply_mutation(operation, jwt)
+      +validateOwnerAndReferences()
+      +checkReceiptAndRevision()
+      +commitAggregateAndReceipt()
+    }
+    class ChangeFeedHandler {
+      +pull_changes(cursor, jwt)
+      +ownerScopedPageAtHighWater()
+    }
+    class RemoteDatabase {
+      +transaction(work)
+      +enforceRLS()
+      +lockAggregate()
+    }
+    SqliteRepositories ..|> WorkoutRepository
+    SqliteRepositories ..|> ExerciseRepository
+    SqliteRepositories ..|> TemplateRepository
+    SqliteRepositories ..|> SettingsRepository
+    SqliteRepositories --> LocalDatabase
+    LocalDatabase --> OutboxOperation
+    SyncCoordinator --> SyncStore
+    SyncStore --> LocalDatabase
+    SyncCoordinator --> SyncGateway
+    SupabaseSyncGateway ..|> SyncGateway
+    SupabaseSyncGateway --> MutationHandler : authenticated RPC
+    SupabaseSyncGateway --> ChangeFeedHandler : authenticated RPC
+    MutationHandler --> RemoteDatabase
+    ChangeFeedHandler --> RemoteDatabase
+    note for MutationHandler "Logical PostgreSQL RPC handler. RLS reads; direct table writes<br/>blocked. Owner-checked narrow RPC, receipt dedupe, revision validation<br/>and child writes in one transaction."
+    note for SyncStore "Local changes plus immutable outbox are atomic. Acks must not<br/>overwrite newer local edits."
+    note for SyncCoordinator "Custom exercise dependencies first. Conflict preserves both versions;<br/>retry is idempotent. No guaranteed OS-background uploads."
