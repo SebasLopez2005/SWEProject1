@@ -1,0 +1,101 @@
+classDiagram
+    direction LR
+    class AuthController {
+      +bootstrap()
+      +signIn(email, password)
+      +register(email, password)
+      +signOut()
+    }
+    class AuthService {
+      +restoreSession()
+      +requireOwner() UUID
+      +signIn(email, password)
+      +signOutIfSafe()
+    }
+    class AuthGateway {
+      <<interface>>
+      +restore()
+      +signIn(email, password)
+      +register(email, password)
+      +refresh()
+      +signOut()
+    }
+    class SupabaseAuthGateway {
+      +restore()
+      +signIn(email, password)
+      +register(email, password)
+      +refresh()
+      +signOut()
+    }
+    class SessionStorageAdapter {
+      +getItem(key)
+      +setItem(key, value)
+      +removeItem(key)
+    }
+    class WorkoutController {
+      +start(date)
+      +addExercise(id)
+      +showPrevious(id)
+      +recordSet(input)
+      +editOrRemove(target)
+      +undo(token)
+      +finish()
+      +resumeOrDiscard()
+    }
+    class ExerciseController {
+      +search(text, muscle)
+      +create(input)
+      +renameOrArchive(id)
+      +restore(id)
+    }
+    class HistoryController {
+      +list(filter, cursor)
+      +open(id)
+      +exerciseHistory(id)
+      +edit(id, patch)
+      +deleteConfirmed(id)
+    }
+    class ProgressController {
+      +load(metric, period)
+      +selectPoint(id)
+    }
+    class TemplateController {
+      +saveWorkoutList(workoutId, name)
+      +createOrEdit(input)
+      +start(id)
+      +deleteConfirmed(id)
+    }
+    class SettingsController {
+      +chooseUnit(unit)
+      +toggleEquivalent(enabled)
+      +setTextScale(scale)
+    }
+    class SyncController {
+      +status()
+      +retry()
+      +reviewConflict(id)
+      +resolve(id, choice)
+    }
+    class AppBootstrap {
+      +openOwnerPartition()
+      +seedCatalog()
+      +loadSettings()
+      +offerResume()
+      +startSyncTriggers()
+    }
+    AuthController --> AuthService
+    AuthService --> AuthGateway
+    SupabaseAuthGateway ..|> AuthGateway
+    SupabaseAuthGateway --> SessionStorageAdapter
+    AuthService --> SyncCoordinator : pending-work guard
+    AuthController --> AppBootstrap
+    WorkoutController --> WorkoutService
+    ExerciseController --> ExerciseService
+    HistoryController --> HistoryService
+    ProgressController --> ProgressService
+    TemplateController --> TemplateService
+    SettingsController --> SettingsService
+    SyncController --> SyncCoordinator
+    AppBootstrap --> LocalDatabase
+    AppBootstrap --> AuthService
+    note for AuthService "First sign-in needs network. Cached account can work offline. No<br/>account mixing."
