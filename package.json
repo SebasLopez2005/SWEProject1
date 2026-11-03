@@ -1,0 +1,17 @@
+{
+  "name": "cs3365-fitness-design",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mermaid design tooling only; generated Expo apps will own their dependencies",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "design:check": "python3 scripts/check_design.py",
+    "design:sync": "python3 scripts/check_design.py --sync",
+    "diagrams:render": "node scripts/render_diagrams.mjs"
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "12.2.0"
+  }
+}
