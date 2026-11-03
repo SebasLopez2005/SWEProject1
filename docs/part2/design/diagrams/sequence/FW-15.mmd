@@ -1,0 +1,17 @@
+sequenceDiagram
+    title FW-15: Open a past workout
+    actor U as Marcus
+    participant C as HistoryController
+    participant S as HistoryService
+    participant R as WorkoutRepository
+    U->>C: Open past workout ID
+    C->>S: getWorkout(id)
+    S->>R: Owner-scoped finished nondeleted workout with entries/sets
+    alt Not found or deleted
+     R-->>C: Explain and return to list
+    else Found
+     R-->>S: Current snapshot
+     S-->>C: Ordered exercises and typed sets
+     C-->>U: Date, duration if known, total volume, units and plain summary
+    end
+    Note over C,S: WorkoutPresenter uses current unit/text preferences -  original weights remain intact. Unsynced edits are visible immediately.
