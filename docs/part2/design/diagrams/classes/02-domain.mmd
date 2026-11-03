@@ -1,0 +1,150 @@
+classDiagram
+    direction TB
+    class Workout {
+      +UUID id
+      +UUID ownerId
+      +Date workoutDate
+      +WorkoutState state
+      +DateTime startedAt
+      +DateTime finishedAt
+      +int revision
+      +WorkoutEntry[] entries
+      +finish()
+      +validate()
+    }
+    class WorkoutEntry {
+      +UUID id
+      +UUID exerciseId
+      +int position
+      +ExerciseSet[] sets
+    }
+    class ExerciseSet {
+      +UUID id
+      +int position
+      +Decimal enteredWeight
+      +WeightUnit enteredUnit
+      +int reps
+      +int seconds
+    }
+    class Exercise {
+      +UUID id
+      +UUID ownerId
+      +String name
+      +String normalizedName
+      +ExerciseType type
+      +String muscleGroup
+      +bool archived
+      +bool everUsed
+      +int revision
+    }
+    class Template {
+      +UUID id
+      +UUID ownerId
+      +String name
+      +TemplateEntry[] entries
+      +int revision
+    }
+    class TemplateEntry {
+      +UUID exerciseId
+      +int position
+    }
+    class UserSettings {
+      +WeightUnit preferredUnit
+      +bool showEquivalent
+      +Decimal textScale
+      +int revision
+    }
+    class WorkoutService {
+      +start(date)
+      +addExercise(id)
+      +prefill(entryId)
+      +recordSet(input)
+      +mutateActive(patch)
+      +undo(token)
+      +finish()
+      +resume()
+      +discard()
+    }
+    class ExerciseService {
+      +search(text, muscle)
+      +create(input)
+      +rename(id, name)
+      +archiveOrRestore(id)
+    }
+    class HistoryService {
+      +list(filter, cursor)
+      +getWorkout(id)
+      +latestPerformance(exerciseId)
+      +exerciseHistory(id)
+      +editFinished(id, patch)
+      +deleteWorkout(id)
+    }
+    class TemplateService {
+      +fromWorkout(id, name)
+      +save(input)
+      +startWorkout(id)
+      +delete(id)
+    }
+    class SettingsService {
+      +load()
+      +update(patch)
+    }
+    class ProgressService {
+      +exerciseSeries(id, period)
+      +weeklySeries(period)
+      +contributingWorkouts(point)
+    }
+    class InputValidator {
+      +validateDate(date, timezone)
+      +validateTypedSet(input, exercise)
+      +validateName(name)
+      +normalizeName(name)
+    }
+    class UndoToken {
+      +UUID workoutId
+      +Workout priorSnapshot
+      +bool available
+    }
+    Workout "1" *-- "0..*" WorkoutEntry
+    WorkoutEntry "1" *-- "0..*" ExerciseSet
+    WorkoutEntry --> Exercise
+    Template "1" *-- "1..*" TemplateEntry
+    TemplateEntry --> Exercise
+    WorkoutService --> InputValidator
+    WorkoutService --> UndoToken
+    WorkoutService --> WorkoutRepository
+    WorkoutService --> ExerciseRepository
+    WorkoutService --> HistoryService
+    ExerciseService --> InputValidator
+    ExerciseService --> ExerciseRepository
+    HistoryService --> InputValidator
+    HistoryService --> WorkoutRepository
+    TemplateService --> TemplateRepository
+    TemplateService --> ExerciseRepository
+    TemplateService --> WorkoutService
+    SettingsService --> SettingsRepository
+    ProgressService --> WorkoutRepository
+    ProgressService --> VolumeCalculator
+    note for Exercise "Stable ID. Types: weight_reps, reps_only, seconds. Shared seed<br/>immutable; custom type locks after use."
+    note for ExerciseSet "Preserve original decimal and kg/lb unit. Reps-only has no weight;<br/>timed has seconds only."
+    note for Workout "One active per owner; finished requires a set. Date never future.<br/>Confirm mutations after SQLite commit."
+    class WorkoutState {
+      <<enumeration>>
+      in_progress
+      finished
+    }
+    class ExerciseType {
+      <<enumeration>>
+      weight_reps
+      reps_only
+      seconds
+    }
+    class WeightUnit {
+      <<enumeration>>
+      kg
+      lb
+    }
+    Workout --> WorkoutState
+    Exercise --> ExerciseType
+    ExerciseSet --> WeightUnit
+    WorkoutService --> UnitConverter
