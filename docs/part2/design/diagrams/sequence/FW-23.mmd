@@ -1,0 +1,16 @@
+sequenceDiagram
+    title FW-23: Reps-only total reps graph
+    actor U as Elena
+    participant C as ProgressController
+    participant S as ProgressService
+    participant R as WorkoutRepository
+    participant V as VolumeCalculator
+    U->>C: Open reps-only exercise progress
+    C->>S: exerciseSeries(exerciseId, period)
+    S->>R: Finished matching reps-only sets
+    R-->>S: Date, workout ID and reps
+    S->>V: Sum reps per workout
+    V-->>S: Reps series
+    S-->>C: Points with metric Total reps
+    C-->>U: Chart + accessible table and empty/sparse explanation
+    Note over C,V: Do not convert reps into weighted volume. Seconds-based exercises are recorded but not graphed.
