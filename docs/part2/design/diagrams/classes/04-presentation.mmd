@@ -1,0 +1,56 @@
+classDiagram
+    direction LR
+    class UnitConverter {
+      +convert(value, from, to) Decimal
+      +formatPrimaryAndEquivalent(set, settings) String
+      +convertPrefill(value, from, to) Decimal
+    }
+    class VolumeCalculator {
+      +weightedVolume(sets, unit) Decimal
+      +totalReps(sets) int
+      +perWorkoutSeries(workouts, exercise, unit)
+      +weeklySeries(workouts, period, unit)
+    }
+    class Period {
+      +String preset
+      +Date startInclusive
+      +Date endInclusive
+      +mondayBuckets()
+    }
+    class ProgressPoint {
+      +String id
+      +Date date
+      +Decimal value
+      +UUID[] workoutIds
+      +String metricUnit
+    }
+    class WorkoutPresenter {
+      +summary(workout, settings)
+      +typedSetRows(entry, settings)
+      +syncLabel(state)
+    }
+    class ChartPresenter {
+      +chart(series)
+      +accessibleTable(series)
+      +comparisonText(series)
+      +emptyOrSparseMessage(series)
+    }
+    class ReadabilityPresenter {
+      +applyTextScale(settings)
+      +accessibleLabels()
+      +reflowLayout()
+    }
+    ProgressService --> VolumeCalculator
+    ProgressService --> Period
+    VolumeCalculator --> UnitConverter
+    VolumeCalculator --> ProgressPoint
+    ChartPresenter --> ProgressPoint
+    WorkoutPresenter --> UnitConverter
+    WorkoutPresenter --> VolumeCalculator
+    WorkoutController --> WorkoutPresenter
+    HistoryController --> WorkoutPresenter
+    ProgressController --> ChartPresenter
+    SettingsController --> ReadabilityPresenter
+    note for UnitConverter "1 kg = 2.20462 lb. Convert before summing; round only display to one<br/>decimal. Never rewrite entered values."
+    note for VolumeCalculator "Finished nondeleted workouts only. Reps-only uses reps; seconds<br/>excluded. Weekly buckets start Monday and include empty weeks."
+    note for ReadabilityPresenter "Persistent scale through 200 percent. Wrap and scroll without missing<br/>controls; support OS accessibility."
