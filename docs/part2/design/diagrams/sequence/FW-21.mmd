@@ -1,0 +1,15 @@
+sequenceDiagram
+    title FW-21: Choose the period
+    actor U as Marcus
+    participant C as ProgressController
+    participant S as ProgressService
+    participant R as WorkoutRepository
+    participant V as VolumeCalculator
+    U->>C: Choose 4 weeks, 12 weeks, 1 year or all time
+    C->>S: Recompute current metric for selected Period
+    S->>R: Filter by saved workout date, inclusive endpoints
+    R-->>S: Matching current workouts
+    S->>V: Reaggregate metric and weekly zero buckets if applicable
+    V-->>S: New series and text-summary values
+    S-->>C: Replace chart, accessible table and summary together
+    Note over C,S: All-time begins at earliest finished workout. Empty account shows empty state. Date choice applies to every graph type.
