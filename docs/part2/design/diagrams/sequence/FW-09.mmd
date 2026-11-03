@@ -1,0 +1,43 @@
+sequenceDiagram
+    title FW-09: Log offline, upload later
+    actor U as Elena
+    participant C as SyncController
+    participant S as SyncCoordinator
+    participant R as SyncStore
+    participant G as SupabaseSyncGateway
+    participant H as MutationHandler / ChangeFeedHandler
+    participant DB as RemoteDatabase
+    U->>C: Log while offline
+    Note over U,R: Logging services atomically persist local records plus immutable OutboxOperation. UI shows saved on device / waiting.
+    C->>S: onForegroundOrReconnect()
+    S->>R: nextReadyOperation() in dependency and per-root order
+    R-->>S: Snapshot, UUID, owner, base revision, hash
+    S->>G: applyMutation(operation, authenticated session)
+    G->>H: apply_mutation
+    alt Receipt exists with same payload
+     H-->>G: Original receipt
+    else Revision or name/type/active-state conflict
+     H-->>G: Conflict with remote snapshot
+    else Valid authorized mutation
+     H->>DB: Transaction: validate, lock root, write children, receipt + change feed
+     DB-->>H: New revision
+     H-->>G: Receipt
+    end
+    G-->>S: Receipt, conflict, auth error or retryable failure
+    alt Receipt
+     S->>R: ackAndRebase -  never overwrite newer local edits
+    else Conflict
+     S->>R: preserveConflict(local, remote) -  block this root
+     S-->>C: Needs attention -  explicit reviewed resolution
+    else Offline / expired auth
+     S-->>C: Keep queue -  waiting or needs sign-in
+    end
+    S->>G: pullChanges(checkpoint)
+    G->>H: pull_changes at server high-water cursor
+    H->>DB: Owner-scoped ordered changes including tombstones
+    DB-->>H: Page and next cursor
+    H-->>G: Authorized change page
+    G-->>S: Page and next cursor
+    S->>R: Apply page + checkpoint atomically -  preserve dirty conflicts
+    Note over S,R: Retries use same operation ID -  conflict never silently overwrites. Sync runs while active, not guaranteed after OS termination.
+    Note over H,DB: Block direct client table writes. Narrow RPC uses fixed search path and explicit authenticated owner checks -  receipt/feed changes commit with the root.
