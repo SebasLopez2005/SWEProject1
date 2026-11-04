@@ -1,6 +1,6 @@
 # Story-to-design coverage and acceptance checklist
 
-Selected input: the reviewed Claude fitness final, **31 FW stories / 101 original points**. No app exists yet: every acceptance check is **not run**. Story text and original detail are preserved in [SELECTED_STORIES.md](SELECTED_STORIES.md).
+Selected input: [the revised fitness report with professor feedback](source/Fitness_Workout_Log_App_Revised_v2.docx), **31 FW stories / 101 original points**. No app exists yet: every acceptance check is **not run**. Story text and original detail are preserved in [SELECTED_STORIES.md](SELECTED_STORIES.md).
 
 | Story | Capability | Sequence | Controller / service | Original points |
 | --- | --- | --- | --- | ---: |
@@ -66,7 +66,7 @@ Status: not run.
 
 ### FW-04 - See previous performance
 
-Expected: Shows the date and sets, or “No previous record”; reflects later edits and deletions (FW-17, FW-18).
+Expected: Shows the date and sets, or “No previous record”; uses only the user’s own workouts; reflects later edits and deletions (FW-17, FW-18).
 
 Design check: Defines which prior session is shown and how local corrections affect it.
 
@@ -122,7 +122,7 @@ Status: not run.
 
 ### FW-11 - Find an exercise; recent first
 
-Expected: Search ignores case, matches anywhere and updates as the user types; with no text, the last 10 used (proposed) come first; no match offers FW-12.
+Expected: The library ships with predefined common gym and home exercises, and the user’s own are added to it; search ignores case, matches anywhere and updates as the user types; with no text, the last 10 used (proposed) come first; no match offers FW-12.
 
 Design check: Makes combined search/filter and offline recent ordering consistent for both implementations.
 
@@ -130,7 +130,7 @@ Status: not run.
 
 ### FW-12 - Create a custom exercise
 
-Expected: Name 1 to 60 characters (proposed), unique under A-EX-3; the type is locked once a set uses it.
+Expected: Name 1 to 60 characters (proposed), unique under A-EX-2; the type is locked once a set uses it; only its creator can see the exercise.
 
 Design check: Specifies private custom exercise creation, name conflicts and eventual type locking.
 
@@ -146,7 +146,7 @@ Status: not run.
 
 ### FW-14 - List finished workouts
 
-Expected: Each row shows the date, up to three exercise names (“and N more”) and the set count; older ones load on scroll; an empty history explains how to log.
+Expected: Each row shows the date, up to three exercise names (“and N more”) and the set count; only the user’s own workouts are listed; older ones load on scroll; an empty history explains how to log.
 
 Design check: Defines an accessible paged list with stable ordering and an honest empty state.
 

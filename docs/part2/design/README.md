@@ -1,6 +1,7 @@
 # Fitness & Workout Log - Mermaid design guide
 
-**Draft v1, November 2, 2026.** Selected scope: Claude gym final, all 31 FW stories.
+**Revised baseline, November 4, 2026.** Selected scope: revised fitness report with professor feedback, all 31 FW stories.
+See [the requirements alignment review](REVISED_REPORT_REVIEW.md) and [source report](source/Fitness_Workout_Log_App_Revised_v2.docx).
 Proposed stack: Expo / React Native, local SQLite and Supabase. Intended iOS
 distribution: TestFlight. This is design, not generated implementation evidence.
 
@@ -23,7 +24,7 @@ and ignored by Git; retain source/PR history as assignment evidence.
 
 ## Review before generation
 
-- Confirm that all 31 stories match the selected Claude final.
+- All 31 story paragraphs and details match the revised report; retain its roles and functional ownership rules.
 - Review conflict handling, Monday weeks, offline account access and archive rules.
 - Review screen flow and large-text behavior with both teammates.
 - Confirm Apple Developer access and the instructor's acceptance of TestFlight.
@@ -87,7 +88,7 @@ Shows the four user situations, functional modules, account/data services and th
 
 ```mermaid
 flowchart TB
-    User["Marcus / Priya / Elena / Tomas"]
+    User["Experienced lifter / Beginner lifter / Home trainer / Returning lifter"]
     subgraph System["Fitness and Workout Log - system boundary"]
       Log["Recording and resume"]
       Library["Exercise library"]
@@ -190,7 +191,8 @@ flowchart TD
     Authenticated -->|Yes| Resume{"Active workout exists?"}
     Resume -->|Yes| Choice["Resume or confirm discard"]
     Resume -->|No| Tabs
-    Choice --> Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
+    Choice -->|Resume| Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
+    Choice -->|Confirm discard| Tabs
     Tabs --> Start["Start empty or from template; today or earlier"] --> Active
     Active --> Finish{"Any completed sets?"}
     Finish -->|No| Active
@@ -947,7 +949,7 @@ sequenceDiagram
 
 ## FW-01: Start a workout, add exercises
 
-As Marcus, I want to start a workout and add exercises as I go, so that I can log in the order I actually train. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to start a workout and add exercises as I go, so that I can log in the order I actually train. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Specifies active-workout uniqueness and ordered exercise entry before logging.
 
@@ -956,7 +958,7 @@ As Marcus, I want to start a workout and add exercises as I go, so that I can lo
 ```mermaid
 sequenceDiagram
     title FW-01: Start a workout, add exercises
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
@@ -980,7 +982,7 @@ sequenceDiagram
 
 ## FW-02: Record a set with prefill
 
-As Marcus, I want to record a set by entering weight and reps, prefilled from my previous set, so that I can log between sets without losing rest time. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to record a set by entering weight and reps, prefilled from my previous set, so that I can log between sets without losing rest time. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Makes prefill precedence and durable confirmation explicit for the central recording interaction.
 
@@ -989,7 +991,7 @@ As Marcus, I want to record a set by entering weight and reps, prefilled from my
 ```mermaid
 sequenceDiagram
     title FW-02: Record a set with prefill
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
@@ -1012,7 +1014,7 @@ sequenceDiagram
 
 ## FW-03: Set form matches exercise type
 
-As Elena, I want the set form to ask only for what applies to the exercise, so that I am not forced to enter a weight for push-ups or planks. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want the set form to ask only for what applies to the exercise, so that I am not forced to enter a weight for push-ups or planks. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Prevents irrelevant weight/repetition fields from leaking into other exercise types.
 
@@ -1021,7 +1023,7 @@ As Elena, I want the set form to ask only for what applies to the exercise, so t
 ```mermaid
 sequenceDiagram
     title FW-03: Set form matches exercise type
-    actor U as Elena
+    actor U as Home trainer
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as ExerciseRepository
@@ -1044,7 +1046,7 @@ sequenceDiagram
 
 ## FW-04: See previous performance
 
-As Priya, I want to see what I did the last time I performed an exercise while I log it, so that I can choose today’s weight instead of guessing. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want to see what I did the last time I performed an exercise while I log it, so that I can choose today’s weight instead of guessing. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Defines which prior session is shown and how local corrections affect it.
 
@@ -1053,13 +1055,13 @@ As Priya, I want to see what I did the last time I performed an exercise while I
 ```mermaid
 sequenceDiagram
     title FW-04: See previous performance
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as WorkoutController
     participant S as HistoryService
     participant R as WorkoutRepository
     U->>C: Add exercise while logging
     C->>S: latestPerformance(exerciseId)
-    S->>R: Latest finished nondeleted workout containing exercise
+    S->>R: Latest own finished nondeleted workout containing exercise
     R-->>S: Date and ordered typed sets, or none
     S-->>C: Current sets with original units
     C-->>U: Previous date and formatted sets -  else No previous record
@@ -1068,7 +1070,7 @@ sequenceDiagram
 
 ## FW-05: Correct or remove a set or entry
 
-As Marcus, I want to correct or remove a set, or remove an entry, during a workout, so that one mistaken tap does not corrupt my history. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to correct or remove a set, or remove an entry, during a workout, so that one mistaken tap does not corrupt my history. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Preserves correction, confirmation and immediate undo behavior without renumbering corruption.
 
@@ -1077,7 +1079,7 @@ As Marcus, I want to correct or remove a set, or remove an entry, during a worko
 ```mermaid
 sequenceDiagram
     title FW-05: Correct or remove a set or entry
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
@@ -1103,7 +1105,7 @@ sequenceDiagram
 
 ## FW-06: Finish workout, see summary
 
-As Tomás, I want to finish a workout and see a short, plain summary, so that I know it is saved and can read what I did. The flow identifies its UI controller, domain service and data boundary.
+As a returning lifter, I want to finish a workout and see a short, plain summary, so that I know it is saved and can read what I did. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Distinguishes a locally saved finish from a successfully uploaded record.
 
@@ -1112,7 +1114,7 @@ As Tomás, I want to finish a workout and see a short, plain summary, so that I 
 ```mermaid
 sequenceDiagram
     title FW-06: Finish workout, see summary
-    actor U as Tomas
+    actor U as Returning lifter
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
@@ -1132,7 +1134,7 @@ sequenceDiagram
 
 ## FW-07: Resume an unfinished workout
 
-As Priya, I want my unfinished workout to still be there if I switch apps or my phone locks, so that an interruption does not cost me the session. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want my unfinished workout to still be there if I switch apps or my phone locks, so that an interruption does not cost me the session. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Requires actual process-restart persistence rather than an in-memory resume flag.
 
@@ -1141,7 +1143,7 @@ As Priya, I want my unfinished workout to still be there if I switch apps or my 
 ```mermaid
 sequenceDiagram
     title FW-07: Resume an unfinished workout
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
@@ -1166,7 +1168,7 @@ sequenceDiagram
 
 ## FW-08: Record a workout on an earlier date
 
-As Elena, I want to record a workout I already did by choosing an earlier date, so that I can catch up when I could not use my phone during the session. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to record a workout I already did by choosing an earlier date, so that I can catch up when I could not use my phone during the session. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Separates a training calendar date from timestamps so delayed logging is graphed correctly.
 
@@ -1175,7 +1177,7 @@ As Elena, I want to record a workout I already did by choosing an earlier date, 
 ```mermaid
 sequenceDiagram
     title FW-08: Record a workout on an earlier date
-    actor U as Elena
+    actor U as Home trainer
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
@@ -1194,7 +1196,7 @@ sequenceDiagram
 
 ## FW-09: Log offline, upload later
 
-As Elena, I want to log a workout when I have no connection and have it uploaded later, so that I never lose a session because of my signal. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to log a workout when I have no connection and have it uploaded later, so that I never lose a session because of my signal. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Models the highest-risk cross-system path, including retries, receipts, conflicts and pull checkpoints.
 
@@ -1203,7 +1205,7 @@ As Elena, I want to log a workout when I have no connection and have it uploaded
 ```mermaid
 sequenceDiagram
     title FW-09: Log offline, upload later
-    actor U as Elena
+    actor U as Home trainer
     participant C as SyncController
     participant S as SyncCoordinator
     participant R as SyncStore
@@ -1248,7 +1250,7 @@ sequenceDiagram
 
 ## FW-10: Choose kg or lb
 
-As Priya, I want to choose whether weights are shown in kg or lb, so that entries match the plates and machines I use. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want to choose whether weights are shown in kg or lb, so that entries match the plates and machines I use. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Keeps account display preferences separate from immutable entered measurements.
 
@@ -1257,7 +1259,7 @@ As Priya, I want to choose whether weights are shown in kg or lb, so that entrie
 ```mermaid
 sequenceDiagram
     title FW-10: Choose kg or lb
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as SettingsController
     participant S as SettingsService
     participant R as SettingsRepository
@@ -1272,7 +1274,7 @@ sequenceDiagram
 
 ## FW-11: Find an exercise; recent first
 
-As Priya, I want to find an exercise by typing part of its name or filtering by muscle group, with recent ones first, so that I can add the right exercise without knowing its exact name. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want to find an exercise by typing part of its name or filtering by muscle group, with recent ones first, so that I can add the right exercise without knowing its exact name. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Makes combined search/filter and offline recent ordering consistent for both implementations.
 
@@ -1281,7 +1283,7 @@ As Priya, I want to find an exercise by typing part of its name or filtering by 
 ```mermaid
 sequenceDiagram
     title FW-11: Find an exercise -  recent first
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
@@ -1295,12 +1297,12 @@ sequenceDiagram
     else Matches
      C-->>U: Select exercise by stable ID
     end
-    Note over S,R: Search works offline using bundled/cached catalog. Shared seed count is unspecified. Source default is up to 10 recent items first.
+    Note over S,R: Search works offline using bundled/cached catalog. FW-11 requires predefined common gym and home exercises plus the user's own. Seed count is unspecified. Source default is up to 10 recent items first.
 ```
 
 ## FW-12: Create a custom exercise
 
-As Elena, I want to create my own exercise with a name and a type, so that I can log home and unusual movements the library lacks. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to create my own exercise with a name and a type, so that I can log home and unusual movements the library lacks. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Specifies private custom exercise creation, name conflicts and eventual type locking.
 
@@ -1309,27 +1311,27 @@ As Elena, I want to create my own exercise with a name and a type, so that I can
 ```mermaid
 sequenceDiagram
     title FW-12: Create a custom exercise
-    actor U as Elena
+    actor U as Home trainer
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
     U->>C: Name, type and muscle group for custom exercise
     C->>S: create(input)
-    S->>S: Validate name -  normalize case and whitespace
+    S->>S: Validate name -  ignore case and spaces for uniqueness (A-EX-2)
     S->>R: Check name against shared and own custom catalog
     alt Duplicate or invalid
      S-->>C: Explain and retain form
     else Unique
      S->>R: mutateAndEnqueue(new owned exercise UUID)
      R-->>S: Local commit
-     S-->>C: Exercise available offline
+     S-->>C: Exercise available offline to its creator only
     end
     Note over S,R: Nonempty name up to source-proposed 60 chars. Type becomes immutable after any set references it. Sync uploads exercise before dependent workout/template.
 ```
 
 ## FW-13: Rename or archive a custom exercise
 
-As Marcus, I want to rename or archive a custom exercise, so that I can tidy my library without losing history. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to rename or archive a custom exercise, so that I can tidy my library without losing history. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Keeps rename/archive changes attached to stable exercise identities and historical sets.
 
@@ -1338,7 +1340,7 @@ As Marcus, I want to rename or archive a custom exercise, so that I can tidy my 
 ```mermaid
 sequenceDiagram
     title FW-13: Rename or archive a custom exercise
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
@@ -1357,7 +1359,7 @@ sequenceDiagram
 
 ## FW-14: List finished workouts
 
-As Tomás, I want to see a list of my finished workouts with dates, exercises and number of sets, so that I can quickly check when and what I trained. The flow identifies its UI controller, domain service and data boundary.
+As a returning lifter, I want to see a list of my finished workouts with dates, exercises and number of sets, so that I can quickly check when and what I trained. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Defines an accessible paged list with stable ordering and an honest empty state.
 
@@ -1366,13 +1368,13 @@ As Tomás, I want to see a list of my finished workouts with dates, exercises an
 ```mermaid
 sequenceDiagram
     title FW-14: List finished workouts
-    actor U as Tomas
+    actor U as Returning lifter
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
     U->>C: Open history / scroll for older rows
     C->>S: list(filter, cursor)
-    S->>R: Finished nondeleted workouts ordered date DESC, ID DESC
+    S->>R: Own finished nondeleted workouts ordered date DESC, ID DESC
     R-->>S: Page and stable next cursor
     S-->>C: Date, first three exercise names, and N more, set count
     alt Empty history
@@ -1385,7 +1387,7 @@ sequenceDiagram
 
 ## FW-15: Open a past workout
 
-As Marcus, I want to open a past workout and see every exercise and set as recorded, so that I can plan a repeat or check what I did. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to open a past workout and see every exercise and set as recorded, so that I can plan a repeat or check what I did. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Provides complete, current records without forcing users through graphs.
 
@@ -1394,7 +1396,7 @@ As Marcus, I want to open a past workout and see every exercise and set as recor
 ```mermaid
 sequenceDiagram
     title FW-15: Open a past workout
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
@@ -1413,7 +1415,7 @@ sequenceDiagram
 
 ## FW-16: History of one exercise
 
-As Marcus, I want to see every time I performed one exercise, with the sets from each session, so that I can follow one lift in numbers. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to see every time I performed one exercise, with the sets from each session, so that I can follow one lift in numbers. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Makes exercise-level history reachable and robust to renaming/archiving.
 
@@ -1422,7 +1424,7 @@ As Marcus, I want to see every time I performed one exercise, with the sets from
 ```mermaid
 sequenceDiagram
     title FW-16: History of one exercise
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
@@ -1437,7 +1439,7 @@ sequenceDiagram
 
 ## FW-17: Edit a finished workout
 
-As Elena, I want to edit a finished workout, so that I can fix mistakes I notice later. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to edit a finished workout, so that I can fix mistakes I notice later. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Carries all original validation rules into finished-record correction and derived views.
 
@@ -1446,7 +1448,7 @@ As Elena, I want to edit a finished workout, so that I can fix mistakes I notice
 ```mermaid
 sequenceDiagram
     title FW-17: Edit a finished workout
-    actor U as Elena
+    actor U as Home trainer
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
@@ -1466,7 +1468,7 @@ sequenceDiagram
 
 ## FW-18: Delete a finished workout
 
-As Elena, I want to delete a finished workout after confirming, so that accidental or test entries do not distort my history and graphs. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to delete a finished workout after confirming, so that accidental or test entries do not distort my history and graphs. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Explains both user-visible permanent deletion and internal synchronization tombstones.
 
@@ -1475,7 +1477,7 @@ As Elena, I want to delete a finished workout after confirming, so that accident
 ```mermaid
 sequenceDiagram
     title FW-18: Delete a finished workout
-    actor U as Elena
+    actor U as Home trainer
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
@@ -1495,7 +1497,7 @@ sequenceDiagram
 
 ## FW-19: Filter history
 
-As Priya, I want to narrow my history to a date range or to one exercise, so that I can find a specific period or lift without scrolling. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want to narrow my history to a date range or to one exercise, so that I can find a specific period or lift without scrolling. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Prevents date and exercise filters from accidentally replacing each other.
 
@@ -1504,7 +1506,7 @@ As Priya, I want to narrow my history to a date range or to one exercise, so tha
 ```mermaid
 sequenceDiagram
     title FW-19: Filter history
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
@@ -1524,7 +1526,7 @@ sequenceDiagram
 
 ## FW-20: Per-exercise volume graph
 
-As Marcus, I want to see a graph of my total volume for one exercise over time, so that I can tell whether I am lifting more than before. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to see a graph of my total volume for one exercise over time, so that I can tell whether I am lifting more than before. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Ties exercise chart points directly to converted source sets and workout IDs.
 
@@ -1533,7 +1535,7 @@ As Marcus, I want to see a graph of my total volume for one exercise over time, 
 ```mermaid
 sequenceDiagram
     title FW-20: Per-exercise volume graph
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as ProgressController
     participant S as ProgressService
     participant R as WorkoutRepository
@@ -1551,7 +1553,7 @@ sequenceDiagram
 
 ## FW-21: Choose the period
 
-As Marcus, I want to choose the period shown on a graph, so that I can compare recent weeks with the longer trend. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to choose the period shown on a graph, so that I can compare recent weeks with the longer trend. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Keeps chart, table and explanation synchronized when period controls change.
 
@@ -1560,7 +1562,7 @@ As Marcus, I want to choose the period shown on a graph, so that I can compare r
 ```mermaid
 sequenceDiagram
     title FW-21: Choose the period
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as ProgressController
     participant S as ProgressService
     participant R as WorkoutRepository
@@ -1577,7 +1579,7 @@ sequenceDiagram
 
 ## FW-22: Overall weekly volume graph
 
-As Priya, I want to see my total volume per week across all weight-based exercises, so that I can tell whether I am training more overall. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want to see my total volume per week across all weight-based exercises, so that I can tell whether I am training more overall. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Defines weekly bucketing, zero weeks and the zero-denominator comparison case.
 
@@ -1586,7 +1588,7 @@ As Priya, I want to see my total volume per week across all weight-based exercis
 ```mermaid
 sequenceDiagram
     title FW-22: Overall weekly volume graph
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as ProgressController
     participant S as ProgressService
     participant R as WorkoutRepository
@@ -1604,7 +1606,7 @@ sequenceDiagram
 
 ## FW-23: Reps-only total reps graph
 
-As Elena, I want to see my total reps per workout for a reps-only exercise, so that I can follow progress on bodyweight exercises. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to see my total reps per workout for a reps-only exercise, so that I can follow progress on bodyweight exercises. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Avoids assigning weighted volume or kilograms to reps-only exercises.
 
@@ -1613,7 +1615,7 @@ As Elena, I want to see my total reps per workout for a reps-only exercise, so t
 ```mermaid
 sequenceDiagram
     title FW-23: Reps-only total reps graph
-    actor U as Elena
+    actor U as Home trainer
     participant C as ProgressController
     participant S as ProgressService
     participant R as WorkoutRepository
@@ -1631,7 +1633,7 @@ sequenceDiagram
 
 ## FW-24: Select a point, open workout
 
-As Marcus, I want to select a point on a graph to see its date and value and open that workout, so that I can understand an unusually high or low session. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to select a point on a graph to see its date and value and open that workout, so that I can understand an unusually high or low session. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Preserves the link from a chart/table point to the actual contributing records.
 
@@ -1640,7 +1642,7 @@ As Marcus, I want to select a point on a graph to see its date and value and ope
 ```mermaid
 sequenceDiagram
     title FW-24: Select a point, open workout
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as ProgressController
     participant S as ProgressService
     participant R as WorkoutRepository
@@ -1661,7 +1663,7 @@ sequenceDiagram
 
 ## FW-25: Save workout as template
 
-As Elena, I want to save the exercises of a finished workout as a named template, so that I can start my usual routine again without re-entering it. The flow identifies its UI controller, domain service and data boundary.
+As a home trainer, I want to save the exercises of a finished workout as a named template, so that I can start my usual routine again without re-entering it. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Makes templates independent exercise lists rather than copies of performed sets.
 
@@ -1670,7 +1672,7 @@ As Elena, I want to save the exercises of a finished workout as a named template
 ```mermaid
 sequenceDiagram
     title FW-25: Save workout as template
-    actor U as Elena
+    actor U as Home trainer
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
@@ -1692,7 +1694,7 @@ sequenceDiagram
 
 ## FW-26: Start workout from template
 
-As Marcus, I want to start a workout from a template, so that its exercises are already in the workout when I begin. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to start a workout from a template, so that its exercises are already in the workout when I begin. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Defines archived exercise handling and avoids copying prescribed loads into a workout.
 
@@ -1701,7 +1703,7 @@ As Marcus, I want to start a workout from a template, so that its exercises are 
 ```mermaid
 sequenceDiagram
     title FW-26: Start workout from template
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
@@ -1712,7 +1714,7 @@ sequenceDiagram
     R-->>S: Ordered IDs with archive flags
     S-->>C: Mark archived exercises and offer skip
     U->>C: Confirm selection
-    S->>W: start(today) -  add selected active exercises in order
+    S->>W: start(today) -  add retained exercises in order, including marked archived references
     W-->>S: New active workout committed via local transaction/outbox
     S-->>C: Empty typed entries -  previous performance available
     Note over C,S: Template unchanged. Existing active workout triggers resume/discard. No load/reps prescription copied from template.
@@ -1720,7 +1722,7 @@ sequenceDiagram
 
 ## FW-27: Create and edit a template
 
-As Priya, I want to create and edit a template by choosing exercises myself, so that I can set up my plan at home before going to the gym. The flow identifies its UI controller, domain service and data boundary.
+As a beginner lifter, I want to create and edit a template by choosing exercises myself, so that I can set up my plan at home before going to the gym. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Captures name validation, ordering and independent template edits.
 
@@ -1729,7 +1731,7 @@ As Priya, I want to create and edit a template by choosing exercises myself, so 
 ```mermaid
 sequenceDiagram
     title FW-27: Create and edit a template
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
@@ -1746,7 +1748,7 @@ sequenceDiagram
 
 ## FW-28: Delete a template
 
-As Marcus, I want to delete a template, so that I can retire routines I no longer use. The flow identifies its UI controller, domain service and data boundary.
+As an experienced lifter, I want to delete a template, so that I can retire routines I no longer use. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Ensures deleting a saved routine never deletes workouts started from it.
 
@@ -1755,7 +1757,7 @@ As Marcus, I want to delete a template, so that I can retire routines I no longe
 ```mermaid
 sequenceDiagram
     title FW-28: Delete a template
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
@@ -1774,7 +1776,7 @@ sequenceDiagram
 
 ## FW-29: Larger text size
 
-As Tomás, I want to make the text larger, so that I can read my workouts and summaries without straining. The flow identifies its UI controller, domain service and data boundary.
+As a returning lifter, I want to make the text larger, so that I can read my workouts and summaries without straining. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Makes large text a persistent app-wide presentation behavior.
 
@@ -1783,7 +1785,7 @@ As Tomás, I want to make the text larger, so that I can read my workouts and su
 ```mermaid
 sequenceDiagram
     title FW-29: Larger text size
-    actor U as Tomas
+    actor U as Returning lifter
     participant C as SettingsController
     participant S as SettingsService
     participant R as SettingsRepository
@@ -1800,7 +1802,7 @@ sequenceDiagram
 
 ## FW-30: See both units
 
-As Tomás, I want to see each weight with its equivalent in the other unit, so that I know how much to load when a gym’s plates use a different unit. The flow identifies its UI controller, domain service and data boundary.
+As a returning lifter, I want to see each weight with its equivalent in the other unit, so that I know how much to load when a gym’s plates use a different unit. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Uses one conversion/formatting path for every equivalent weight display.
 
@@ -1809,7 +1811,7 @@ As Tomás, I want to see each weight with its equivalent in the other unit, so t
 ```mermaid
 sequenceDiagram
     title FW-30: See both units
-    actor U as Tomas
+    actor U as Returning lifter
     participant C as SettingsController
     participant S as SettingsService
     participant R as SettingsRepository
@@ -1826,7 +1828,7 @@ sequenceDiagram
 
 ## FW-31: Enter a set in either unit
 
-As Tomás, I want to enter a set in either kg or lb, so that I can log what the plates say without converting. The flow identifies its UI controller, domain service and data boundary.
+As a returning lifter, I want to enter a set in either kg or lb, so that I can log what the plates say without converting. The flow identifies its UI controller, domain service and data boundary.
 
 **Design value:** Prevents a unit switch from silently reinterpreting a number without conversion.
 
@@ -1835,7 +1837,7 @@ As Tomás, I want to enter a set in either kg or lb, so that I can log what the 
 ```mermaid
 sequenceDiagram
     title FW-31: Enter a set in either unit
-    actor U as Tomas
+    actor U as Returning lifter
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository

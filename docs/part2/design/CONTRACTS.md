@@ -31,7 +31,7 @@ Recommended indexes follow reads rather than speculative size promises: owner/wo
 
 ## Domain validation
 
-- No empty exercise/template name; initially retain the source proposal of 1-60 characters. Custom exercise name normalization trims/collapses whitespace and case-folds; enforce against shared names as well as the owner's custom names. Template names are unique per owner ignoring case.
+- No empty exercise/template name; initially retain the source proposal of 1-60 characters. Custom exercise name normalization removes spaces and case-folds (revised A-EX-2); enforce against shared names as well as the owner's custom names. Template names are unique per owner ignoring case.
 - Weighted sets: finite decimal weight from 0 through 999.9 in the entered unit, whole reps from 1 through 999. Reps-only: reps only. Timed: whole seconds at least 1. Disallow irrelevant fields rather than summing them accidentally. These source-proposed bounds can be changed by a reviewed diagram revision.
 - A new set copies the previous set in that entry. If none exists, use the latest finished set for the exercise. If prefill must change unit, convert the value before applying it, without changing its source record. An empty history produces an unfilled form, never a guessed training recommendation.
 - Exercise search combines case-insensitive substring and muscle filters. With no text, show up to the source-proposed 10 recent exercises first; do not infer that the library contains any promised number of exercises.

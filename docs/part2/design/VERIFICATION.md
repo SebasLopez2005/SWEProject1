@@ -15,3 +15,10 @@ Local render outputs are ignored under `design/rendered/`; regenerate with the r
 Update November 3: initial design PRs published one by one as a draft stack; see [PR history](../experiments/PR_HISTORY.md). No merges or generations.
 
 Pending: teammate review, baseline merge/freeze, actual model generations, native tests, two-model comparison and deployment. Review the proposed conflict/date/auth decisions before freezing the design.
+
+## Revised report alignment November 4
+
+- Adopted the retained revised DOCX as the requirements baseline; all 31 story paragraphs and acceptance details match it exactly.
+- Updated role actors, functional ownership behavior, FW-11 library requirement and A-EX-2 references. Corrected discard navigation and archived template handling. See [alignment review](REVISED_REPORT_REVIEW.md) for findings and remaining source/design distinctions.
+- All 42 diagrams rendered successfully to SVG and PNG using Mermaid CLI and installed headless Chrome. Visually inspected the changed context/navigation and FW-04/FW-11/FW-12/FW-14 sheets together; render success alone is not an app acceptance test.
+- The design checker passes revised story/detail parity, role actors, description/acceptance mirrors, 31 stories / 101 points, all 42 indexed sources, class participants, current links and integrity of 41 archived files. `git diff --check` passes.

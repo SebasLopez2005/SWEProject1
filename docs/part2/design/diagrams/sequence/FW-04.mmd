@@ -1,12 +1,12 @@
 sequenceDiagram
     title FW-04: See previous performance
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as WorkoutController
     participant S as HistoryService
     participant R as WorkoutRepository
     U->>C: Add exercise while logging
     C->>S: latestPerformance(exerciseId)
-    S->>R: Latest finished nondeleted workout containing exercise
+    S->>R: Latest own finished nondeleted workout containing exercise
     R-->>S: Date and ordered typed sets, or none
     S-->>C: Current sets with original units
     C-->>U: Previous date and formatted sets -  else No previous record

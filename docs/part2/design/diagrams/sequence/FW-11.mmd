@@ -1,6 +1,6 @@
 sequenceDiagram
     title FW-11: Find an exercise -  recent first
-    actor U as Priya
+    actor U as Beginner lifter
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
@@ -14,4 +14,4 @@ sequenceDiagram
     else Matches
      C-->>U: Select exercise by stable ID
     end
-    Note over S,R: Search works offline using bundled/cached catalog. Shared seed count is unspecified. Source default is up to 10 recent items first.
+    Note over S,R: Search works offline using bundled/cached catalog. FW-11 requires predefined common gym and home exercises plus the user's own. Seed count is unspecified. Source default is up to 10 recent items first.

@@ -15,7 +15,8 @@ DESIGN = ROOT / 'docs/part2/design'
 def guide_text(index):
     text = '''# Fitness & Workout Log - Mermaid design guide
 
-**Draft v1, November 2, 2026.** Selected scope: Claude gym final, all 31 FW stories.
+**Revised baseline, November 4, 2026.** Selected scope: revised fitness report with professor feedback, all 31 FW stories.
+See [the requirements alignment review](REVISED_REPORT_REVIEW.md) and [source report](source/Fitness_Workout_Log_App_Revised_v2.docx).
 Proposed stack: Expo / React Native, local SQLite and Supabase. Intended iOS
 distribution: TestFlight. This is design, not generated implementation evidence.
 
@@ -38,7 +39,7 @@ and ignored by Git; retain source/PR history as assignment evidence.
 
 ## Review before generation
 
-- Confirm that all 31 stories match the selected Claude final.
+- All 31 story paragraphs and details match the revised report; retain its roles and functional ownership rules.
 - Review conflict handling, Monday weeks, offline account access and archive rules.
 - Review screen flow and large-text behavior with both teammates.
 - Confirm Apple Developer access and the instructor's acceptance of TestFlight.
@@ -82,6 +83,16 @@ def main():
             errors.append(f'Archived file missing or changed: {path}')
 
     stories = json.loads((DESIGN / 'stories.json').read_text())
+    from zipfile import ZipFile
+    from xml.etree import ElementTree as ET
+    with ZipFile(DESIGN / 'source/Fitness_Workout_Log_App_Revised_v2.docx') as source:
+        root = ET.fromstring(source.read('word/document.xml'))
+    ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+    paragraphs = [''.join(t.text or '' for t in p.findall('.//w:t', ns)) for p in root.findall('.//w:p', ns)]
+    for story in stories:
+        matches = [i for i, p in enumerate(paragraphs) if p.startswith(story['id'] + '. As ')]
+        if len(matches) != 1 or paragraphs[matches[0]].split('. ', 1)[1] != story['story'] or paragraphs[matches[0] + 1] != story['detail']:
+            errors.append(f"Revised report story/detail mismatch: {story['id']}")
     ids = [s['id'] for s in stories]
     expected_ids = [f'FW-{i:02d}' for i in range(1, 32)]
     if ids != expected_ids or sum(s['points'] for s in stories) != 101:
@@ -96,6 +107,15 @@ def main():
     coverage = (DESIGN / 'TRACEABILITY.md').read_text()
     for story in stories:
         source = (DESIGN / story['sequence']).read_text()
+        description = index[story['sequence'].removeprefix('diagrams/')][1]
+        if not description.startswith(story['story']):
+            errors.append(f"Diagram description differs from revised story: {story['id']}")
+        role = story['story'].split(', I want', 1)[0].removeprefix('As ')
+        role = re.sub(r'^(an?|the) ', '', role).capitalize()
+        if f'actor U as {role}' not in source:
+            errors.append(f"Sequence actor differs from revised role: {story['id']}")
+        if f"Expected: {story['detail']}" not in coverage:
+            errors.append(f"Acceptance detail differs from revised report: {story['id']}")
         if f"title {story['id']}:" not in source or story['id'] not in coverage:
             errors.append(f"Missing sequence/coverage: {story['id']}")
         for alias in re.findall(r'^\s*participant\s+\w+\s+as\s+(.+)$', source, re.M):
