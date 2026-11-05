@@ -1,0 +1,24 @@
+sequenceDiagram
+    title FW-05: Correct or remove a set or entry
+    actor U as Marcus
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Edit set or remove set/entry
+    alt Remove
+     C-->>U: Confirm removal
+     U->>C: Confirm or cancel
+    end
+    opt Confirmed removal or valid edit
+     C->>S: mutateActive(patch)
+     S->>S: Validate -  capture prior snapshot in UndoToken
+     S->>R: mutateAndEnqueue(edited workout -  renumber positions)
+     R-->>S: Local commit
+     S-->>C: Updated sets and immediate undo option
+     opt User selects immediate undo
+      C->>S: undo(token)
+      S->>R: mutateAndEnqueue(restored snapshot)
+      R-->>C: Committed restored record
+     end
+    end
+    Note over C,S: Cancel changes nothing. Undo expires on subsequent mutation/navigation -  sync preserves operation order.
