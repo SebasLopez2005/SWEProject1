@@ -1,0 +1,18 @@
+sequenceDiagram
+    title FW-06: Finish workout, see summary
+    actor U as Tomas
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Finish workout
+    C->>S: finish()
+    S->>S: Drop empty entries -  validate remaining sets
+    alt No sets remain
+     S-->>C: Explain -  continue recording or discard
+    else At least one set
+     S->>R: mutateAndEnqueue(finished workout + finish timestamp)
+     R-->>S: Local commit
+     S-->>C: Finished workout and dropped-entry notice
+     C-->>U: Plain date, duration if known, exercises, sets, volume and sync status
+    end
+    Note over C,R: A summary means saved locally -  uploaded is shown only after cloud receipt. Timed/reps-only values remain distinct from weighted volume.
