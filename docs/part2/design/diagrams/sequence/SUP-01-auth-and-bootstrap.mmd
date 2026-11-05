@@ -1,0 +1,31 @@
+sequenceDiagram
+    title Supporting flow: authentication and local isolation
+    actor U as User
+    participant C as AuthController
+    participant A as AuthService
+    participant G as SupabaseAuthGateway
+    participant B as AppBootstrap
+    participant D as LocalDatabase
+    participant S as SyncCoordinator
+    U->>C: Launch / sign in
+    C->>A: restoreSession or signIn
+    A->>G: Restore cached identity -  refresh online if possible
+    alt First sign-in without connection
+      G-->>C: Explain connection required -  no data from another owner
+    else Authenticated or previously authenticated offline
+      G-->>A: Owner ID and session state
+      A->>B: Bootstrap this owner
+      B->>D: Open isolated partition -  migrate -  seed -  load settings
+      B-->>C: Main UI and offer resume
+      B->>S: Start authenticated foreground/reconnect triggers
+    end
+    U->>C: Sign out / change account
+    C->>A: signOutIfSafe()
+    A->>S: hasPendingOrConflicts()
+    alt Pending or conflicting work
+      S-->>C: Block -  sync/resolve or explicitly confirm discard
+    else Safe or explicit informed discard
+      A->>G: Clear session
+      C->>D: Close partition -  clear in-memory records
+      C-->>U: Sign-in screen
+    end
