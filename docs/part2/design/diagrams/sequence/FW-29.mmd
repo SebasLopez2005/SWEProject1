@@ -1,0 +1,15 @@
+sequenceDiagram
+    title FW-29: Larger text size
+    actor U as Tomas
+    participant C as SettingsController
+    participant S as SettingsService
+    participant R as SettingsRepository
+    participant P as ReadabilityPresenter
+    U->>C: Choose larger text up to 200 percent
+    C->>S: update(textScale)
+    S->>R: mutateAndEnqueue(settings)
+    R-->>S: Local commit
+    S-->>C: Persistent preference
+    C->>P: applyTextScale and reflowLayout
+    P-->>U: Readable entry, history, summary, template and settings controls
+    Note over C,P: Wrap/scroll without losing content. Provide plain labels, screen-reader labels and text/table chart alternatives. Restore preference at launch.
