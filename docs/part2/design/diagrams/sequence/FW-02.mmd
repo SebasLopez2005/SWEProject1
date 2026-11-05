@@ -1,0 +1,21 @@
+sequenceDiagram
+    title FW-02: Record a set with prefill
+    actor U as Marcus
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Open next weighted set
+    C->>S: prefill(entryId)
+    S->>R: Current entry and latest finished performance
+    R-->>S: Prior set or no history
+    S-->>C: Prefill current-entry last set -  else latest finished set
+    U->>C: Confirm weight, unit and reps
+    C->>S: recordSet(input)
+    alt Invalid input
+     S-->>C: Explain field -  keep input
+    else Valid typed set
+     S->>R: mutateAndEnqueue(workout with appended set)
+     R-->>S: Commit or storage error
+     S-->>C: Confirm after commit -  else keep input and show not saved
+    end
+    Note over C,S: Source validation choices: weight 0..999.9 entered-unit -  integer reps 1..999. No guessed load if history empty.
