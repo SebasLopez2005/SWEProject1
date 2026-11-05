@@ -1,0 +1,18 @@
+sequenceDiagram
+    title FW-17: Edit a finished workout
+    actor U as Elena
+    participant C as HistoryController
+    participant S as HistoryService
+    participant R as WorkoutRepository
+    U->>C: Edit finished workout date / entries / sets
+    C->>S: editFinished(id, patch)
+    S->>S: Apply typed-set rules, nonfuture date, at least one set
+    alt Invalid or empty result
+     S-->>C: Explain -  keep saved version and editor input
+    else Valid
+     S->>R: mutateAndEnqueue(updated full snapshot)
+     R-->>S: Local commit
+     S-->>C: Updated summary
+     C-->>U: History, previous performance and graphs reflect edit
+    end
+    Note over S,R: Works offline -  local data event invalidates derived views. Later upload uses expected revision, with explicit conflict if remote changed.
