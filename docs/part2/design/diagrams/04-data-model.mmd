@@ -1,0 +1,111 @@
+erDiagram
+    ACCOUNT ||--o{ WORKOUT : owns
+    ACCOUNT ||--o{ EXERCISE : owns_custom
+    ACCOUNT ||--o{ TEMPLATE : owns
+    ACCOUNT ||--|| USER_SETTINGS : prefers
+    WORKOUT ||--o{ WORKOUT_ENTRY : orders
+    WORKOUT_ENTRY ||--o{ EXERCISE_SET : contains
+    EXERCISE ||--o{ WORKOUT_ENTRY : identifies
+    TEMPLATE ||--o{ TEMPLATE_ENTRY : orders
+    EXERCISE ||--o{ TEMPLATE_ENTRY : references
+    ACCOUNT ||--o{ OUTBOX_OPERATION : local_queue
+    ACCOUNT ||--o{ SYNC_CONFLICT : local_preservation
+    ACCOUNT ||--|| SYNC_CHECKPOINT : local_cursor
+    ACCOUNT ||--o{ MUTATION_RECEIPT : server_deduplication
+    ACCOUNT ||--o{ CHANGE_EVENT : server_pull_feed
+    ACCOUNT { uuid id PK }
+    WORKOUT {
+      uuid id PK
+      uuid owner_id FK
+      date workout_date
+      string state
+      datetime started_at
+      datetime finished_at
+      int revision
+      datetime deleted_at
+    }
+    WORKOUT_ENTRY {
+      uuid id PK
+      uuid workout_id FK
+      uuid exercise_id FK
+      int position
+    }
+    EXERCISE_SET {
+      uuid id PK
+      uuid entry_id FK
+      int position
+      decimal entered_weight
+      string entered_unit
+      int reps
+      int seconds
+    }
+    EXERCISE {
+      uuid id PK
+      uuid owner_id FK "null for shared seed"
+      string name
+      string normalized_name
+      string exercise_type
+      string muscle_group
+      boolean archived
+      boolean ever_used
+      int revision
+    }
+    TEMPLATE {
+      uuid id PK
+      uuid owner_id FK
+      string name
+      string normalized_name
+      int revision
+      datetime deleted_at
+    }
+    TEMPLATE_ENTRY {
+      uuid id PK
+      uuid template_id FK
+      uuid exercise_id FK
+      int position
+    }
+    USER_SETTINGS {
+      uuid owner_id PK
+      string preferred_unit
+      boolean show_equivalent
+      decimal text_scale
+      int revision
+    }
+    OUTBOX_OPERATION {
+      uuid operation_id PK
+      uuid owner_id FK
+      uuid aggregate_id
+      string aggregate_kind
+      int local_sequence
+      int base_revision
+      string immutable_payload
+      string payload_hash
+      string timezone
+      int schema_version
+    }
+    SYNC_CONFLICT {
+      uuid id PK
+      uuid owner_id FK
+      uuid aggregate_id
+      string local_snapshot
+      string remote_snapshot
+      string reason
+    }
+    SYNC_CHECKPOINT {
+      uuid owner_id PK
+      bigint last_cursor
+    }
+    MUTATION_RECEIPT {
+      uuid operation_id PK "paired with owner"
+      uuid owner_id FK
+      string payload_hash
+      int resulting_revision
+    }
+    CHANGE_EVENT {
+      bigint cursor PK
+      uuid owner_id FK
+      uuid aggregate_id
+      string aggregate_kind
+      int revision
+      string snapshot_or_tombstone
+    }
