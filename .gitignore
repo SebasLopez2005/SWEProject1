@@ -1,0 +1,16 @@
+.DS_Store
+~$*
+node_modules/
+.expo/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.ipa
+*.apk
+*.aab
+*.mobileprovision
+*.p12
+*.p8
+docs/part2/design/rendered/
