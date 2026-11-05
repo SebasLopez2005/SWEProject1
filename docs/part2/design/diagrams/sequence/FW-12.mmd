@@ -1,18 +1,18 @@
 sequenceDiagram
     title FW-12: Create a custom exercise
-    actor U as Elena
+    actor U as Home trainer
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
     U->>C: Name, type and muscle group for custom exercise
     C->>S: create(input)
-    S->>S: Validate name -  normalize case and whitespace
+    S->>S: Validate name -  ignore case and spaces for uniqueness (A-EX-2)
     S->>R: Check name against shared and own custom catalog
     alt Duplicate or invalid
      S-->>C: Explain and retain form
     else Unique
      S->>R: mutateAndEnqueue(new owned exercise UUID)
      R-->>S: Local commit
-     S-->>C: Exercise available offline
+     S-->>C: Exercise available offline to its creator only
     end
     Note over S,R: Nonempty name up to source-proposed 60 chars. Type becomes immutable after any set references it. Sync uploads exercise before dependent workout/template.

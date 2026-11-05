@@ -1,12 +1,12 @@
 sequenceDiagram
     title FW-14: List finished workouts
-    actor U as Tomas
+    actor U as Returning lifter
     participant C as HistoryController
     participant S as HistoryService
     participant R as WorkoutRepository
     U->>C: Open history / scroll for older rows
     C->>S: list(filter, cursor)
-    S->>R: Finished nondeleted workouts ordered date DESC, ID DESC
+    S->>R: Own finished nondeleted workouts ordered date DESC, ID DESC
     R-->>S: Page and stable next cursor
     S-->>C: Date, first three exercise names, and N more, set count
     alt Empty history

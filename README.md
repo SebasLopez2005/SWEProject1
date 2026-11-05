@@ -2,7 +2,7 @@
 
 Part 2 continues **Diego's final Claude Fitness & Workout specification**, with **31 stories (FW-01 through FW-31)**. Both code-generation models will use this same product scope. Expo / React Native is the mobile frontend; Supabase supplies authentication, the hosted API and PostgreSQL. SQLite supports offline work on the device. The intended iOS distribution is TestFlight.
 
-**Status:** design draft v1, ready for team review. No application has been generated or deployed. No generation attempt has been consumed.
+**Status:** design draft v1, ready for team review. No application has been generated or deployed. No generation attempt has been consumed. The initial design is now published as [stacked draft PRs](docs/part2/experiments/PR_HISTORY.md), one per diagram; none has been merged.
 
 ## Start here
 

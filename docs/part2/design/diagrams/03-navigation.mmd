@@ -5,7 +5,8 @@ flowchart TD
     Authenticated -->|Yes| Resume{"Active workout exists?"}
     Resume -->|Yes| Choice["Resume or confirm discard"]
     Resume -->|No| Tabs
-    Choice --> Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
+    Choice -->|Resume| Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
+    Choice -->|Confirm discard| Tabs
     Tabs --> Start["Start empty or from template; today or earlier"] --> Active
     Active --> Finish{"Any completed sets?"}
     Finish -->|No| Active

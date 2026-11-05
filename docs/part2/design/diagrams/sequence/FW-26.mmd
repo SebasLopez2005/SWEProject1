@@ -1,6 +1,6 @@
 sequenceDiagram
     title FW-26: Start workout from template
-    actor U as Marcus
+    actor U as Experienced lifter
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
@@ -11,7 +11,7 @@ sequenceDiagram
     R-->>S: Ordered IDs with archive flags
     S-->>C: Mark archived exercises and offer skip
     U->>C: Confirm selection
-    S->>W: start(today) -  add selected active exercises in order
+    S->>W: start(today) -  add retained exercises in order, including marked archived references
     W-->>S: New active workout committed via local transaction/outbox
     S-->>C: Empty typed entries -  previous performance available
     Note over C,S: Template unchanged. Existing active workout triggers resume/discard. No load/reps prescription copied from template.
