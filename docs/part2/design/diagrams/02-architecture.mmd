@@ -1,0 +1,50 @@
+flowchart LR
+    subgraph Phone["iOS / Android - Expo React Native runtime"]
+      direction TB
+      UI["Expo Router screens and accessible components"]
+      C["Feature UI controllers"]
+      S["Domain services and validation"]
+      P["Presenters: unit conversion, text scale, volume aggregation"]
+      Repo["Owner-scoped local repository ports"]
+      SQL["expo-sqlite: workouts, catalog, templates, settings"]
+      Queue["SQLite outbox, conflicts and sync checkpoint"]
+      Sync["SyncCoordinator + SyncGateway"]
+      Auth["AuthService + session storage adapter"]
+      Lifecycle["Foreground and reconnect events"]
+      UI --> C
+      C --> S & P & Auth
+      S --> Repo
+      P --> Repo
+      Repo --> SQL
+      Repo --> Queue
+      C --> Sync
+      Lifecycle --> Sync
+      Sync --> Queue & SQL
+      Sync --> Auth
+      Note["Confirm only after local transaction commits.
+Network loss keeps work saved and pending.
+Sign-out must resolve or explicitly discard pending work."]
+      Note -.-> Repo
+    end
+    subgraph Backend["Supabase hosted backend"]
+      direction TB
+      SA["Auth service"]
+      API["JWT-authenticated Data API and RPC endpoints"]
+      RPC["apply_mutation / pull_changes
+Owner checks, revisions, validation, transactions"]
+      PG["PostgreSQL: normalized entities + RLS"]
+      Receipts["Operation receipts and ordered change feed"]
+      API --> RPC
+      RPC --> PG & Receipts
+      API --> PG
+    end
+    Auth -->|"HTTPS: email/password + session refresh"| SA
+    Sync -->|"HTTPS: snapshots, operation IDs, revisions"| API
+    subgraph Distribution["Build and distribution - outside request runtime"]
+      direction TB
+      Git["GitHub design PRs and independent generated outputs"]
+      EAS["EAS Build and Submit"]
+      ASC["App Store Connect / TestFlight"]
+      Git --> EAS --> ASC
+    end
+    ASC -. "signed app installation" .-> Phone
