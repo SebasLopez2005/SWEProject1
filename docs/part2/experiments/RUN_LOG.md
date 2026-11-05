@@ -1,13 +1,13 @@
 # Generation and diagram-iteration log
 
-Status as of November 2, 2026: **design draft only; 0 app generations**. This preparation is not evidence of any implemented feature.
+Status as of November 4, 2026: **initial design stack merged; 0 app generations**. This preparation is not evidence of any implemented feature.
 
 ## Preparation D0
 
 - Student selected Expo/TestFlight, then explicitly chose **Claude gym scope + Supabase**.
 - Archived Part 1 without changing file content; selected the reviewed 31-story Word final.
-- Drafted context, architecture, navigation, data, module-class and per-story sequence models. Added explicit local durability, typed-set, sync-conflict and unit rules to resolve open assumptions.
-- Initial design PRs: [stacked draft PR index](PR_HISTORY.md); no merge commit yet.
+- Initial design artifacts: context, architecture, navigation, data, module-class and per-story sequence models. Proposed rules cover local durability, typed sets, sync conflicts and units.
+- Initial design PRs: [merged PR index and commit records](PR_HISTORY.md); #45 includes the revised requirements alignment.
 - Runtime/demo validation: not yet possible; no generated app.
 
 ## Round records
@@ -33,3 +33,7 @@ Status as of November 2, 2026: **design draft only; 0 app generations**. This pr
 - Remaining backlog IDs:
 
 Do not replace 'not tested' with 'pass' because code appears to exist.
+
+## Initial baseline integration November 4
+
+All initial PRs #2–#45 were merged in dependency order with individual scope comments. #45 carries the revised professor-feedback alignment. The [PR index](PR_HISTORY.md) records merge commits and superseded wording. Record the exact main commit supplied to both models before round 1; no application generation has run.

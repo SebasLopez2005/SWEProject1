@@ -1,6 +1,6 @@
 # Selected scope and design decisions
 
-Date: November 2, 2026. Draft v1. This document records selected requirements and proposed design decisions.
+Updated November 4, 2026. Revised requirements baseline; initial PR stack merged. This document records selected requirements and proposed design decisions.
 
 ## Selected product
 

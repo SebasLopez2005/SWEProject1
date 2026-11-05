@@ -1,17 +1,17 @@
 # Two-model generation and evidence protocol
 
-This follows the supplied Part 2 assignment. Generated app code must not be manually repaired for the assessed one-shot result. Diagram revisions are the mechanism for improving a result, and each merged design PR must be followed by a full generation. The user asked to prepare the diagrams first; no coding model has been run yet.
+This follows the supplied Part 2 assignment. Generated app code must not be manually repaired for the assessed one-shot result. Diagram revisions are the mechanism for improving a result, and each merged design PR must be followed by a full generation. Diagram review precedes application generation; no application-generation run has occurred yet.
 
 ## Before round 1
 
 1. Review all 31 story flows, five class sheets, top-level diagrams and proposed decisions. Run `python3 scripts/check_design.py` and render the Mermaid sources. Freeze the shared prompt and review the initial [stacked diagram PRs](PR_HISTORY.md).
-2. Verify repository visibility and instructor access. Record the initial merged design PR and exact Git commit. Initial draft PRs are now published and indexed in PR_HISTORY.md; none is merged.
+2. Verify repository visibility and instructor access. Record the initial merged design PR and exact Git commit. The initial stack #2–#45 is merged and indexed in PR_HISTORY.md; use the final merged revision rather than an intermediate diagram commit.
 3. Choose actual coding models/versions. Sebastian uses ChatGPT and Diego uses Claude, but record exact IDs/settings actually used; do not infer them from the product-specification provider names.
 4. Select an empty output per model and isolate its backend/build identity. Neither model reads the other's generated app or previous generated implementation.
 
 ## Initial PR stack
 
-The student requested one PR per diagram. These initial draft PRs separate the already-authored baseline for review; they are not generation-driven revisions. Keep them unmerged until the baseline review and the assignment's generation-after-merge handling are settled. Later actual outcome-driven diagram revisions must link their generation evidence.
+The student requested one PR per diagram. These initial draft PRs separate the baseline for review; they are not generation-driven revisions. The repository owner requested consolidation on November 4, 2026; #2–#45 are now merged in order as one initial baseline. This assembly is not 44 application-generation rounds. The instructor's interpretation of generation-after-merge remains an assignment question, not a result established by the merges. Later actual outcome-driven diagram revisions must link their generation evidence.
 
 ## Each paired round
 

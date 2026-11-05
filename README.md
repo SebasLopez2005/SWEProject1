@@ -1,50 +1,62 @@
-# CS3365 - Fitness & Workout Log
+# Fitness and Workout Log
 
-Part 2 continues **Diego's final Claude Fitness & Workout specification**, with **31 stories (FW-01 through FW-31)**. Both code-generation models will use this same product scope. Expo / React Native is the mobile frontend; Supabase supplies authentication, the hosted API and PostgreSQL. SQLite supports offline work on the device. The intended iOS distribution is TestFlight.
+CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, reviewing previous performance, and tracking training volume.
 
-**Status:** design draft v1, ready for team review. No application has been generated or deployed. No generation attempt has been consumed. The initial design is now published as [stacked draft PRs](docs/part2/experiments/PR_HISTORY.md), one per diagram; none has been merged.
+**Current status:** the initial design PR stack (#2–#45) is merged. The revised report with professor feedback is the requirements baseline: **31 stories, 101 original story points, and 42 Mermaid diagrams**. No application generation or deployment has run.
 
-## Start here
+## Project documents
 
-- [Part 2 design guide and diagram index](docs/part2/design/README.md)
-- [Selected requirements and decisions](docs/part2/design/SCOPE.md)
-- [Architecture and data contracts](docs/part2/design/CONTRACTS.md)
-- [31-story traceability and acceptance checks](docs/part2/design/TRACEABILITY.md)
-- [Assignment checklist and report draft](docs/part2/REPORT.md)
-- [Two-model generation procedure](docs/part2/experiments/README.md)
-- [Expo / TestFlight deployment plan](docs/part2/DEPLOYMENT.md)
-- [Part 2 prompt log](docs/part2/PROMPT_LOG.md)
+| Area | Start here | Contents |
+| --- | --- | --- |
+| Revised requirements | [Source report](docs/part2/design/source/Fitness_Workout_Log_App_Revised_v2.docx) | Professor-reviewed fitness specification |
+| Design | [Diagram guide](docs/part2/design/README.md) | Context, architecture, navigation, data, classes and story sequences |
+| Requirements coverage | [Traceability](docs/part2/design/TRACEABILITY.md) | All 31 stories and unexecuted acceptance checks |
+| Scope and behavior | [Decisions](docs/part2/design/SCOPE.md) · [Contracts](docs/part2/design/CONTRACTS.md) | Product boundary and implementation rules |
+| Revision review | [Report alignment](docs/part2/design/REVISED_REPORT_REVIEW.md) | Corrections and remaining design proposals |
+| Assignment | [Part 2 report](docs/part2/REPORT.md) · [Backlog](docs/part2/BACKLOG.md) | Deliverables, presentation and future work |
+| Generation evidence | [Procedure](docs/part2/experiments/README.md) · [Run log](docs/part2/experiments/RUN_LOG.md) | Two independent model outputs; no runs yet |
+| Review history | [PR index](docs/part2/experiments/PR_HISTORY.md) | Individual PRs, merge commits and superseded wording |
+| Deployment | [Deployment plan](docs/part2/DEPLOYMENT.md) | Expo, Supabase and TestFlight; not deployed |
+| Part 1 | [Archive](docs/part1/README.md) | Original requirements, reviews, finals and prompt records |
 
 ## Repository layout
 
 ```text
+apps/                    Independent generated model outputs (currently empty)
 docs/
-  part1/                 Original requirements, drafts, reviews and print files
-    final/               All four final Word documents and separate prompt log
+  part1/                 Original Part 1 archive
+    final/               Final Word documents and standalone prompt log
   part2/
-    design/              Decisions, contracts, coverage and Mermaid sources
+    design/
+      source/            Revised requirements report
       diagrams/
-        classes/         Detailed class model, divided into modules
-        sequence/        One sequence per FW story, plus supporting flows
-    experiments/         Generation rules, run records and comparison template
-    prompts/             Shared prompt for the two coding models
-    REPORT.md            Report draft; results remain unfilled until observed
-    BACKLOG.md           Backlog method and hypothetical first sprint
-apps/                    Reserved for independently generated model outputs
-scripts/                 Design checks and local diagram rendering
+        classes/         Five class-model sheets
+        sequence/        31 story sequences and two supporting flows
+      README.md          All 42 diagrams with explanations
+    experiments/         PR history, model procedure and result records
+    prompts/             Shared application-generation prompt
+    REPORT.md            Assignment report draft
+    BACKLOG.md           Remaining work and hypothetical sprint
+scripts/                 Design checks and diagram rendering
 ```
 
-The Part 1 files were relocated without changing their contents. [Archive manifest](docs/part1/ARCHIVE_MANIFEST.json) records original paths and hashes. Paths inside historical prompt text and binary documents are evidence of the original conversation and are not rewritten.
+The Part 1 archive preserves its original contents. Its [manifest](docs/part1/ARCHIVE_MANIFEST.json) records original paths and SHA-256 hashes. The later revised report is retained separately under the active design source folder.
 
-## Review diagrams
+## Review and validate
 
-GitHub previews the Mermaid diagrams in the [design guide](docs/part2/design/README.md). Editable `.mmd` files are the source of truth; the guide's Mermaid blocks mirror them.
+GitHub previews all Mermaid blocks in the [diagram guide](docs/part2/design/README.md). The `.mmd` sources are authoritative; synchronize the guide after diagram changes.
 
 ```sh
+python3 scripts/check_design.py --sync
 python3 scripts/check_design.py
-# Optional local SVG rendering; Node.js and Chrome/Chromium are needed.
+
+# Optional local rendering requires Node.js and Chrome or Chromium.
 PUPPETEER_SKIP_DOWNLOAD=true npm ci
 CHROME_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run diagrams:render
 ```
 
-Use a design pull request before the first generation. Later changes to behavior belong in diagrams and a new design PR, followed by full regeneration. See the experiment procedure before running either model. GitHub reports the repository as public (verified November 2, 2026). Confirm the instructor can follow the submitted repo/PR links.
+The design checks validate source parity, coverage, mirrors, links and archive integrity. Rendering validates Mermaid syntax; neither proves app behavior. See [verification](docs/part2/design/VERIFICATION.md).
+
+## Next milestone
+
+Record the exact merged baseline commit, then use the [shared prompt](docs/part2/prompts/ONE_SHOT.md) for independent Expo / React Native app generations with SQLite and Supabase. Record both results before revising diagrams. TestFlight remains the intended iOS distribution. No generation is started by merging the initial design stack.

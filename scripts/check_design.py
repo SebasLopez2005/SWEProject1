@@ -43,9 +43,9 @@ and ignored by Git; retain source/PR history as assignment evidence.
 - Review conflict handling, Monday weeks, offline account access and archive rules.
 - Review screen flow and large-text behavior with both teammates.
 - Confirm Apple Developer access and the instructor's acceptance of TestFlight.
-- Merge the initial diagram PR before invoking either coding model.
+- Initial PRs #2–#45 are merged; record the final baseline commit before invoking either coding model.
 
-No generation has run and no PR/deployment link has been fabricated. See the
+The initial design stack is merged. No application generation or deployment has run. See the
 [report](../REPORT.md) and [experiment protocol](../experiments/README.md).
 
 ## Diagram contents

@@ -4,7 +4,7 @@
 
 ## Cover: selection and problem
 
-We selected the **Claude Fitness & Workout Log App**, one of the four Part 1 product/provider options. The [selected final](../part1/final/07_Final_Reviewed_Claude_Product_Definition.docx) contains 31 stories across nine initiatives and four proto-personas. The other gym alternative and both meal-planning alternatives remain in the Part 1 archive.
+We selected the **Claude Fitness & Workout Log App**, one of the four Part 1 product/provider options. The [revised report with professor feedback](design/source/Fitness_Workout_Log_App_Revised_v2.docx) contains 31 stories across nine initiatives and four proto-personas. The other gym alternative and both meal-planning alternatives remain in the Part 1 archive.
 
 People need a reliable workout record they can enter between sets, consult for previous performance and understand through history and volume graphs. The nine 1-pagers add important design consequences: typed sets for weight/reps, reps-only and timed exercises; offline local persistence; editable history; a stable exercise catalog; repeatable exercise lists; readable text; and mixed kg/lb input. This requires offline synchronization and consistent derived views, not only a set-entry form.
 
@@ -20,7 +20,7 @@ The user selected Expo for mobile development, TestFlight for iOS distribution, 
 | At least one sequence per story | 31 FW sequence diagrams, mapped in [traceability](design/TRACEABILITY.md) |
 | Detailed classes incl. controllers and database handlers | Five class-model sheets in design guide; logical RPC handlers included |
 | Diagrams in Mermaid with descriptions/justifications | `.mmd` sources and design guide; syntax/render verification required |
-| PR history of design modifications | Procedure ready; [Initial draft PR index](experiments/PR_HISTORY.md); no merges yet |
+| PR history of design modifications | Initial stack #2–#45 merged; [PR history and merge records](experiments/PR_HISTORY.md) |
 | Same design exercised with two coding models | Shared prompt ready; neither model has run |
 | Detailed iterations, failures and diagram changes | [Experiment log](experiments/RUN_LOG.md), currently unexecuted |
 | Public GitHub pointers and instructor access | Remote is https://github.com/SebasLopez2005/SWEProject1 ; GitHub visibility verified PUBLIC on November 2, 2026; instructor link check pending |
@@ -36,7 +36,7 @@ The [design guide](design/README.md) contains every diagram inline, with its own
 
 ## Iteration and model comparison
 
-No implementation results exist yet. The initial design was drafted from the selected Claude requirements after the student chose that scope. This preparatory design work is not an application generation round. The initial design is published as stacked draft PRs, one per diagram; see the [PR history](experiments/PR_HISTORY.md). It still needs team review and an agreed baseline-merge/freeze before generation.
+No implementation results exist yet. The initial design covers the selected Claude requirements. This preparatory design work is not an application generation round. The initial design stack (#2–#45) is merged, retaining one PR per diagram and the final professor-feedback alignment in #45; see the [PR history](experiments/PR_HISTORY.md). Record the exact merged baseline commit before the first generation.
 
 For every paired round, record the design commit, merged PR, exact model/version, exact prompt, generated code commit, commands, real test results, reproducible failures and deployment evidence. Both models use the same frozen design and clean independent output. Only diagram changes may improve behavior between rounds, followed by a fresh full generation. Use at most three paired generation rounds as the conservative team protocol. [Experiment procedure](experiments/README.md) explains the boundary between setup, assessment and diagram revisions.
 

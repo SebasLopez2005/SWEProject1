@@ -11,7 +11,8 @@ model's app, an earlier generated implementation, or generated-code solutions.
 Use docs/part2/design/README.md and every .mmd source in its diagrams directory.
 The selected product is Diego's reviewed Claude Fitness & Workout scope: all
 31 FW stories, not the 12-story ChatGPT alternative. SELECTED_STORIES.md and
-the archived Part 1 reviewed final are requirement context. SCOPE.md,
+docs/part2/design/source/Fitness_Workout_Log_App_Revised_v2.docx are requirement
+context; this revised report supersedes the archived Part 1 final. SCOPE.md,
 CONTRACTS.md and TRACEABILITY.md explain the models; do not invent extra scope.
 
 Generate an Expo React Native TypeScript application with Expo Router,
