@@ -1,0 +1,16 @@
+sequenceDiagram
+    title FW-22: Overall weekly volume graph
+    actor U as Priya
+    participant C as ProgressController
+    participant S as ProgressService
+    participant R as WorkoutRepository
+    participant V as VolumeCalculator
+    U->>C: Open overall weekly volume
+    C->>S: weeklySeries(period)
+    S->>R: Finished weighted sets in date range
+    R-->>S: Records and dates
+    S->>V: Convert to preferred unit -  sum weight times reps by Monday-start week
+    V-->>S: Weekly points including zero weeks and source workout IDs
+    S-->>C: Points and latest-two-week comparison values
+    C-->>U: Chart + table + plain sentence -  label partial weeks
+    Note over C,V: Reps-only and timed sets excluded. Previous week zero uses absolute difference, never division by zero.
