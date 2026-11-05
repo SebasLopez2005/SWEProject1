@@ -1,0 +1,22 @@
+sequenceDiagram
+    title FW-01: Start a workout, add exercises
+    actor U as Marcus
+    participant C as WorkoutController
+    participant S as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Start workout for today
+    C->>S: start(today)
+    S->>R: active()
+    R-->>S: Existing active or none
+    alt Existing active
+     S-->>C: Offer resume or confirmed discard
+    else None
+     S->>R: mutateAndEnqueue(new active UUID)
+     R-->>S: Local commit
+     S-->>C: Active workout
+     U->>C: Select active exercise from library
+     C->>S: addExercise(exerciseId)
+     S->>R: mutateAndEnqueue(ordered empty entry)
+     R-->>C: Committed -  entry ready
+    end
+    Note over S,R: One active workout per owner -  date today or past. Empty active workout may be discarded, never finished.
