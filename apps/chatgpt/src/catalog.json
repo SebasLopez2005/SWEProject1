@@ -1,0 +1,218 @@
+[
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000001",
+    "name": "Barbell Bench Press",
+    "muscle": "Chest",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000002",
+    "name": "Dumbbell Bench Press",
+    "muscle": "Chest",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000003",
+    "name": "Push-up",
+    "muscle": "Chest",
+    "type": "reps_only",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000004",
+    "name": "Barbell Squat",
+    "muscle": "Legs",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000005",
+    "name": "Leg Press",
+    "muscle": "Legs",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000006",
+    "name": "Calf Raise",
+    "muscle": "Legs",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000007",
+    "name": "Bodyweight Squat",
+    "muscle": "Legs",
+    "type": "reps_only",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000008",
+    "name": "Romanian Deadlift",
+    "muscle": "Legs",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000009",
+    "name": "Seated Cable Row",
+    "muscle": "Back",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000010",
+    "name": "Dumbbell Row",
+    "muscle": "Back",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000011",
+    "name": "Lat Pulldown",
+    "muscle": "Back",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000012",
+    "name": "Pull-up",
+    "muscle": "Back",
+    "type": "reps_only",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000013",
+    "name": "Deadlift",
+    "muscle": "Back",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000014",
+    "name": "Overhead Press",
+    "muscle": "Shoulders",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000015",
+    "name": "Lateral Raise",
+    "muscle": "Shoulders",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000016",
+    "name": "Dumbbell Curl",
+    "muscle": "Arms",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000017",
+    "name": "Triceps Pushdown",
+    "muscle": "Arms",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000018",
+    "name": "Plank",
+    "muscle": "Core",
+    "type": "seconds",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000019",
+    "name": "Side Plank",
+    "muscle": "Core",
+    "type": "seconds",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000020",
+    "name": "Crunch",
+    "muscle": "Core",
+    "type": "reps_only",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000021",
+    "name": "Farmer Carry",
+    "muscle": "Full body",
+    "type": "seconds",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000022",
+    "name": "Kettlebell Swing",
+    "muscle": "Full body",
+    "type": "weight_reps",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000023",
+    "name": "Glute Bridge",
+    "muscle": "Legs",
+    "type": "reps_only",
+    "archived": false,
+    "shared": true
+  },
+  {
+    "kind": "exercise",
+    "id": "00000000-0000-4000-8000-000000000024",
+    "name": "Wall Sit",
+    "muscle": "Legs",
+    "type": "seconds",
+    "archived": false,
+    "shared": true
+  }
+]

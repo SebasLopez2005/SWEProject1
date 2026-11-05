@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Fitness & Workout Log",
+    "slug": "fitness-workout-log",
+    "version": "1.0.0",
+    "scheme": "fitnessworkoutlog",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "edu.cs3365.fitnessworkoutlog",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "edu.cs3365.fitnessworkoutlog"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      "@react-native-community/datetimepicker"
+    ],
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  }
+}

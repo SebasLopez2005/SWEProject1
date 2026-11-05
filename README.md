@@ -22,7 +22,7 @@ CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, 
 ## Repository layout
 
 ```text
-apps/                    Independent generated model outputs (currently empty)
+apps/                    Independent implementation folders
 docs/
   part1/                 Original Part 1 archive
     final/               Final Word documents and standalone prompt log
@@ -59,4 +59,4 @@ The design checks validate source parity, coverage, mirrors, links and archive i
 
 ## Next milestone
 
-Record the exact merged baseline commit, then use the [shared prompt](docs/part2/prompts/ONE_SHOT.md) for independent Expo / React Native app generations with SQLite and Supabase. Record both results before revising diagrams. TestFlight remains the intended iOS distribution. No generation is started by merging the initial design stack.
+Use the [app setup](apps/chatgpt/README.md) to launch the iOS simulator or run local Supabase. The [generation log](docs/part2/experiments/RUN_LOG.md) separates this implementation from the independent Claude output and eventual TestFlight distribution.
