@@ -1,0 +1,29 @@
+flowchart TD
+    Launch["Launch: restore session and owner database"] --> Authenticated{"Previously authenticated?"}
+    Authenticated -->|No| SignIn["Sign in / register online"]
+    SignIn --> Tabs["Tabs: Workout / History / Progress / Exercises / Templates / Settings"]
+    Authenticated -->|Yes| Resume{"Active workout exists?"}
+    Resume -->|Yes| Choice["Resume or confirm discard"]
+    Resume -->|No| Tabs
+    Choice --> Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
+    Tabs --> Start["Start empty or from template; today or earlier"] --> Active
+    Active --> Finish{"Any completed sets?"}
+    Finish -->|No| Active
+    Finish -->|Yes| Summary["Finish: plain summary + local/cloud status"]
+    Summary --> SaveTemplate["Save exercise list as template"]
+    Tabs --> History["Paged history; date and exercise filters"]
+    History --> Detail["Workout detail"]
+    Detail --> Edit["Edit finished workout / confirm delete"]
+    Tabs --> Exercises["Search + muscle filter; recent first"]
+    Exercises --> Custom["Create / rename / archive / restore custom exercise"]
+    Exercises --> ExerciseHistory["Exercise history incl. archived"]
+    Detail --> ExerciseHistory
+    Tabs --> Progress["Exercise or weekly chart + text/table; choose period"]
+    Progress --> Point["Select point or accessible row"]
+    Point --> Detail
+    Point --> Week["Contributing workouts for week"] --> Detail
+    Tabs --> Templates["Create/edit/reorder/delete lists; start workout"]
+    Templates --> Start
+    Tabs --> Settings["kg/lb, equivalent toggle, text scale up to 200%, sync/sign-out"]
+    Settings --> Sync["Pending / uploaded / needs sign-in / conflict review"]
+    Sync --> Resolve["Preserve both versions; explicitly resolve"]
