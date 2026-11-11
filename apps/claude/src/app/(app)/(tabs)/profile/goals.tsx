@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
-import { goalProgress } from '../../../domain/analytics';
-import { formatDateLong, formatDateShort, todayLocal, addDays } from '../../../domain/dates';
-import type { LiftGoal, Unit } from '../../../domain/types';
-import { formatStoredWeight } from '../../../domain/units';
-import { setPickerTarget } from '../../../state/picker';
-import { useLoad, useSession } from '../../../state/session';
-import { Banner, Button, Card, DateField, Empty, Field, Loading, Row, Screen, Segmented, T } from '../../../ui/kit';
-import { colors, radius, space } from '../../../ui/theme';
+import { goalProgress } from '../../../../domain/analytics';
+import { formatDateLong, formatDateShort, todayLocal, addDays } from '../../../../domain/dates';
+import type { LiftGoal, Unit } from '../../../../domain/types';
+import { formatStoredWeight } from '../../../../domain/units';
+import { setPickerTarget } from '../../../../state/picker';
+import { useLoad, useSession } from '../../../../state/session';
+import { Banner, Button, Card, DateField, Empty, Field, Loading, Row, Screen, Segmented, T } from '../../../../ui/kit';
+import { colors, radius, space } from '../../../../ui/theme';
 
 /** TR-09: goals for an exact weighted exercise; best qualifying set links to its workout. */
 export default function Goals() {

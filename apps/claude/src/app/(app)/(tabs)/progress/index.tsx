@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { exerciseSeries, PERIOD_LABEL, seriesSummarySentence, weeklyComparisonSentence, weeklyVolume, type Period } from '../../../domain/analytics';
-import { round1 } from '../../../domain/units';
-import { setPickerTarget } from '../../../state/picker';
-import { useLoad, useSession } from '../../../state/session';
-import { ProgressChart, ValueTable, type ChartPoint } from '../../../ui/Chart';
-import { Banner, Button, Card, Empty, Loading, Screen, Segmented, T } from '../../../ui/kit';
-import { colors } from '../../../ui/theme';
+import { exerciseSeries, PERIOD_LABEL, seriesSummarySentence, weeklyComparisonSentence, weeklyVolume, type Period } from '../../../../domain/analytics';
+import { round1 } from '../../../../domain/units';
+import { setPickerTarget } from '../../../../state/picker';
+import { useLoad, useSession } from '../../../../state/session';
+import { ProgressChart, ValueTable, type ChartPoint } from '../../../../ui/Chart';
+import { Banner, Button, Card, Empty, Loading, Screen, Segmented, T } from '../../../../ui/kit';
+import { colors } from '../../../../ui/theme';
 
 /** FW-20..24: per-exercise volume / total reps, overall weekly volume, period choice, point drill-down. */
 export default function Progress() {

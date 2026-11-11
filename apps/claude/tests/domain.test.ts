@@ -8,7 +8,7 @@ import { normalizeName, validateActual, validateTargets } from '../src/domain/va
 
 const ex = (id: string, type: Exercise['type'], pm: string[] = [], sm: string[] = []): Exercise => ({
   id, ownerId: null, name: id, normalizedName: id, type, category: 'strength', equipment: 'barbell', primaryMuscles: pm, secondaryMuscles: sm,
-  instructions: '', sourceId: null, archived: false, everUsed: true, revision: 0,
+  instructions: '', sourceId: null, media: [], archived: false, everUsed: true, revision: 0,
 });
 
 let n = 0;

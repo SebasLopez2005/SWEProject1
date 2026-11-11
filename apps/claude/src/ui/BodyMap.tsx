@@ -1,84 +1,135 @@
-// TR-07 front/back body diagram. Deeper champagne = more estimated working-set
-// volume. Zero regions show an outline only. The legend and the exact-value list
-// next to it carry the same information without relying on colour.
-import { View } from 'react-native';
-import Svg, { Circle, Ellipse, G, Polygon, Rect, Text as SvgText } from 'react-native-svg';
+// TR-07A: anatomical front/back body figure (male or female) from
+// react-native-body-highlighter (MIT). Catalog muscle tags map to figure
+// regions; deeper champagne = more estimated working-set volume. The legend
+// and exact-value list next to it carry the same information without colour.
+import { memo, useMemo } from 'react';
+import { View, useWindowDimensions } from 'react-native';
+import Body, { type ExtendedBodyPart, type Slug } from 'react-native-body-highlighter';
 import { MUSCLE_BANDS, muscleBand } from '../domain/analytics';
-import { T, Row } from './kit';
+import type { BodyFigure } from '../domain/types';
+import { Row, T } from './kit';
 import { colors, space } from './theme';
 
-type Shape =
-  | { t: 'e'; cx: number; cy: number; rx: number; ry: number }
-  | { t: 'r'; x: number; y: number; w: number; h: number }
-  | { t: 'p'; points: string };
-
-const FRONT: Record<string, Shape[]> = {
-  neck: [{ t: 'r', x: 54, y: 33, w: 12, h: 9 }],
-  shoulders: [{ t: 'e', cx: 36, cy: 50, rx: 11, ry: 9 }, { t: 'e', cx: 84, cy: 50, rx: 11, ry: 9 }],
-  chest: [{ t: 'r', x: 45, y: 45, w: 14, h: 20 }, { t: 'r', x: 61, y: 45, w: 14, h: 20 }],
-  biceps: [{ t: 'e', cx: 29, cy: 73, rx: 6, ry: 13 }, { t: 'e', cx: 91, cy: 73, rx: 6, ry: 13 }],
-  forearms: [{ t: 'e', cx: 25, cy: 102, rx: 5, ry: 14 }, { t: 'e', cx: 95, cy: 102, rx: 5, ry: 14 }],
-  abdominals: [{ t: 'r', x: 49, y: 68, w: 22, h: 38 }],
-  abductors: [{ t: 'e', cx: 41, cy: 114, rx: 5, ry: 9 }, { t: 'e', cx: 79, cy: 114, rx: 5, ry: 9 }],
-  adductors: [{ t: 'e', cx: 55, cy: 130, rx: 4, ry: 14 }, { t: 'e', cx: 65, cy: 130, rx: 4, ry: 14 }],
-  quadriceps: [{ t: 'e', cx: 46, cy: 145, rx: 8, ry: 25 }, { t: 'e', cx: 74, cy: 145, rx: 8, ry: 25 }],
-  calves: [{ t: 'e', cx: 46, cy: 200, rx: 6, ry: 19 }, { t: 'e', cx: 74, cy: 200, rx: 6, ry: 19 }],
+/** Catalog muscle tag → figure regions. */
+export const SLUGS_FOR_MUSCLE: Record<string, Slug[]> = {
+  abdominals: ['abs', 'obliques'],
+  abductors: ['abductors'],
+  adductors: ['adductors'],
+  biceps: ['biceps'],
+  calves: ['calves'],
+  chest: ['chest'],
+  forearms: ['forearm'],
+  glutes: ['gluteal'],
+  hamstrings: ['hamstring'],
+  lats: ['upper-back'],
+  'lower back': ['lower-back'],
+  'middle back': ['upper-back'],
+  neck: ['neck'],
+  quadriceps: ['quadriceps'],
+  shoulders: ['deltoids'],
+  traps: ['trapezius'],
+  triceps: ['triceps'],
 };
 
-const BACK: Record<string, Shape[]> = {
-  traps: [{ t: 'p', points: '46,40 74,40 60,64' }],
-  shoulders: [{ t: 'e', cx: 36, cy: 50, rx: 11, ry: 9 }, { t: 'e', cx: 84, cy: 50, rx: 11, ry: 9 }],
-  'middle back': [{ t: 'r', x: 52, y: 64, w: 16, h: 18 }],
-  lats: [{ t: 'e', cx: 43, cy: 76, rx: 7, ry: 16 }, { t: 'e', cx: 77, cy: 76, rx: 7, ry: 16 }],
-  'lower back': [{ t: 'r', x: 51, y: 86, w: 18, h: 16 }],
-  triceps: [{ t: 'e', cx: 29, cy: 73, rx: 6, ry: 13 }, { t: 'e', cx: 91, cy: 73, rx: 6, ry: 13 }],
-  forearms: [{ t: 'e', cx: 25, cy: 102, rx: 5, ry: 14 }, { t: 'e', cx: 95, cy: 102, rx: 5, ry: 14 }],
-  glutes: [{ t: 'e', cx: 51, cy: 114, rx: 9, ry: 10 }, { t: 'e', cx: 69, cy: 114, rx: 9, ry: 10 }],
-  hamstrings: [{ t: 'e', cx: 46, cy: 148, rx: 8, ry: 22 }, { t: 'e', cx: 74, cy: 148, rx: 8, ry: 22 }],
-  calves: [{ t: 'e', cx: 46, cy: 200, rx: 7, ry: 19 }, { t: 'e', cx: 74, cy: 200, rx: 7, ry: 19 }],
-};
+const NEUTRAL: Slug[] = ['hair', 'head', 'hands', 'feet', 'knees', 'ankles', 'tibialis'];
 
-function Figure({ title, regions, scores, selected, onSelect }: { title: string; regions: Record<string, Shape[]>; scores: Map<string, number>; selected: string | null; onSelect: (r: string) => void }) {
+/** Figure region tapped → catalog muscles it represents. */
+export function musclesForSlug(slug: Slug | undefined): string[] {
+  if (!slug) return [];
+  return Object.entries(SLUGS_FOR_MUSCLE).filter(([, s]) => s.includes(slug)).map(([m]) => m);
+}
+
+function partsFromScores(scores: Map<string, number>, selected: string | null): ExtendedBodyPart[] {
+  const bySlug = new Map<Slug, number>();
+  for (const [muscle, score] of scores) {
+    for (const slug of SLUGS_FOR_MUSCLE[muscle] ?? []) bySlug.set(slug, Math.max(bySlug.get(slug) ?? 0, score)); // shared regions use the larger score
+  }
+  const selectedSlugs = new Set(selected ? SLUGS_FOR_MUSCLE[selected] ?? [] : []);
+  const parts: ExtendedBodyPart[] = NEUTRAL.map((slug) => ({ slug, styles: { fill: colors.figureSkin } }));
+  const allSlugs = new Set<Slug>([...bySlug.keys(), ...selectedSlugs]);
+  for (const slug of allSlugs) {
+    const band = muscleBand(bySlug.get(slug) ?? 0);
+    parts.push({
+      slug,
+      styles: {
+        fill: band === 0 ? colors.figureBase : colors.heat[band],
+        stroke: selectedSlugs.has(slug) ? colors.text : undefined,
+        strokeWidth: selectedSlugs.has(slug) ? 3 : undefined,
+      },
+    });
+  }
+  return parts;
+}
+
+function Figure({ figure, side, parts, scale, onPress }: { figure: BodyFigure; side: 'front' | 'back'; parts: ExtendedBodyPart[]; scale: number; onPress?: (slug: Slug | undefined) => void }) {
   return (
-    <View style={{ alignItems: 'center', flex: 1 }}>
-      <Svg width={140} height={250} viewBox="0 0 120 230">
-        <Circle cx={60} cy={20} r={13} fill="none" stroke={colors.border} strokeWidth={1.5} />
-        {Object.entries(regions).map(([region, shapes]) => {
-          const band = muscleBand(scores.get(region) ?? 0);
-          const fill = band === 0 ? 'transparent' : colors.heat[band];
-          const stroke = selected === region ? colors.text : band === 0 ? colors.faint : colors.accent;
-          return (
-            <G key={region} onPress={() => onSelect(region)}>
-              {shapes.map((s, i) =>
-                s.t === 'e' ? <Ellipse key={i} cx={s.cx} cy={s.cy} rx={s.rx} ry={s.ry} fill={fill} stroke={stroke} strokeWidth={selected === region ? 2 : 1} />
-                  : s.t === 'r' ? <Rect key={i} x={s.x} y={s.y} width={s.w} height={s.h} rx={4} fill={fill} stroke={stroke} strokeWidth={selected === region ? 2 : 1} />
-                    : <Polygon key={i} points={s.points} fill={fill} stroke={stroke} strokeWidth={selected === region ? 2 : 1} />,
-              )}
-            </G>
-          );
-        })}
-        <SvgText x={60} y={228} fill={colors.muted} fontSize={10} textAnchor="middle">{title}</SvgText>
-      </Svg>
+    <View style={{ alignItems: 'center' }}>
+      <Body
+        data={parts}
+        gender={figure}
+        side={side}
+        scale={scale}
+        border={colors.border}
+        defaultFill={colors.figureBase}
+        onBodyPartPress={onPress ? (p) => onPress(p.slug) : undefined}
+      />
+      <T variant="caption" color={colors.faint}>{side === 'front' ? 'Front' : 'Back'}</T>
     </View>
   );
 }
 
-export function BodyMap({ scores, selected, onSelect }: { scores: Map<string, number>; selected: string | null; onSelect: (r: string) => void }) {
+/** Heat map of estimated working-set volume (TR-07 / TR-07A). */
+export const BodyMap = memo(function BodyMap({ scores, selected, onSelect, figure, compact }: { scores: Map<string, number>; selected: string | null; onSelect: (muscle: string) => void; figure: BodyFigure; compact?: boolean }) {
+  const { width } = useWindowDimensions();
+  const scale = Math.min((width - space.lg * 4) / 2 / 200, compact ? 0.7 : 0.85);
+  const parts = useMemo(() => partsFromScores(scores, selected), [scores, selected]);
+  const press = (slug: Slug | undefined) => {
+    const candidates = musclesForSlug(slug);
+    if (!candidates.length) return;
+    const best = candidates.reduce((a, b) => ((scores.get(b) ?? 0) > (scores.get(a) ?? 0) ? b : a));
+    onSelect(best);
+  };
   return (
     <View style={{ gap: space.sm }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }} accessible={false} importantForAccessibility="no-hide-descendants">
-        <Figure title="Front" regions={FRONT} scores={scores} selected={selected} onSelect={onSelect} />
-        <Figure title="Back" regions={BACK} scores={scores} selected={selected} onSelect={onSelect} />
+        <Figure figure={figure} side="front" parts={parts} scale={scale} onPress={press} />
+        <Figure figure={figure} side="back" parts={parts} scale={scale} onPress={press} />
       </View>
-      <Row gap={space.md} style={{ justifyContent: 'center' }}>
-        {MUSCLE_BANDS.map((b, i) => (
-          <Row key={b.label} gap={4}>
-            <View style={{ width: 14, height: 14, borderRadius: 3, backgroundColor: i === 0 ? 'transparent' : colors.heat[i], borderWidth: 1, borderColor: i === 0 ? colors.faint : colors.accent }} />
-            <T variant="caption" color={colors.muted}>{b.label}</T>
-          </Row>
-        ))}
-      </Row>
-      <T variant="caption" color={colors.faint} center>Set-equivalents: each completed working set adds 1.0 to its primary muscles and 0.5 to secondary muscles.</T>
+      {!compact ? (
+        <Row gap={space.md} style={{ justifyContent: 'center' }}>
+          {MUSCLE_BANDS.map((b, i) => (
+            <Row key={b.label} gap={4}>
+              <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: i === 0 ? colors.figureBase : colors.heat[i], borderWidth: i === 0 ? 1 : 0, borderColor: colors.border }} />
+              <T variant="caption" color={colors.muted}>{b.label}</T>
+            </Row>
+          ))}
+        </Row>
+      ) : null}
     </View>
   );
-}
+});
+
+/** TR-06A: muscles an exercise works, primary in champagne and secondary dimmer. */
+export const MusclesWorked = memo(function MusclesWorked({ primary, secondary, figure }: { primary: string[]; secondary: string[]; figure: BodyFigure }) {
+  const { width } = useWindowDimensions();
+  const scale = Math.min((width - space.lg * 4) / 2 / 200, 0.62);
+  const parts = useMemo(() => {
+    const out: ExtendedBodyPart[] = NEUTRAL.map((slug) => ({ slug, styles: { fill: colors.figureSkin } }));
+    const seen = new Set<Slug>();
+    for (const m of primary) for (const slug of SLUGS_FOR_MUSCLE[m] ?? []) if (!seen.has(slug)) { seen.add(slug); out.push({ slug, styles: { fill: colors.accent } }); }
+    for (const m of secondary) for (const slug of SLUGS_FOR_MUSCLE[m] ?? []) if (!seen.has(slug)) { seen.add(slug); out.push({ slug, styles: { fill: colors.heat[2] } }); }
+    return out;
+  }, [primary, secondary]);
+  return (
+    <View style={{ gap: space.sm }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around' }} accessible={false} importantForAccessibility="no-hide-descendants">
+        <Figure figure={figure} side="front" parts={parts} scale={scale} />
+        <Figure figure={figure} side="back" parts={parts} scale={scale} />
+      </View>
+      <Row gap={space.md} style={{ justifyContent: 'center' }}>
+        <Row gap={4}><View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: colors.accent }} /><T variant="caption" color={colors.muted}>Primary</T></Row>
+        <Row gap={4}><View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: colors.heat[2] }} /><T variant="caption" color={colors.muted}>Secondary</T></Row>
+      </Row>
+    </View>
+  );
+});

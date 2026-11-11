@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
-import { useLoad, useSession } from '../../../state/session';
-import { formatTarget, plural } from '../../../ui/format';
-import { Button, Card, Empty, Loading, Row, Screen, T } from '../../../ui/kit';
-import { colors } from '../../../ui/theme';
+import { useLoad, useSession } from '../../../../state/session';
+import { formatTarget, plural } from '../../../../ui/format';
+import { Button, Card, Empty, Loading, Row, Screen, T } from '../../../../ui/kit';
+import { colors } from '../../../../ui/theme';
 
 /** FW-27 / TR-01: routines (templates) list. */
 export default function Routines() {

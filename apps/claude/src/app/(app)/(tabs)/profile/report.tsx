@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { monthlyReport } from '../../../domain/analytics';
-import { formatDateShort, monthKey, monthLabel, previousMonthKey, todayLocal, addDays, monthEnd } from '../../../domain/dates';
-import { formatAggregate, formatStoredWeight } from '../../../domain/units';
-import { useLoad, useSession } from '../../../state/session';
-import { Button, Card, Empty, KeyValue, Loading, Row, Screen, Section, T } from '../../../ui/kit';
-import { colors } from '../../../ui/theme';
+import { monthlyReport } from '../../../../domain/analytics';
+import { formatDateShort, monthKey, monthLabel, previousMonthKey, todayLocal, addDays, monthEnd } from '../../../../domain/dates';
+import { formatAggregate, formatStoredWeight } from '../../../../domain/units';
+import { useLoad, useSession } from '../../../../state/session';
+import { Button, Card, Empty, KeyValue, Loading, Row, Screen, Section, T } from '../../../../ui/kit';
+import { colors } from '../../../../ui/theme';
 
 function delta(cur: number, prev: number, fmt: (n: number) => string) {
   const d = cur - prev;

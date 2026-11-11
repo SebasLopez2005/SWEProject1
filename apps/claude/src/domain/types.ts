@@ -31,6 +31,7 @@ export interface Exercise {
   secondaryMuscles: string[];
   instructions: string;
   sourceId: string | null;
+  media: string[]; // catalog form photo paths (start, end)
   archived: boolean;
   everUsed: boolean;
   revision: number;
@@ -108,11 +109,14 @@ export interface Routine {
   entries: RoutineEntry[];
 }
 
+export type BodyFigure = 'male' | 'female';
+
 export interface Settings {
   unit: Unit;
   unitChosen: boolean;
   showEquivalent: boolean;
   textScale: number;
+  bodyFigure: BodyFigure;
   revision: number;
 }
 

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
-import { addDays, formatDateLong, todayLocal } from '../../../domain/dates';
-import type { BodyweightReading, Unit } from '../../../domain/types';
-import { convert, formatStoredWeight, round1 } from '../../../domain/units';
-import { useLoad, useSession } from '../../../state/session';
-import { ProgressChart, type ChartPoint } from '../../../ui/Chart';
-import { Banner, Button, Card, DateField, Empty, Field, Loading, Row, Screen, Section, Segmented, T } from '../../../ui/kit';
-import { colors } from '../../../ui/theme';
+import { addDays, formatDateLong, todayLocal } from '../../../../domain/dates';
+import type { BodyweightReading, Unit } from '../../../../domain/types';
+import { convert, formatStoredWeight, round1 } from '../../../../domain/units';
+import { useLoad, useSession } from '../../../../state/session';
+import { ProgressChart, type ChartPoint } from '../../../../ui/Chart';
+import { Banner, Button, Card, DateField, Empty, Field, Loading, Row, Screen, Section, Segmented, T } from '../../../../ui/kit';
+import { colors } from '../../../../ui/theme';
 
 /** TR-11: optional bodyweight readings (original unit kept), trend chart and target. */
 export default function Bodyweight() {

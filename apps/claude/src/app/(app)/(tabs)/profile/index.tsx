@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
-import { goalProgress, monthlyReport, muscleActivity } from '../../../domain/analytics';
-import { addDays, monthKey, monthLabel, todayLocal } from '../../../domain/dates';
-import { MUSCLE_LABEL } from '../../../domain/preparation';
-import { formatAggregate } from '../../../domain/units';
-import { useLoad, useSession } from '../../../state/session';
-import { BodyMap } from '../../../ui/BodyMap';
-import { plural } from '../../../ui/format';
-import { Card, Loading, Row, Screen, Section, StatusPill, T } from '../../../ui/kit';
-import { colors } from '../../../ui/theme';
+import { goalProgress, monthlyReport, muscleActivity } from '../../../../domain/analytics';
+import { addDays, monthKey, monthLabel, todayLocal } from '../../../../domain/dates';
+import { MUSCLE_LABEL } from '../../../../domain/preparation';
+import { formatAggregate } from '../../../../domain/units';
+import { useLoad, useSession } from '../../../../state/session';
+import { BodyMap } from '../../../../ui/BodyMap';
+import { plural } from '../../../../ui/format';
+import { Card, Loading, Row, Screen, Section, StatusPill, T } from '../../../../ui/kit';
+import { colors } from '../../../../ui/theme';
 
 export default function Profile() {
   const { repo, settings, identity, syncState } = useSession();

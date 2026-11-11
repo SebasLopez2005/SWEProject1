@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { muscleActivity, muscleBand, MUSCLE_BANDS } from '../../../domain/analytics';
-import { addDays, formatDateLong, formatDateShort, todayLocal } from '../../../domain/dates';
-import { MUSCLE_LABEL } from '../../../domain/preparation';
-import { useLoad, useSession } from '../../../state/session';
-import { BodyMap } from '../../../ui/BodyMap';
-import { Banner, Button, Card, DateField, Loading, Row, Screen, Section, Segmented, T } from '../../../ui/kit';
-import { colors, space } from '../../../ui/theme';
+import { muscleActivity, muscleBand, MUSCLE_BANDS } from '../../../../domain/analytics';
+import { addDays, formatDateLong, formatDateShort, todayLocal } from '../../../../domain/dates';
+import { MUSCLE_LABEL } from '../../../../domain/preparation';
+import { useLoad, useSession } from '../../../../state/session';
+import { BodyMap } from '../../../../ui/BodyMap';
+import { Banner, Button, Card, DateField, Loading, Row, Screen, Section, Segmented, T } from '../../../../ui/kit';
+import { colors, space } from '../../../../ui/theme';
 
 /** TR-07: estimated training volume by region with exact totals and contributing sets. */
 export default function Muscles() {

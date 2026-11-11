@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
-import type { HistoryRow } from '../../../data/repository';
-import { addDays, formatDateLong, formatDuration, todayLocal } from '../../../domain/dates';
-import { setPickerTarget } from '../../../state/picker';
-import { useApp, useSession } from '../../../state/session';
-import { namesWithMore, plural } from '../../../ui/format';
-import { Banner, Button, Card, DateField, Empty, Row, StatusPill, T } from '../../../ui/kit';
-import { colors, space } from '../../../ui/theme';
+import type { HistoryRow } from '../../../../data/repository';
+import { addDays, formatDateLong, formatDuration, todayLocal } from '../../../../domain/dates';
+import { setPickerTarget } from '../../../../state/picker';
+import { useApp, useSession } from '../../../../state/session';
+import { namesWithMore, plural } from '../../../../ui/format';
+import { Banner, Button, Card, DateField, Empty, Row, StatusPill, T } from '../../../../ui/kit';
+import { colors, space } from '../../../../ui/theme';
 
 /** FW-14 list with keyset paging; FW-19 combinable date-range and exercise filters. */
 export default function History() {
