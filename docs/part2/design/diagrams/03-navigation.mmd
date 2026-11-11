@@ -29,9 +29,11 @@ flowchart TD
       History["History and filters"] --> Detail["Workout detail"]
       Detail --> Edit["Correct actuals or confirm delete"]
       Exercises["Offline exercise catalog"] --> Custom["Custom exercise, tags, rename, archive or restore"]
+      Exercises --> Form["How to perform<br/>Start/end photo demo, numbered steps, muscles on body figure"]
+      Active --> Form
       Exercises & Detail --> ExerciseHistory["Exercise history"]
       Progress["Exercise or weekly chart and accessible values"] --> Detail
-      Profile["Profile"] --> Muscle["Front/back muscle map and exact set-equivalents"]
+      Profile["Profile"] --> Muscle["Realistic front/back body figure, male or female<br/>Exact set-equivalents and accessible list"]
       Muscle --> Region["Contributing exercises and sets"] --> Detail
       Profile --> Report["Monthly report and comparison"]
       Profile --> Goal["Lift goals"] --> Detail
@@ -40,10 +42,10 @@ flowchart TD
     end
 
     Tabs --> Workout & Routines & History & Exercises & Progress & Profile & Settings
-    Settings["Settings"] --> Preferences["Units, equivalent values and text scale"]
+    Settings["Settings"] --> Preferences["Units, equivalent values, text scale and body figure"]
     Settings --> Reminders["Opt-in reminders and local schedule"]
     Settings --> Sync["Sync status, conflict review and sign-out"]
     Notification["Workout reminder"] --> Workout
     Activity["Rest Live Activity or alert"] --> Active
-    Note["Dark UI; native glass when supported<br/>Solid fallback, readable labels and text scaling"]
+    Note["Dark UI; native glass when supported<br/>Native tab bar, large titles, compact grouped rows<br/>Solid fallback, readable labels and text scaling"]
     Note -.-> Tabs

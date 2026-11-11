@@ -56,6 +56,17 @@ These are design checks for the next generation. TR-01 and TR-02 extend the orig
 | TR-12 | Workout reminders and original messages | [Reminders](diagrams/sequence/TR-12-reminders.mmd) |
 | TR-13 | iOS Lock Screen countdown | [Rest and Live Activity](diagrams/sequence/TR-03-13-rest-and-live-activity.mmd) |
 
+## Claude round 2 revision
+
+Student feedback after Claude One Shot 1. See [Round 2 requirements](ROUND_02_CLAUDE.md).
+
+| ID | Capability | Model |
+| --- | --- | --- |
+| UI-04 | Compact, iOS-native density: large titles, native tab bar, grouped rows | [Navigation](diagrams/03-navigation.mmd) |
+| UI-05 | Responsiveness: immediate set rows, visible-only recomputation | [Presentation classes](diagrams/classes/04-presentation.mmd) |
+| TR-07A | Anatomical male or female body figure | [Catalog and muscles](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd) |
+| TR-06A | How to perform: photo demo, steps, muscles worked | [Catalog and muscles](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd) |
+
 ## Per-story checks
 
 The expected statements below preserve the original report wording. Where behavior changes, use the TR acceptance checks and revised diagrams for the next run.

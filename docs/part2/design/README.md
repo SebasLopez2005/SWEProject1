@@ -1,6 +1,6 @@
 # Fitness & Workout Log - Mermaid design guide
 
-**Planned training design, November 8, 2026.** The original 31 FW stories and point estimates are retained for traceability. The [training draft](TRAINING_REQUIREMENTS_DRAFT.md) adds TR-01–13 and supersedes conflicting behavior in the original scope. See the [interface requirements](ROUND_02_UI.md) for the dark theme.
+**Planned training design, November 8, 2026.** The original 31 FW stories and point estimates are retained for traceability. The [training draft](TRAINING_REQUIREMENTS_DRAFT.md) adds TR-01–13 and supersedes conflicting behavior in the original scope. See the [interface requirements](ROUND_02_UI.md) for the dark theme. Claude round 2 adds [density, responsiveness, a realistic body figure and form guidance](ROUND_02_CLAUDE.md).
 See [the requirements alignment review](REVISED_REPORT_REVIEW.md) and [source report](source/Fitness_Workout_Log_App_Revised_v2.docx).
 Proposed stack: Expo / React Native, local SQLite and Supabase. Intended iOS
 distribution: TestFlight. This is design, not generated implementation evidence.
@@ -82,7 +82,7 @@ for the process before another run.
 - [TR-01 / TR-02: Plan a routine and complete working sets](diagrams/sequence/TR-01-02-planned-training.mmd)
 - [TR-03 / TR-13: Rest countdown and iOS Lock Screen](diagrams/sequence/TR-03-13-rest-and-live-activity.mmd)
 - [TR-04 / TR-05: Warm-up and targeted mobility](diagrams/sequence/TR-04-05-preparation.mmd)
-- [TR-06 / TR-07: Offline catalog and profile muscle map](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd)
+- [TR-06 / TR-07: Offline catalog, form guidance and muscle map](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd)
 - [TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight](diagrams/sequence/TR-08-09-11-profile-progress.mmd)
 - [TR-10: Export my data](diagrams/sequence/TR-10-export.mmd)
 - [TR-12: Opt-in workout reminders](diagrams/sequence/TR-12-reminders.mmd)
@@ -227,9 +227,11 @@ flowchart TD
       History["History and filters"] --> Detail["Workout detail"]
       Detail --> Edit["Correct actuals or confirm delete"]
       Exercises["Offline exercise catalog"] --> Custom["Custom exercise, tags, rename, archive or restore"]
+      Exercises --> Form["How to perform<br/>Start/end photo demo, numbered steps, muscles on body figure"]
+      Active --> Form
       Exercises & Detail --> ExerciseHistory["Exercise history"]
       Progress["Exercise or weekly chart and accessible values"] --> Detail
-      Profile["Profile"] --> Muscle["Front/back muscle map and exact set-equivalents"]
+      Profile["Profile"] --> Muscle["Realistic front/back body figure, male or female<br/>Exact set-equivalents and accessible list"]
       Muscle --> Region["Contributing exercises and sets"] --> Detail
       Profile --> Report["Monthly report and comparison"]
       Profile --> Goal["Lift goals"] --> Detail
@@ -238,12 +240,12 @@ flowchart TD
     end
 
     Tabs --> Workout & Routines & History & Exercises & Progress & Profile & Settings
-    Settings["Settings"] --> Preferences["Units, equivalent values and text scale"]
+    Settings["Settings"] --> Preferences["Units, equivalent values, text scale and body figure"]
     Settings --> Reminders["Opt-in reminders and local schedule"]
     Settings --> Sync["Sync status, conflict review and sign-out"]
     Notification["Workout reminder"] --> Workout
     Activity["Rest Live Activity or alert"] --> Active
-    Note["Dark UI; native glass when supported<br/>Solid fallback, readable labels and text scaling"]
+    Note["Dark UI; native glass when supported<br/>Native tab bar, large titles, compact grouped rows<br/>Solid fallback, readable labels and text scaling"]
     Note -.-> Tabs
 ```
 
@@ -353,6 +355,7 @@ erDiagram
       string preferred_unit
       boolean show_equivalent
       decimal text_scale
+      string body_figure "male or female, display only"
       int revision
     }
     OUTBOX_OPERATION {
@@ -483,6 +486,7 @@ erDiagram
       string category
       string equipment "unknown permitted"
       string instructions
+      string media_paths "start/end form photos at the pinned revision"
     }
     EXERCISE_MUSCLE {
       uuid exercise_id PK
@@ -1076,6 +1080,16 @@ classDiagram
       +clearRestEffects()
       +replaceWorkoutReminders(schedule)
     }
+    class BodyFigurePresenter {
+      +regionsFor(scores, figure, side)
+      +regionForPress(regionId) String[]
+      +musclesWorked(exercise, figure)
+    }
+    class ExerciseFormPresenter {
+      +demoFrames(exercise) Url[]
+      +numberedSteps(exercise) String[]
+      +offlineFallback(exercise)
+    }
     class ReadabilityPresenter {
       +applyTextScale(settings)
       +accessibleLabels()
@@ -1083,6 +1097,9 @@ classDiagram
     }
     ProfileService --> ProfileRepository
     ProfileService --> MuscleActivityPresenter
+    MuscleActivityPresenter --> BodyFigurePresenter
+    ExerciseController --> ExerciseFormPresenter
+    ExerciseFormPresenter --> BodyFigurePresenter
     ProfileService --> MonthlyReportPresenter
     MonthlyReportPresenter --> UnitConverter
     MonthlyReportPresenter --> VolumeCalculator
@@ -1107,6 +1124,8 @@ classDiagram
     note for VolumeCalculator "Completed working sets in finished sessions. Reps-only uses reps.<br/>Timed work is separate from weighted volume. Weekly buckets start Monday and include empty weeks."
     note for MuscleActivityPresenter "Deduplicate regions. Primary credits 1.0 and secondary 0.5.<br/>Front and back map share an exact-value list and legend."
     note for TrainingDeviceService "Persist deadline or paused remainder. Replace prior OS requests.<br/>Unsupported Live Activity or denied alerts leave in-app rest usable."
+    note for BodyFigurePresenter "Anatomical male or female figure, front and back. Catalog tags map<br/>to figure regions; shared regions use the larger score. Tap opens the breakdown."
+    note for ExerciseFormPresenter "Pinned start/end photos load on demand and cache. Steps and muscles<br/>work offline; photos explain when unavailable."
     note for ReadabilityPresenter "Persistent scale through 200 percent. Wrap and scroll without missing<br/>controls; support OS accessibility."
 ```
 
@@ -2327,11 +2346,11 @@ sequenceDiagram
     Note over C,R: Warm-up and mobility have separate phases in the summary. They add zero to working volume, muscle scores and lift goals.
 ```
 
-## TR-06 / TR-07: Offline catalog and profile muscle map
+## TR-06 / TR-07: Offline catalog, form guidance and muscle map
 
-Shows a pinned catalog import, offline search and estimated muscle scores with source links.
+Shows a pinned catalog import, offline search, per-exercise form guidance and estimated muscle scores on a male or female anatomical figure.
 
-**Design value:** Separates catalog roles from calculated set-equivalents and provides exact values alongside color.
+**Design value:** Separates catalog roles from calculated set-equivalents, keeps exact values alongside colour, and gives each exercise an offline text equivalent of its photo demonstration.
 
 [Edit Mermaid source](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd)
 
@@ -2346,19 +2365,33 @@ sequenceDiagram
     participant S as ProfileService
     participant D as ProfileRepository
     participant M as MuscleActivityPresenter
+    participant F as ExerciseFormPresenter
+    participant B as BodyFigurePresenter
     I->>R: Verify pinned metadata and merge by stable mapped ID
     Note over I,R: Preserve prior exercise IDs. Catalog category is separate from logging type.
     U->>E: Search offline by name, equipment, muscle or category
     E->>R: Search shared and owned active entries
     R-->>U: Matching exercises or custom exercise option
+    opt How to perform (library, picker or workout entry menu)
+        U->>E: Open form guidance for one exercise
+        E->>F: demoFrames, numberedSteps
+        F->>B: musclesWorked(exercise, saved figure)
+        F-->>U: Start/end photo demo, numbered steps and highlighted muscles
+        Note over F,B: Steps and muscles work offline.<br/>Pinned photos load on demand, cache,<br/>and explain when unavailable.
+    end
     U->>P: Open front/back muscle map and select period
     P->>S: loadMuscleActivity(period)
     S->>D: Read finished sessions and completed working sets by workout date
     D-->>S: Set IDs, variants and region tags
     S->>M: Deduplicate tags by region with primary precedence
     M->>M: Sum 1.0 per primary region and 0.5 per secondary region
-    M-->>U: Darker bands, legend, exact totals and unmapped count
-    U->>P: Open a region from the map or accessible list
+    M->>B: regionsFor(scores, male or female figure, front and back)
+    B-->>U: Anatomical figure with darker bands, legend, exact totals and unmapped count
+    opt Switch figure
+        U->>P: Choose male or female
+        P->>S: Save synced display preference
+    end
+    U->>P: Tap a muscle on the figure or a row in the accessible list
     P-->>U: Contributing exercises, sets and workout links
     Note over S,M: Default last 7 calendar days. Recompute after corrections or deletion.
 ```

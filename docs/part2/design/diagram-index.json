@@ -230,9 +230,9 @@
     "Preserves preparation in history and excludes it from working-set totals."
   ],
   "sequence/TR-06-07-catalog-and-muscles.mmd": [
-    "TR-06 / TR-07: Offline catalog and profile muscle map",
-    "Shows a pinned catalog import, offline search and estimated muscle scores with source links.",
-    "Separates catalog roles from calculated set-equivalents and provides exact values alongside color."
+    "TR-06 / TR-07: Offline catalog, form guidance and muscle map",
+    "Shows a pinned catalog import, offline search, per-exercise form guidance and estimated muscle scores on a male or female anatomical figure.",
+    "Separates catalog roles from calculated set-equivalents, keeps exact values alongside colour, and gives each exercise an offline text equivalent of its photo demonstration."
   ],
   "sequence/TR-08-09-11-profile-progress.mmd": [
     "TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight",

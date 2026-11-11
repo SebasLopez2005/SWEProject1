@@ -8,18 +8,32 @@ sequenceDiagram
     participant S as ProfileService
     participant D as ProfileRepository
     participant M as MuscleActivityPresenter
+    participant F as ExerciseFormPresenter
+    participant B as BodyFigurePresenter
     I->>R: Verify pinned metadata and merge by stable mapped ID
     Note over I,R: Preserve prior exercise IDs. Catalog category is separate from logging type.
     U->>E: Search offline by name, equipment, muscle or category
     E->>R: Search shared and owned active entries
     R-->>U: Matching exercises or custom exercise option
+    opt How to perform (library, picker or workout entry menu)
+        U->>E: Open form guidance for one exercise
+        E->>F: demoFrames, numberedSteps
+        F->>B: musclesWorked(exercise, saved figure)
+        F-->>U: Start/end photo demo, numbered steps and highlighted muscles
+        Note over F,B: Steps and muscles work offline.<br/>Pinned photos load on demand, cache,<br/>and explain when unavailable.
+    end
     U->>P: Open front/back muscle map and select period
     P->>S: loadMuscleActivity(period)
     S->>D: Read finished sessions and completed working sets by workout date
     D-->>S: Set IDs, variants and region tags
     S->>M: Deduplicate tags by region with primary precedence
     M->>M: Sum 1.0 per primary region and 0.5 per secondary region
-    M-->>U: Darker bands, legend, exact totals and unmapped count
-    U->>P: Open a region from the map or accessible list
+    M->>B: regionsFor(scores, male or female figure, front and back)
+    B-->>U: Anatomical figure with darker bands, legend, exact totals and unmapped count
+    opt Switch figure
+        U->>P: Choose male or female
+        P->>S: Save synced display preference
+    end
+    U->>P: Tap a muscle on the figure or a row in the accessible list
     P-->>U: Contributing exercises, sets and workout links
     Note over S,M: Default last 7 calendar days. Recompute after corrections or deletion.

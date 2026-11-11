@@ -71,6 +71,16 @@ classDiagram
       +clearRestEffects()
       +replaceWorkoutReminders(schedule)
     }
+    class BodyFigurePresenter {
+      +regionsFor(scores, figure, side)
+      +regionForPress(regionId) String[]
+      +musclesWorked(exercise, figure)
+    }
+    class ExerciseFormPresenter {
+      +demoFrames(exercise) Url[]
+      +numberedSteps(exercise) String[]
+      +offlineFallback(exercise)
+    }
     class ReadabilityPresenter {
       +applyTextScale(settings)
       +accessibleLabels()
@@ -78,6 +88,9 @@ classDiagram
     }
     ProfileService --> ProfileRepository
     ProfileService --> MuscleActivityPresenter
+    MuscleActivityPresenter --> BodyFigurePresenter
+    ExerciseController --> ExerciseFormPresenter
+    ExerciseFormPresenter --> BodyFigurePresenter
     ProfileService --> MonthlyReportPresenter
     MonthlyReportPresenter --> UnitConverter
     MonthlyReportPresenter --> VolumeCalculator
@@ -102,4 +115,6 @@ classDiagram
     note for VolumeCalculator "Completed working sets in finished sessions. Reps-only uses reps.<br/>Timed work is separate from weighted volume. Weekly buckets start Monday and include empty weeks."
     note for MuscleActivityPresenter "Deduplicate regions. Primary credits 1.0 and secondary 0.5.<br/>Front and back map share an exact-value list and legend."
     note for TrainingDeviceService "Persist deadline or paused remainder. Replace prior OS requests.<br/>Unsupported Live Activity or denied alerts leave in-app rest usable."
+    note for BodyFigurePresenter "Anatomical male or female figure, front and back. Catalog tags map<br/>to figure regions; shared regions use the larger score. Tap opens the breakdown."
+    note for ExerciseFormPresenter "Pinned start/end photos load on demand and cache. Steps and muscles<br/>work offline; photos explain when unavailable."
     note for ReadabilityPresenter "Persistent scale through 200 percent. Wrap and scroll without missing<br/>controls; support OS accessibility."
