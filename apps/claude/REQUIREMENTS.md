@@ -5,7 +5,7 @@ Sources: `docs/part2/design/SELECTED_STORIES.md` (revised report text), `TRAININ
 **Evidence codes** (all run on Nov 11, 2026 unless stated):
 - **U** — `tests/domain.test.ts` (pure rules)
 - **R** — `tests/repository.test.ts`, `tests/sync.test.ts` (real SQLite via `node:sqlite`, same SQL as the device)
-- **B** — `tests/backend.test.ts` against the local Supabase stack (9/9 passed)
+- **B** — `tests/backend.test.ts` against the local Supabase stack and the hosted `repwise-claude` project (9/9 passed on each)
 - **S** — exercised by hand in the native development build on the iPhone 17 Pro simulator, iOS 26.5
 
 **Status**: ✅ implemented and verified · 🟡 implemented, not verified end-to-end (reason given) · ⛔ blocked

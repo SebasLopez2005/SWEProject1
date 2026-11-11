@@ -16,7 +16,7 @@ const run = URL && KEY ? describe : describe.skip;
 
 async function user(): Promise<{ client: SupabaseClient; id: string }> {
   const client = createClient(URL!, KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
-  const email = `t-${randomUUID().slice(0, 8)}@example.test`;
+  const email = `repwise-test-${randomUUID().slice(0, 8)}@${process.env.SUPABASE_TEST_EMAIL_DOMAIN ?? 'example.test'}`;
   const { data, error } = await client.auth.signUp({ email, password: 'correct-horse-battery' });
   if (error || !data.user || !data.session) throw new Error(`signUp failed: ${error?.message ?? 'no session (confirmations on?)'}`);
   return { client, id: data.user.id };

@@ -48,5 +48,5 @@ Consequential decisions made while implementing the design autonomously. Each na
 
 ## Not done / environment-limited
 
-- **Hosted Supabase project**: the Supabase connector requires an explicit in-chat cost confirmation (quoted $0/month) before creating a project, so it was not created unattended. The TestFlight build therefore ships with device-only profiles and no cloud URL. See README "Enable cloud sync".
+- **Hosted Supabase project**: created after the student confirmed it in chat (Free plan, $0/month) and paused SwiftlyCR to stay within the free limit. Email confirmation is off for the demo.
 - Background upload while iOS has suspended/terminated the app is not promised (per `SCOPE.md`).

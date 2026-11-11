@@ -83,26 +83,24 @@ SUPABASE_TEST_URL=http://127.0.0.1:57321 SUPABASE_TEST_PUBLISHABLE_KEY=<publisha
 
 The backend suite creates throwaway users on the **local** stack and checks offline upload, lost-response retry idempotency, operation-id reuse rejection, conflict preservation and resolution, owner isolation (RLS + RPC + no direct writes), tombstones, custom-exercise dependency ordering, server-side validation, the one-active-workout rule and full demo-data upload.
 
-## Enable cloud sync for a hosted build
+## Hosted backend (configured)
 
-1. Create a Supabase project (free plan is sufficient). Apply migrations: `npx supabase@3.1.0 link --project-ref <ref>` then `npx supabase@3.1.0 db push`.
-2. In Auth settings decide on email confirmation (the app handles "check your inbox").
-3. Add EAS environment variables for the `production` environment: `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key only — never the secret/service-role key).
-4. Rebuild. Without these variables the build runs in device-only mode, clearly labelled.
+- Supabase project **repwise-claude** (`chazdxtlttcotisfoopd`, us-east-2, Free plan). All four migrations are applied (`npx supabase@3.1.0 db push --remote`); a dry run reports it up to date.
+- Email confirmation is **off** for the classroom demo, so a professor can create an account instantly. For real users, turn it back on and configure SMTP (the app already shows "check your inbox").
+- EAS `production` environment variables: `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key only; never the secret key).
+- The backend suite also passes against the hosted project (9/9 on Nov 11, 2026); its disposable accounts were deleted afterwards. Run it again with `SUPABASE_TEST_EMAIL_DOMAIN=<real domain>` because hosted Auth rejects `example.*` addresses.
+- Security advisor: helper `search_path` warnings fixed by migration `…000400`. The remaining notices are intentional: internal tables have RLS with no client policies (deny all), and `apply_mutation` / `pull_changes` are the two SECURITY DEFINER entry points the design calls for.
+- To free the slot the org owner's 2-project free limit required, the **SwiftlyCR** project was paused at the owner's request (data kept; restore it from the Supabase dashboard).
 
 ## Build and ship to TestFlight
 
-EAS project: `@swiftlycrdev/repwise-claude` (created). The first build needs an interactive Apple Developer sign-in to create provisioning profiles for the app **and** its `ExpoWidgetsTarget` (Live Activity) extension:
+EAS project: `@swiftlycrdev/repwise-claude`. The first build needs an interactive Apple Developer sign-in to create provisioning profiles for the app **and** its `ExpoWidgetsTarget` (Live Activity) extension. One command builds and submits:
 
 ```bash
-npx eas-cli@latest build --platform ios --profile production
+npx eas-cli@latest build --platform ios --profile production --auto-submit
 ```
 
-```bash
-npx eas-cli@latest submit --platform ios --latest
-```
-
-Then add yourself to an internal TestFlight group in App Store Connect.
+Answer **Yes** to logging in to your Apple account, sign in, pick your team, and accept the defaults to generate the distribution profiles (the existing distribution certificate can be reused). After the build (about 15–25 minutes) EAS submits it to App Store Connect, which creates the app record. Apple then processes it (5–30 minutes). In App Store Connect → the app → TestFlight, add the build to your internal group (for example **Team (Expo)**), then install it from the TestFlight app on your iPhone.
 
 ## Known limitations
 
