@@ -4,14 +4,14 @@ sequenceDiagram
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
-    U->>C: Type part of name and optionally select muscle group
-    C->>S: search(text, muscle)
+    U->>C: Type part of name and optionally select muscle, equipment or category
+    C->>S: search(text, muscle, equipment, category)
     S->>R: Search shared + own active exercises locally
-    R-->>S: Case-insensitive substring plus muscle matches
+    R-->>S: Case-insensitive substring plus filter matches
     S-->>C: Results -  with empty text recent exercises first
     alt No matches
      C-->>U: No match -  offer create custom exercise
     else Matches
      C-->>U: Select exercise by stable ID
     end
-    Note over S,R: Search works offline using bundled/cached catalog. FW-11 requires predefined common gym and home exercises plus the user's own. Seed count is unspecified. Source default is up to 10 recent items first.
+    Note over S,R: Use the pinned offline catalog plus the user’s own records. Preserve stable IDs and recent-first behavior.

@@ -10,12 +10,13 @@ sequenceDiagram
     R-->>S: Durable active workout or none
     alt Active exists
      S-->>C: Offer resume or discard
-     U->>C: Choose resume
-     C-->>U: Restore ordered entries and confirmed sets
-     opt User instead confirms discard
+     alt Resume
+      U->>C: Resume
+      C-->>U: Restore target snapshots, pending/done/skipped rows, actuals and local rest state
+     else Confirm discard
       C->>S: discard()
       S->>R: deleteAndEnqueue(active id)
-      R-->>C: Local commit -  no active session
+      R-->>C: Local commit -  clear rest alert and Live Activity
      end
     else None
      C-->>U: Start workout screen

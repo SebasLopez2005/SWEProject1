@@ -1,30 +1,49 @@
 flowchart TD
-    Launch["Launch: restore session and owner database"] --> Authenticated{"Previously authenticated?"}
-    Authenticated -->|No| SignIn["Sign in / register online"]
-    SignIn --> Tabs["Tabs: Workout / History / Progress / Exercises / Templates / Settings"]
-    Authenticated -->|Yes| Resume{"Active workout exists?"}
+    Launch["Restore account and local records"] --> Authenticated{"Known session?"}
+    Authenticated -->|No| SignIn["Sign in or register online"]
+    SignIn --> Resume
+    Authenticated -->|Yes| Resume{"Active workout?"}
     Resume -->|Yes| Choice["Resume or confirm discard"]
-    Resume -->|No| Tabs
-    Choice -->|Resume| Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
-    Choice -->|Confirm discard| Tabs
-    Tabs --> Start["Start empty or from template; today or earlier"] --> Active
-    Active --> Finish{"Any completed sets?"}
-    Finish -->|No| Active
-    Finish -->|Yes| Summary["Finish: plain summary + local/cloud status"]
-    Summary --> SaveTemplate["Save exercise list as template"]
-    Tabs --> History["Paged history; date and exercise filters"]
-    History --> Detail["Workout detail"]
-    Detail --> Edit["Edit finished workout / confirm delete"]
-    Tabs --> Exercises["Search + muscle filter; recent first"]
-    Exercises --> Custom["Create / rename / archive / restore custom exercise"]
-    Exercises --> ExerciseHistory["Exercise history incl. archived"]
-    Detail --> ExerciseHistory
-    Tabs --> Progress["Exercise or weekly chart + text/table; choose period"]
-    Progress --> Point["Select point or accessible row"]
-    Point --> Detail
-    Point --> Week["Contributing workouts for week"] --> Detail
-    Tabs --> Templates["Create/edit/reorder/delete lists; start workout"]
-    Templates --> Start
-    Tabs --> Settings["kg/lb, equivalent toggle, text scale up to 200%, sync/sign-out"]
-    Settings --> Sync["Pending / uploaded / needs sign-in / conflict review"]
-    Sync --> Resolve["Preserve both versions; explicitly resolve"]
+    Resume -->|No| Tabs["Main navigation"]
+    Choice -->|Resume| Active
+    Choice -->|Discard| Tabs
+
+    subgraph Train["Training"]
+      Workout["Workout"] --> Select["Select routine or start ad hoc; today or earlier"]
+      Routines["Routines"] --> Editor["Create, edit, reorder or delete<br/>Set, rep/time, optional load, RIR and rest targets"]
+      Routines --> Select
+      Editor --> Select
+      Select --> Prep["Optional warm-up and targeted mobility"]
+      Prep --> Active["Active workout<br/>Planned rows and actual fields<br/>Mark done, skip, undo or add a set"]
+      Active --> Rest["Between-set timer<br/>Pause, resume, extend or skip"]
+      Rest --> Active
+      Active --> Cool["Optional post-workout mobility"]
+      Active & Cool --> Finish{"At least one completed working set for a plan?"}
+      Finish -->|Continue logging| Active
+      Finish -->|Yes| Pending["Confirm marking remaining rows skipped, if any"]
+      Pending --> Summary["Finish summary<br/>Working sets, preparation and sync status"]
+      Summary --> SaveRoutine["Review targets and save as a routine"] --> Editor
+    end
+
+    subgraph Review["History and progress"]
+      History["History and filters"] --> Detail["Workout detail"]
+      Detail --> Edit["Correct actuals or confirm delete"]
+      Exercises["Offline exercise catalog"] --> Custom["Custom exercise, tags, rename, archive or restore"]
+      Exercises & Detail --> ExerciseHistory["Exercise history"]
+      Progress["Exercise or weekly chart and accessible values"] --> Detail
+      Profile["Profile"] --> Muscle["Front/back muscle map and exact set-equivalents"]
+      Muscle --> Region["Contributing exercises and sets"] --> Detail
+      Profile --> Report["Monthly report and comparison"]
+      Profile --> Goal["Lift goals"] --> Detail
+      Profile --> Weight["Optional bodyweight trend and target"]
+      Profile --> Export["Export my data<br/>Choose dates and files, then share"]
+    end
+
+    Tabs --> Workout & Routines & History & Exercises & Progress & Profile & Settings
+    Settings["Settings"] --> Preferences["Units, equivalent values and text scale"]
+    Settings --> Reminders["Opt-in reminders and local schedule"]
+    Settings --> Sync["Sync status, conflict review and sign-out"]
+    Notification["Workout reminder"] --> Workout
+    Activity["Rest Live Activity or alert"] --> Active
+    Note["Dark UI; native glass when supported<br/>Solid fallback, readable labels and text scaling"]
+    Note -.-> Tabs

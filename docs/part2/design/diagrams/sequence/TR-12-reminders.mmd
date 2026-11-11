@@ -1,0 +1,24 @@
+sequenceDiagram
+    title TR-12: Opt-in workout reminders
+    actor U as Lifter
+    participant C as TrainingDeviceController
+    participant D as TrainingDeviceService
+    participant R as SettingsRepository
+    participant W as WorkoutRepository
+    participant G as DeviceActivityGateway
+    U->>C: Enable reminders and select weekdays and local time
+    C->>D: Validate schedule and request notification permission
+    D->>R: Save desired preferences in the owner partition
+    alt Disabled or permission denied
+        D->>G: Cancel existing workout reminder requests
+        D-->>U: Show effective status
+    else Enabled and allowed
+        D->>W: Check completed workouts on candidate local dates
+        D->>G: Replace owned requests with one per eligible date
+        G-->>U: Deliver a rotating original message and today's workout link
+    end
+    opt Open app, change schedule, or learn of completed workout
+        D->>W: Read current completion by workout date
+        D->>G: Remove satisfied or outdated requests and reconcile schedule
+    end
+    Note over R,G: Preference may sync. Pending requests and platform permission are local to each device.

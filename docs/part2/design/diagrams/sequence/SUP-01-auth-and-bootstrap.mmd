@@ -7,6 +7,7 @@ sequenceDiagram
     participant B as AppBootstrap
     participant D as LocalDatabase
     participant S as SyncCoordinator
+    participant N as TrainingDeviceService
     U->>C: Launch / sign in
     C->>A: restoreSession or signIn
     A->>G: Restore cached identity -  refresh online if possible
@@ -16,6 +17,7 @@ sequenceDiagram
       G-->>A: Owner ID and session state
       A->>B: Bootstrap this owner
       B->>D: Open isolated partition -  migrate -  seed -  load settings
+      B->>N: Reconcile this owner’s rest and reminders on this device
       B-->>C: Main UI and offer resume
       B->>S: Start authenticated foreground/reconnect triggers
     end
@@ -26,6 +28,7 @@ sequenceDiagram
       S-->>C: Block -  sync/resolve or explicitly confirm discard
     else Safe or explicit informed discard
       A->>G: Clear session
-      C->>D: Close partition -  clear in-memory records
+      C->>N: Cancel the outgoing owner’s scheduled effects
+      C->>D: Close partition and clear in-memory records
       C-->>U: Sign-in screen
     end

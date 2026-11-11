@@ -10,12 +10,12 @@ sequenceDiagram
     R-->>S: weight_reps, reps_only or seconds
     S-->>C: Matching field schema
     alt weight_reps
-     C-->>U: Weight + kg/lb + reps
+     C-->>U: Weight + kg/lb + reps with optional actual RIR for working sets
     else reps_only
-     C-->>U: Reps only
+     C-->>U: Reps with optional actual RIR for working sets
     else seconds
      C-->>U: Whole seconds only
     end
-    U->>C: Record set
+    U->>C: Mark planned set done or record extra set
     C->>S: recordSet(typed input)
     Note over C,S: Reject irrelevant fields -  require positive whole reps/seconds. Confirm via atomic WorkoutRepository mutation as FW-02.

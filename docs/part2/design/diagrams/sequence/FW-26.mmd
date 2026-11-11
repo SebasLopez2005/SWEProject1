@@ -5,13 +5,14 @@ sequenceDiagram
     participant S as TemplateService
     participant R as TemplateRepository
     participant W as WorkoutService
-    U->>C: Start workout from template
+    U->>C: Select a saved routine and workout date
     C->>S: startWorkout(templateId)
-    S->>R: get(templateId) and resolve exercises
-    R-->>S: Ordered IDs with archive flags
+    S->>R: Load ordered entries, targets and archive flags
+    R-->>S: Routine and exercise references
     S-->>C: Mark archived exercises and offer skip
     U->>C: Confirm selection
-    S->>W: start(today) -  add retained exercises in order, including marked archived references
-    W-->>S: New active workout committed via local transaction/outbox
-    S-->>C: Empty typed entries -  previous performance available
-    Note over C,S: Template unchanged. Existing active workout triggers resume/discard. No load/reps prescription copied from template.
+    C->>S: Start with the approved entries
+    S->>W: Create independent target snapshot for retained entries
+    W-->>C: Commit active session and outbox
+    C-->>U: Show pending rows and actual fields
+    Note over C,S: Existing active workout offers resume or discard. Legacy exercise-only routines open with empty typed entries and previous performance.

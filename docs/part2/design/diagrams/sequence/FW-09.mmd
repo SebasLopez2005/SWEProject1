@@ -39,5 +39,5 @@ sequenceDiagram
     H-->>G: Authorized change page
     G-->>S: Page and next cursor
     S->>R: Apply page + checkpoint atomically -  preserve dirty conflicts
-    Note over S,R: Retries use same operation ID -  conflict never silently overwrites. Sync runs while active, not guaranteed after OS termination.
+    Note over S,R: Sync routines, workouts, goals, bodyweight and preferences. Timer state and OS request IDs are device local.<br/>Retries use same operation ID -  conflict never silently overwrites. Sync runs while active, not guaranteed after OS termination.
     Note over H,DB: Block direct client table writes. Narrow RPC uses fixed search path and explicit authenticated owner checks -  receipt/feed changes commit with the root.

@@ -1,0 +1,25 @@
+sequenceDiagram
+    title TR-06 / TR-07: Offline catalog and profile muscle map
+    actor U as Lifter
+    participant I as CatalogImporter
+    participant E as ExerciseController
+    participant R as ExerciseRepository
+    participant P as ProfileController
+    participant S as ProfileService
+    participant D as ProfileRepository
+    participant M as MuscleActivityPresenter
+    I->>R: Verify pinned metadata and merge by stable mapped ID
+    Note over I,R: Preserve prior exercise IDs. Catalog category is separate from logging type.
+    U->>E: Search offline by name, equipment, muscle or category
+    E->>R: Search shared and owned active entries
+    R-->>U: Matching exercises or custom exercise option
+    U->>P: Open front/back muscle map and select period
+    P->>S: loadMuscleActivity(period)
+    S->>D: Read finished sessions and completed working sets by workout date
+    D-->>S: Set IDs, variants and region tags
+    S->>M: Deduplicate tags by region with primary precedence
+    M->>M: Sum 1.0 per primary region and 0.5 per secondary region
+    M-->>U: Darker bands, legend, exact totals and unmapped count
+    U->>P: Open a region from the map or accessible list
+    P-->>U: Contributing exercises, sets and workout links
+    Note over S,M: Default last 7 calendar days. Recompute after corrections or deletion.

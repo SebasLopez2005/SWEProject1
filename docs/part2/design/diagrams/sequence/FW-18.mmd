@@ -13,6 +13,6 @@ sequenceDiagram
      S->>R: deleteAndEnqueue(tombstone)
      R-->>S: Local commit
      S-->>C: Deleted locally -  upload pending if offline
-     C-->>U: Remove from history, previous performance and all graphs
+     C-->>U: Refresh history, graphs, muscle activity, monthly report and goals
     end
     Note over S,R: No user-facing recycle bin. Keep sync tombstone so cloud deletion propagates and cannot be resurrected by a stale pull.

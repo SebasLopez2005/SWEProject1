@@ -37,13 +37,16 @@ classDiagram
       +addExercise(id)
       +showPrevious(id)
       +recordSet(input)
+      +markDone(rowId, actual)
+      +skip(rowId)
+      +showPreparation(phase)
       +editOrRemove(target)
       +undo(token)
       +finish()
       +resumeOrDiscard()
     }
     class ExerciseController {
-      +search(text, muscle)
+      +search(text, muscle, equipment, category)
       +create(input)
       +renameOrArchive(id)
       +restore(id)
@@ -60,7 +63,8 @@ classDiagram
       +selectPoint(id)
     }
     class TemplateController {
-      +saveWorkoutList(workoutId, name)
+      +reviewRoutineFromWorkout(workoutId)
+      +saveReviewedRoutine(input)
       +createOrEdit(input)
       +start(id)
       +deleteConfirmed(id)
@@ -69,6 +73,21 @@ classDiagram
       +chooseUnit(unit)
       +toggleEquivalent(enabled)
       +setTextScale(scale)
+    }
+    class ProfileController {
+      +muscleMap(period)
+      +monthlyReport(month)
+      +saveLiftGoal(input)
+      +saveBodyweight(input)
+      +exportData(selection)
+    }
+    class TrainingDeviceController {
+      +pauseRest()
+      +resumeRest()
+      +extendRest(seconds)
+      +skipRest()
+      +saveReminderPreference(input)
+      +openFromNotification(link)
     }
     class SyncController {
       +status()
@@ -90,12 +109,17 @@ classDiagram
     AuthService --> SyncCoordinator : pending-work guard
     AuthController --> AppBootstrap
     WorkoutController --> WorkoutService
+    WorkoutController --> TrainingDeviceController
     ExerciseController --> ExerciseService
     HistoryController --> HistoryService
     ProgressController --> ProgressService
     TemplateController --> TemplateService
     SettingsController --> SettingsService
     SyncController --> SyncCoordinator
+    ProfileController --> ProfileService
+    ProfileController --> ExportService
+    TrainingDeviceController --> TrainingDeviceService
+    AppBootstrap --> TrainingDeviceService : reconcile local OS requests
     AppBootstrap --> LocalDatabase
     AppBootstrap --> AuthService
     note for AuthService "First sign-in needs network. Cached account can work offline. No<br/>account mixing."

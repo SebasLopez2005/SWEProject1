@@ -22,3 +22,9 @@ Pending: teammate review, baseline merge/freeze, actual model generations, nativ
 - Updated role actors, functional ownership behavior, FW-11 library requirement and A-EX-2 references. Corrected discard navigation and archived template handling. See [alignment review](REVISED_REPORT_REVIEW.md) for findings and remaining source/design distinctions.
 - All 42 diagrams rendered successfully to SVG and PNG using Mermaid CLI and installed headless Chrome. Visually inspected the changed context/navigation and FW-04/FW-11/FW-12/FW-14 sheets together; render success alone is not an app acceptance test.
 - The design checker passes revised story/detail parity, role actors, description/acceptance mirrors, 31 stories / 101 points, all 42 indexed sources, class participants, current links and integrity of 41 archived files. `git diff --check` passes.
+
+## Planned training diagrams, November 8, 2026
+
+- The [traceability matrix](TRACEABILITY.md) maps all 13 training requirements to seven sequence diagrams. The design checker also verifies the 31 baseline stories, their 101 points, and the integrity of the 41 archived files.
+- `npm run diagrams:render -- --png` rendered all 50 indexed diagrams to SVG and PNG. Reviewed the context, architecture, navigation, and both entity relationship diagrams together.
+- `python3 scripts/check_design.py` and `git diff --check` passed. App generation remains on hold.

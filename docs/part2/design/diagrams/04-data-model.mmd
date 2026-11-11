@@ -6,6 +6,7 @@ erDiagram
     WORKOUT ||--o{ WORKOUT_ENTRY : orders
     WORKOUT_ENTRY ||--o{ EXERCISE_SET : contains
     EXERCISE ||--o{ WORKOUT_ENTRY : identifies
+    TEMPLATE o|..o{ WORKOUT : snapshots_into
     TEMPLATE ||--o{ TEMPLATE_ENTRY : orders
     EXERCISE ||--o{ TEMPLATE_ENTRY : references
     ACCOUNT ||--o{ OUTBOX_OPERATION : local_queue
@@ -17,6 +18,9 @@ erDiagram
     WORKOUT {
       uuid id PK
       uuid owner_id FK
+      uuid template_id "optional historical reference"
+      int template_revision "optional historical source revision"
+      int default_rest_seconds "optional session snapshot"
       date workout_date
       string state
       datetime started_at
@@ -29,15 +33,27 @@ erDiagram
       uuid workout_id FK
       uuid exercise_id FK
       int position
+      string phase "warmup, work or mobility"
+      string rest_mode "inherit, duration or off"
+      int rest_seconds "snapshotted when applicable"
     }
     EXERCISE_SET {
       uuid id PK
       uuid entry_id FK
       int position
+      string state "pending, done or skipped"
+      int target_reps "optional snapshot"
+      int target_seconds "optional snapshot"
+      decimal target_load
+      string target_unit
+      int target_rir_min
+      int target_rir_max
       decimal entered_weight
       string entered_unit
       int reps
       int seconds
+      int actual_rir "optional for rep-based work"
+      datetime completed_at "optional for legacy data"
     }
     EXERCISE {
       uuid id PK
@@ -45,7 +61,7 @@ erDiagram
       string name
       string normalized_name
       string exercise_type
-      string muscle_group
+      string muscle_group "legacy filter group"
       boolean archived
       boolean ever_used
       int revision
@@ -63,6 +79,16 @@ erDiagram
       uuid template_id FK
       uuid exercise_id FK
       int position
+      string phase
+      int target_set_count "optional for legacy lists"
+      int target_reps
+      int target_seconds
+      decimal target_load
+      string target_unit
+      int target_rir_min
+      int target_rir_max
+      string rest_mode
+      int rest_seconds
     }
     USER_SETTINGS {
       uuid owner_id PK

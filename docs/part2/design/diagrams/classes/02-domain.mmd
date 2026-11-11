@@ -4,6 +4,9 @@ classDiagram
       +UUID id
       +UUID ownerId
       +Date workoutDate
+      +UUID sourceTemplateId
+      +int sourceTemplateRevision
+      +int defaultRestSeconds
       +WorkoutState state
       +DateTime startedAt
       +DateTime finishedAt
@@ -16,15 +19,21 @@ classDiagram
       +UUID id
       +UUID exerciseId
       +int position
+      +TrainingPhase phase
+      +RestRule restRule
       +ExerciseSet[] sets
     }
     class ExerciseSet {
       +UUID id
       +int position
+      +SetState state
+      +SetTarget targetSnapshot
       +Decimal enteredWeight
       +WeightUnit enteredUnit
       +int reps
       +int seconds
+      +int actualRir
+      +DateTime completedAt
     }
     class Exercise {
       +UUID id
@@ -33,6 +42,7 @@ classDiagram
       +String normalizedName
       +ExerciseType type
       +String muscleGroup
+      +MuscleRole[] muscleTags
       +bool archived
       +bool everUsed
       +int revision
@@ -42,11 +52,44 @@ classDiagram
       +UUID ownerId
       +String name
       +TemplateEntry[] entries
+      +int defaultRestSeconds
       +int revision
     }
     class TemplateEntry {
       +UUID exerciseId
       +int position
+      +TrainingPhase phase
+      +int targetSetCount
+      +SetTarget target
+      +RestRule restRule
+    }
+    class SetTarget {
+      +int reps
+      +int seconds
+      +Decimal load
+      +WeightUnit unit
+      +int rirMin
+      +int rirMax
+    }
+    class TrainingPhase {
+      <<enumeration>>
+      warmup
+      work
+      mobility
+    }
+    class SetState {
+      <<enumeration>>
+      pending
+      done
+      skipped
+    }
+    class RestRule {
+      +String mode
+      +int seconds
+    }
+    class MuscleRole {
+      +String regionId
+      +String role
     }
     class UserSettings {
       +WeightUnit preferredUnit
@@ -56,17 +99,20 @@ classDiagram
     }
     class WorkoutService {
       +start(date)
+      +startWithSnapshot(date, routine)
       +addExercise(id)
       +prefill(entryId)
       +recordSet(input)
+      +markDone(rowId, actual)
+      +skip(rowId)
       +mutateActive(patch)
       +undo(token)
-      +finish()
+      +finish(confirmSkipPending)
       +resume()
       +discard()
     }
     class ExerciseService {
-      +search(text, muscle)
+      +search(text, muscle, equipment, category)
       +create(input)
       +rename(id, name)
       +archiveOrRestore(id)
@@ -80,7 +126,8 @@ classDiagram
       +deleteWorkout(id)
     }
     class TemplateService {
-      +fromWorkout(id, name)
+      +reviewFromWorkout(id)
+      +saveReviewedRoutine(input)
       +save(input)
       +startWorkout(id)
       +delete(id)
@@ -97,6 +144,7 @@ classDiagram
     class InputValidator {
       +validateDate(date, timezone)
       +validateTypedSet(input, exercise)
+      +validateSetTarget(target, exercise)
       +validateName(name)
       +normalizeName(name)
     }
@@ -108,6 +156,14 @@ classDiagram
     Workout "1" *-- "0..*" WorkoutEntry
     WorkoutEntry "1" *-- "0..*" ExerciseSet
     WorkoutEntry --> Exercise
+    WorkoutEntry --> TrainingPhase
+    WorkoutEntry --> RestRule
+    ExerciseSet --> SetState
+    ExerciseSet "1" *-- "0..1" SetTarget : historical target
+    TemplateEntry "1" *-- "0..1" SetTarget : routine target
+    TemplateEntry --> TrainingPhase
+    TemplateEntry --> RestRule
+    Exercise "1" *-- "0..*" MuscleRole
     Template "1" *-- "1..*" TemplateEntry
     TemplateEntry --> Exercise
     WorkoutService --> InputValidator
@@ -115,6 +171,7 @@ classDiagram
     WorkoutService --> WorkoutRepository
     WorkoutService --> ExerciseRepository
     WorkoutService --> HistoryService
+    WorkoutService --> TrainingDeviceService : after confirmed work change
     ExerciseService --> InputValidator
     ExerciseService --> ExerciseRepository
     HistoryService --> InputValidator
@@ -126,8 +183,8 @@ classDiagram
     ProgressService --> WorkoutRepository
     ProgressService --> VolumeCalculator
     note for Exercise "Stable ID. Types: weight_reps, reps_only, seconds. Shared seed<br/>immutable; custom type locks after use."
-    note for ExerciseSet "Preserve original decimal and kg/lb unit. Reps-only has no weight;<br/>timed has seconds only."
-    note for Workout "One active per owner; finished requires a set. Date never future.<br/>Confirm mutations after SQLite commit."
+    note for ExerciseSet "Targets and actual values are separate. Only done rows have actuals.<br/>Typed fields and original kg/lb values are preserved."
+    note for Workout "One active per owner. Planned finish requires a completed working set.<br/>Pending rows are skipped only after confirmation. Dates cannot be future."
     class WorkoutState {
       <<enumeration>>
       in_progress

@@ -2,6 +2,8 @@
 
 Updated November 4, 2026. Revised requirements baseline; initial PR stack merged. This document records selected requirements and proposed design decisions.
 
+The November 4 scope below is the historical baseline. The [planned training draft](TRAINING_REQUIREMENTS_DRAFT.md) records requested changes to routines, rest, analytics and bodyweight. Review that draft before freezing another generation.
+
 ## Selected product
 
 The user explicitly selected **Claude gym scope + Supabase**. The authoritative requirements input is now [the revised report with professor feedback](source/Fitness_Workout_Log_App_Revised_v2.docx), adopted November 4, 2026. It supersedes [the earlier reviewed final](../../part1/final/07_Final_Reviewed_Claude_Product_Definition.docx) for this design. Older Claude drafts and the 12-story ChatGPT alternative do not define the selected scope. Working app name: **Fitness & Workout Log**. Its four proto-personas are Marcus Reyes, Priya Nair, Elena Okafor and Tomás Vargas. All **31 stories / 101 initial story points** remain in design scope; the points are historical estimates, not a release commitment.

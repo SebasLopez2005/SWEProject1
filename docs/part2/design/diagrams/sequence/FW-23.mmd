@@ -7,7 +7,7 @@ sequenceDiagram
     participant V as VolumeCalculator
     U->>C: Open reps-only exercise progress
     C->>S: exerciseSeries(exerciseId, period)
-    S->>R: Finished matching reps-only sets
+    S->>R: Completed reps-only working sets in finished workouts
     R-->>S: Date, workout ID and reps
     S->>V: Sum reps per workout
     V-->>S: Reps series

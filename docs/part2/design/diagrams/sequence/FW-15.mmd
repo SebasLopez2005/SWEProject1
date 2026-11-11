@@ -11,7 +11,7 @@ sequenceDiagram
      R-->>C: Explain and return to list
     else Found
      R-->>S: Current snapshot
-     S-->>C: Ordered exercises and typed sets
-     C-->>U: Date, duration if known, total volume, units and plain summary
+     S-->>C: Ordered exercises, planned targets and confirmed actuals
+     C-->>U: Date, duration if known, working volume, units and preparation breakdown
     end
     Note over C,S: WorkoutPresenter uses current unit/text preferences -  original weights remain intact. Unsynced edits are visible immediately.

@@ -1,0 +1,46 @@
+sequenceDiagram
+    title TR-01 / TR-02: Plan a routine and complete working sets
+    actor U as Lifter
+    participant T as TemplateController
+    participant P as TemplateService
+    participant C as WorkoutController
+    participant W as WorkoutService
+    participant R as WorkoutRepository
+    U->>T: Save ordered exercise targets and optional rest
+    T->>P: Validate typed targets, set count and optional RIR range
+    P-->>U: Saved after local routine commit
+    U->>T: Start the saved routine
+    T->>P: Load current routine and review archived entries
+    P->>W: Start with approved targets and stable pending rows
+    W->>R: Atomically save session snapshot and outbox
+    R-->>C: Show targets and editable actual fields
+    Note over T,R: Existing active session offers resume or discard. Older lists open with empty entries and no invented targets.
+    U->>C: Enter actual reps, load/unit or time, and optional actual RIR
+    C->>W: Mark done for existing row ID
+    alt Invalid actual or commit fails
+        W-->>C: Keep input. The row stays pending.
+    else Commit succeeds
+        W->>R: Persist typed actuals, done state and outbox
+        R-->>C: Update completed count
+        Note over C,W: Confirmed working-set completion can start rest in TR-03. Duplicate completion does not create another result.
+    end
+    opt Skip, undo, or add an extra set
+        U->>C: Change the current session
+        C->>W: Validate transition without changing the routine
+        W->>R: Atomically persist new session snapshot and outbox
+    end
+    U->>C: Finish workout
+    alt No working set done
+        C-->>U: Continue logging or discard
+    else Working set done
+        opt Rows are pending
+            C-->>U: Confirm marking pending rows skipped
+            U->>C: Confirm or decline
+            break Confirmation declined
+                C-->>U: Return to active workout
+            end
+        end
+        C->>W: Finish after required confirmation
+        W->>R: Persist finished session and outbox
+        R-->>U: Summary with planned and completed counts
+    end

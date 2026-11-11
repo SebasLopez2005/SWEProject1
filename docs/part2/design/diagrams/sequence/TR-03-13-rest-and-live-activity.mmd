@@ -1,0 +1,39 @@
+sequenceDiagram
+    title TR-03 / TR-13: Rest countdown and iOS Lock Screen
+    actor U as Lifter
+    participant W as WorkoutService
+    participant D as TrainingDeviceService
+    participant R as DeviceStateRepository
+    participant G as DeviceActivityGateway
+    W->>D: Working-set completion committed
+    alt Auto-rest enabled and another working set remains
+        D->>R: Replace local state with source set and absolute deadline
+        D->>G: Reconcile previous alert and activity
+        opt Alert permission granted
+            G->>G: Schedule one rest-end alert for deadline
+        end
+        opt iOS supports and permits Live Activities
+            G->>G: Upsert system countdown and active workout link
+        end
+        G-->>R: Save current OS request IDs locally
+        D-->>U: Show in-app countdown
+    else No eligible rest
+        D->>G: Clear prior rest effects
+        D->>R: Clear rest state
+    end
+    U->>G: Lock phone or leave app
+    Note over G: System renders deadline countdown and can deliver its scheduled alert while the app is suspended.
+    U->>D: Reopen workout, optionally through the activity or alert
+    D->>R: Read persisted deadline or paused remainder
+    D-->>U: Restore countdown or show rest complete
+    opt Pause, resume, extend or skip
+        U->>D: Change rest
+        D->>R: Persist remaining time, updated deadline or ended state
+        D->>G: Replace or cancel old alert and update or end activity
+    end
+    opt Undo the triggering completion, finish or discard
+        W->>D: Source is no longer active
+        D->>G: Cancel alert and end activity
+        D->>R: Clear rest state
+    end
+    Note over D,R: Effects belong to the starting device. Reconcile OS requests after interruption. Timer state stays on the device.

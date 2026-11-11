@@ -4,12 +4,12 @@ sequenceDiagram
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
-    U->>C: Create or edit named template
-    C-->>U: Search exercise library, add, reorder, remove
-    U->>C: Save ordered list
-    C->>S: save(name, ordered exerciseIds)
-    S->>S: Validate name, unique per owner, nonempty exercise list
+    U->>C: Create or edit named routine
+    C-->>U: Search, add, reorder and set typed targets, RIR or rest
+    U->>C: Save ordered routine
+    C->>S: save(name, ordered entries and targets)
+    S->>S: Validate unique owner name, entries and target ranges
     S->>R: mutateAndEnqueue(template snapshot)
     R-->>S: Local commit or validation/storage failure
     S-->>C: Saved after commit -  else explain and keep editor
-    Note over C,R: Renaming/reordering changes this template only, not previous workouts. Archived references stay marked -  new selections must be active.
+    Note over C,R: Routine edits apply to later starts. Existing snapshots keep their targets. Archived references stay marked.

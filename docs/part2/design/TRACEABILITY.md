@@ -1,6 +1,6 @@
 # Story-to-design coverage and acceptance checklist
 
-Selected input: [the revised fitness report with professor feedback](source/Fitness_Workout_Log_App_Revised_v2.docx), **31 FW stories / 101 original points**. No app exists yet: every acceptance check is **not run**. Story text and original detail are preserved in [SELECTED_STORIES.md](SELECTED_STORIES.md).
+Selected input: [the revised fitness report with professor feedback](source/Fitness_Workout_Log_App_Revised_v2.docx), **31 FW stories / 101 original points**. The original story text and acceptance wording are preserved in [SELECTED_STORIES.md](SELECTED_STORIES.md). The [planned training draft](TRAINING_REQUIREMENTS_DRAFT.md) adds TR-01–13. Use the dated [run log](../experiments/RUN_LOG.md) for implementation evidence.
 
 | Story | Capability | Sequence | Controller / service | Original points |
 | --- | --- | --- | --- | ---: |
@@ -36,9 +36,29 @@ Selected input: [the revised fitness report with professor feedback](source/Fitn
 | FW-30 | See both units | [Flow](diagrams/sequence/FW-30.mmd) | SettingsController / SettingsService | 3 |
 | FW-31 | Enter a set in either unit | [Flow](diagrams/sequence/FW-31.mmd) | WorkoutController / WorkoutService | 5 |
 
+## Planned training coverage
+
+These are design checks for the next generation. TR-01 and TR-02 extend the original exercise-only template flow with optional prescriptions and set completion.
+
+| ID | Capability | Sequence |
+| --- | --- | --- |
+| TR-01 | Routine prescriptions and historical snapshots | [Planned training](diagrams/sequence/TR-01-02-planned-training.mmd) |
+| TR-02 | Confirm actuals, skip, undo and finish | [Planned training](diagrams/sequence/TR-01-02-planned-training.mmd) |
+| TR-03 | Device-local rest timer | [Rest and Live Activity](diagrams/sequence/TR-03-13-rest-and-live-activity.mmd) |
+| TR-04 | Warm-up steps | [Preparation](diagrams/sequence/TR-04-05-preparation.mmd) |
+| TR-05 | Targeted mobility | [Preparation](diagrams/sequence/TR-04-05-preparation.mmd) |
+| TR-06 | Pinned offline exercise catalog | [Catalog and muscles](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd) |
+| TR-07 | Muscle diagram and exact set-equivalents | [Catalog and muscles](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd) |
+| TR-08 | Monthly report | [Profile progress](diagrams/sequence/TR-08-09-11-profile-progress.mmd) |
+| TR-09 | Exact-lift goals | [Profile progress](diagrams/sequence/TR-08-09-11-profile-progress.mmd) |
+| TR-10 | Owner-selected CSV files | [Export](diagrams/sequence/TR-10-export.mmd) |
+| TR-11 | Optional bodyweight tracking | [Profile progress](diagrams/sequence/TR-08-09-11-profile-progress.mmd) |
+| TR-12 | Workout reminders and original messages | [Reminders](diagrams/sequence/TR-12-reminders.mmd) |
+| TR-13 | iOS Lock Screen countdown | [Rest and Live Activity](diagrams/sequence/TR-03-13-rest-and-live-activity.mmd) |
+
 ## Per-story checks
 
-Use the following as the same checklist for both models. Record pass/fail/not tested and concrete evidence per run; expected behavior is not evidence.
+The expected statements below preserve the original report wording. Where behavior changes, use the TR acceptance checks and revised diagrams for the next run.
 
 ### FW-01 - Start a workout, add exercises
 

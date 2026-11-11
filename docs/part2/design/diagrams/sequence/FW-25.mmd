@@ -5,16 +5,18 @@ sequenceDiagram
     participant S as TemplateService
     participant R as TemplateRepository
     participant W as HistoryService
-    U->>C: Save finished workout as named template
-    C->>S: fromWorkout(workoutId, name)
+    U->>C: Save finished workout as a routine
+    C->>S: reviewFromWorkout(workoutId)
     S->>W: getWorkout(workoutId)
-    W-->>S: Ordered finished workout entries
-    S->>R: Check normalized template name uniqueness
-    alt Invalid or duplicate name
-     S-->>C: Explain -  preserve name input
+    W-->>S: Ordered entries, available targets and confirmed results
+    S-->>U: Review name, exercise order and editable targets
+    U->>C: Confirm reviewed routine
+    C->>S: saveReviewedRoutine(input)
+    S->>R: Check unique owner name and validate targets
+    alt Invalid input
+        S-->>C: Explain and preserve editor
     else Valid
-     S->>R: mutateAndEnqueue(new template with ordered exercise IDs only)
-     R-->>S: Local commit
-     S-->>C: Template saved, upload pending if offline
+        S->>R: Commit new routine and outbox
+        R-->>C: Saved locally
     end
-    Note over S,R: Nonempty name up to source-proposed 60 chars. No sets, weights or reps copied -  source workout remains independent.
+    Note over S,R: Actual load and RIR become targets only by explicit choice. The source workout keeps its own results.

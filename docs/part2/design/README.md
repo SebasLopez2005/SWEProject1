@@ -1,6 +1,6 @@
 # Fitness & Workout Log - Mermaid design guide
 
-**Revised baseline, November 4, 2026.** Selected scope: revised fitness report with professor feedback, all 31 FW stories.
+**Planned training design, November 8, 2026.** The original 31 FW stories and point estimates are retained for traceability. The [training draft](TRAINING_REQUIREMENTS_DRAFT.md) adds TR-01–13 and supersedes conflicting behavior in the original scope. See the [interface requirements](ROUND_02_UI.md) for the dark theme.
 See [the requirements alignment review](REVISED_REPORT_REVIEW.md) and [source report](source/Fitness_Workout_Log_App_Revised_v2.docx).
 Proposed stack: Expo / React Native, local SQLite and Supabase. Intended iOS
 distribution: TestFlight. This is design, not generated implementation evidence.
@@ -14,8 +14,8 @@ Start with context and architecture, then navigation/data, the five class-model
 sheets and the story sequences. The two supporting sequences explain account
 bootstrap and conflict resolution. Class sheets form one modular class model;
 repeated names mean the same logical type. Every diagram has a description and
-justification below. There are 42 Mermaid sources: 4 top-level, 5 class sheets,
-31 story sequences and 2 supporting sequences.
+justification below. The index includes 5 top-level diagrams, 5 class sheets,
+31 original story sequences, 2 supporting sequences and 7 planned training sequences.
 
 The `.mmd` sources are authoritative. Run `python3 scripts/check_design.py --sync`
 after editing them to update the mirrored Mermaid blocks below, then render.
@@ -30,8 +30,9 @@ and ignored by Git; retain source/PR history as assignment evidence.
 - Confirm Apple Developer access and the instructor's acceptance of TestFlight.
 - Initial PRs #2–#45 are merged; record the final baseline commit before invoking either coding model.
 
-The initial design stack is merged. No application generation or deployment has run. See the
-[report](../REPORT.md) and [experiment protocol](../experiments/README.md).
+The next generation is on hold. See the [experiment log](../experiments/RUN_LOG.md)
+for implementation history and the [experiment protocol](../experiments/README.md)
+for the process before another run.
 
 ## Diagram contents
 
@@ -39,6 +40,7 @@ The initial design stack is merged. No application generation or deployment has 
 - [Runtime architecture and distribution](diagrams/02-architecture.mmd)
 - [Screen navigation](diagrams/03-navigation.mmd)
 - [Persistent entity relationships](diagrams/04-data-model.mmd)
+- [Persistent entity relationships for profile, catalog and device state](diagrams/05-training-data.mmd)
 - [Class model: controllers and account access](diagrams/classes/01-ui-and-auth.mmd)
 - [Class model: domain entities and services](diagrams/classes/02-domain.mmd)
 - [Class model: repositories and backend handlers](diagrams/classes/03-persistence-and-sync.mmd)
@@ -77,10 +79,17 @@ The initial design stack is merged. No application generation or deployment has 
 - [FW-29: Larger text size](diagrams/sequence/FW-29.mmd)
 - [FW-30: See both units](diagrams/sequence/FW-30.mmd)
 - [FW-31: Enter a set in either unit](diagrams/sequence/FW-31.mmd)
+- [TR-01 / TR-02: Plan a routine and complete working sets](diagrams/sequence/TR-01-02-planned-training.mmd)
+- [TR-03 / TR-13: Rest countdown and iOS Lock Screen](diagrams/sequence/TR-03-13-rest-and-live-activity.mmd)
+- [TR-04 / TR-05: Warm-up and targeted mobility](diagrams/sequence/TR-04-05-preparation.mmd)
+- [TR-06 / TR-07: Offline catalog and profile muscle map](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd)
+- [TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight](diagrams/sequence/TR-08-09-11-profile-progress.mmd)
+- [TR-10: Export my data](diagrams/sequence/TR-10-export.mmd)
+- [TR-12: Opt-in workout reminders](diagrams/sequence/TR-12-reminders.mmd)
 
 ## Context and functional modules
 
-Shows the four user situations, functional modules, account/data services and the mobile distribution boundary.
+Shows lifter roles, planned training, profile insights, device alerts, export and the hosted account and sync boundaries.
 
 **Design value:** Makes product responsibilities explicit without confusing TestFlight with a runtime workout service.
 
@@ -89,34 +98,36 @@ Shows the four user situations, functional modules, account/data services and th
 ```mermaid
 flowchart TB
     User["Experienced lifter / Beginner lifter / Home trainer / Returning lifter"]
-    subgraph System["Fitness and Workout Log - system boundary"]
-      Log["Recording and resume"]
-      Library["Exercise library"]
+    subgraph System["Fitness and Workout Log"]
+      Plan["Routine planning and presets"]
+      Log["Warm-up, planned set completion, rest and resume"]
+      Library["Offline exercise and mobility catalog"]
       History["History and correction"]
-      Progress["Volume and reps progress"]
-      Templates["Reusable exercise lists"]
-      Settings["Units and readability"]
-      Data["Local-first persistence and sync"]
+      Profile["Muscle activity, monthly reports, goals and optional bodyweight"]
+      Export["Export my data"]
+      Settings["Display, units, reminder preferences"]
+      Data["Owner-scoped local storage and sync"]
       Identity["Account access"]
+      Device["Local alerts and iOS Live Activity adapter"]
+      Plan --> Library
+      Log --> Plan & Library & Device
+      Settings --> Device
+      Profile --> Export
+      Plan & Log & Library & History & Profile & Export & Settings & Identity --> Data
     end
-    User --> Log & Library & History & Progress & Templates & Settings
-    Log --> Library & Templates & Data
-    History --> Data
-    Progress --> Data
-    Library --> Data
-    Templates --> Data
-    Settings --> Data
-    Identity --> Data
+    User --> Plan & Log & Library & History & Profile & Settings & Identity
     Identity --> Auth["Supabase Auth"]
     Data --> Cloud["Supabase hosted data services"]
-    User --> Identity
+    Device --> OS["OS notifications / iOS Lock Screen"]
+    Export --> Share["System share sheet / user-selected destination"]
+    Seed["Pinned exercise metadata snapshot"] --> Library
     Instructor["Instructor / beta tester"] --> TF["TestFlight distribution"]
     TF -. "installs mobile app; no workout traffic" .-> System
 ```
 
 ## Runtime architecture and distribution
 
-Separates device UI/controllers, local repositories/SQLite/outbox and hosted Supabase Auth/API/PostgreSQL. EAS and TestFlight are a separate build path.
+Connects local records and the sync outbox to Supabase, with separate device timers, ActivityKit and the system share sheet.
 
 **Design value:** Explains why confirming a set is local and why the API still needs owner checks, idempotency and atomic writes.
 
@@ -126,58 +137,59 @@ Separates device UI/controllers, local repositories/SQLite/outbox and hosted Sup
 flowchart LR
     subgraph Phone["iOS / Android - Expo React Native runtime"]
       direction TB
-      UI["Expo Router screens and accessible components"]
+      UI["Expo Router screens and accessible components<br/>Dark theme, glass controls or solid fallback"]
       C["Feature UI controllers"]
-      S["Domain services and validation"]
-      P["Presenters: unit conversion, text scale, volume aggregation"]
+      S["Domain services: routines, set completion, timers, goals and measurements"]
+      P["Presenters: units, muscle scores, reports, chart values and text scaling"]
+      Export["Export service: local CSV generation"]
       Repo["Owner-scoped local repository ports"]
-      SQL["expo-sqlite: workouts, catalog, templates, settings"]
+      SQL["SQLite: routines, workout snapshots, catalog, goals, weight and preferences"]
+      Local["Device-local timer state and OS request IDs"]
       Queue["SQLite outbox, conflicts and sync checkpoint"]
       Sync["SyncCoordinator + SyncGateway"]
       Auth["AuthService + session storage adapter"]
-      Lifecycle["Foreground and reconnect events"]
+      Lifecycle["Launch, foreground and reconnect events"]
+      Device["Timer and reminder adapters"]
       UI --> C
-      C --> S & P & Auth
-      S --> Repo
-      P --> Repo
-      Repo --> SQL
-      Repo --> Queue
+      C --> S & P & Auth & Export
+      S & P & Export --> Repo
+      Repo --> SQL & Queue
       C --> Sync
-      Lifecycle --> Sync
-      Sync --> Queue & SQL
-      Sync --> Auth
-      Note["Confirm only after local transaction commits.
-Network loss keeps work saved and pending.
-Sign-out must resolve or explicitly discard pending work."]
-      Note -.-> Repo
+      Lifecycle --> Sync & Device
+      Sync --> Queue & SQL & Auth
+      S --> Device
+      Device <--> Local
     end
     subgraph Backend["Supabase hosted backend"]
       direction TB
       SA["Auth service"]
       API["JWT-authenticated Data API and RPC endpoints"]
-      RPC["apply_mutation / pull_changes
-Owner checks, revisions, validation, transactions"]
+      RPC["apply_mutation / pull_changes<br/>Owner checks, revisions, validation and transactions"]
       PG["PostgreSQL: normalized entities + RLS"]
       Receipts["Operation receipts and ordered change feed"]
       API --> RPC
       RPC --> PG & Receipts
       API --> PG
     end
+    Seed["Pinned catalog metadata and ID map"] --> SQL
     Auth -->|"HTTPS: email/password + session refresh"| SA
-    Sync -->|"HTTPS: snapshots, operation IDs, revisions"| API
-    subgraph Distribution["Build and distribution - outside request runtime"]
+    Sync -->|"HTTPS: owner snapshots, operation IDs and revisions"| API
+    Device --> OS["Local notification scheduler"]
+    Device --> Widget["iOS ActivityKit widget extension<br/>System-rendered countdown from deadline"]
+    Export --> Share["System share sheet"]
+    subgraph Distribution["Build and distribution"]
       direction TB
-      Git["GitHub design PRs and independent generated outputs"]
+      Git["GitHub design PRs and generated outputs"]
       EAS["EAS Build and Submit"]
       ASC["App Store Connect / TestFlight"]
       Git --> EAS --> ASC
     end
-    ASC -. "signed app installation" .-> Phone
+    ASC -. "signed native installation" .-> Phone
 ```
 
 ## Screen navigation
 
-Maps launch, authentication, resume, main areas, typed entry, summary, history drill-down, templates and sync review.
+Maps routine planning, preparation, set completion, rest, profile insights, export and reminder entry points.
 
 **Design value:** Gives both coding models the same reachable screen flows; no story should exist only as an isolated service method.
 
@@ -185,42 +197,61 @@ Maps launch, authentication, resume, main areas, typed entry, summary, history d
 
 ```mermaid
 flowchart TD
-    Launch["Launch: restore session and owner database"] --> Authenticated{"Previously authenticated?"}
-    Authenticated -->|No| SignIn["Sign in / register online"]
-    SignIn --> Tabs["Tabs: Workout / History / Progress / Exercises / Templates / Settings"]
-    Authenticated -->|Yes| Resume{"Active workout exists?"}
+    Launch["Restore account and local records"] --> Authenticated{"Known session?"}
+    Authenticated -->|No| SignIn["Sign in or register online"]
+    SignIn --> Resume
+    Authenticated -->|Yes| Resume{"Active workout?"}
     Resume -->|Yes| Choice["Resume or confirm discard"]
-    Resume -->|No| Tabs
-    Choice -->|Resume| Active["Active workout: previous sets, typed entry, unit toggle, edit/undo"]
-    Choice -->|Confirm discard| Tabs
-    Tabs --> Start["Start empty or from template; today or earlier"] --> Active
-    Active --> Finish{"Any completed sets?"}
-    Finish -->|No| Active
-    Finish -->|Yes| Summary["Finish: plain summary + local/cloud status"]
-    Summary --> SaveTemplate["Save exercise list as template"]
-    Tabs --> History["Paged history; date and exercise filters"]
-    History --> Detail["Workout detail"]
-    Detail --> Edit["Edit finished workout / confirm delete"]
-    Tabs --> Exercises["Search + muscle filter; recent first"]
-    Exercises --> Custom["Create / rename / archive / restore custom exercise"]
-    Exercises --> ExerciseHistory["Exercise history incl. archived"]
-    Detail --> ExerciseHistory
-    Tabs --> Progress["Exercise or weekly chart + text/table; choose period"]
-    Progress --> Point["Select point or accessible row"]
-    Point --> Detail
-    Point --> Week["Contributing workouts for week"] --> Detail
-    Tabs --> Templates["Create/edit/reorder/delete lists; start workout"]
-    Templates --> Start
-    Tabs --> Settings["kg/lb, equivalent toggle, text scale up to 200%, sync/sign-out"]
-    Settings --> Sync["Pending / uploaded / needs sign-in / conflict review"]
-    Sync --> Resolve["Preserve both versions; explicitly resolve"]
+    Resume -->|No| Tabs["Main navigation"]
+    Choice -->|Resume| Active
+    Choice -->|Discard| Tabs
+
+    subgraph Train["Training"]
+      Workout["Workout"] --> Select["Select routine or start ad hoc; today or earlier"]
+      Routines["Routines"] --> Editor["Create, edit, reorder or delete<br/>Set, rep/time, optional load, RIR and rest targets"]
+      Routines --> Select
+      Editor --> Select
+      Select --> Prep["Optional warm-up and targeted mobility"]
+      Prep --> Active["Active workout<br/>Planned rows and actual fields<br/>Mark done, skip, undo or add a set"]
+      Active --> Rest["Between-set timer<br/>Pause, resume, extend or skip"]
+      Rest --> Active
+      Active --> Cool["Optional post-workout mobility"]
+      Active & Cool --> Finish{"At least one completed working set for a plan?"}
+      Finish -->|Continue logging| Active
+      Finish -->|Yes| Pending["Confirm marking remaining rows skipped, if any"]
+      Pending --> Summary["Finish summary<br/>Working sets, preparation and sync status"]
+      Summary --> SaveRoutine["Review targets and save as a routine"] --> Editor
+    end
+
+    subgraph Review["History and progress"]
+      History["History and filters"] --> Detail["Workout detail"]
+      Detail --> Edit["Correct actuals or confirm delete"]
+      Exercises["Offline exercise catalog"] --> Custom["Custom exercise, tags, rename, archive or restore"]
+      Exercises & Detail --> ExerciseHistory["Exercise history"]
+      Progress["Exercise or weekly chart and accessible values"] --> Detail
+      Profile["Profile"] --> Muscle["Front/back muscle map and exact set-equivalents"]
+      Muscle --> Region["Contributing exercises and sets"] --> Detail
+      Profile --> Report["Monthly report and comparison"]
+      Profile --> Goal["Lift goals"] --> Detail
+      Profile --> Weight["Optional bodyweight trend and target"]
+      Profile --> Export["Export my data<br/>Choose dates and files, then share"]
+    end
+
+    Tabs --> Workout & Routines & History & Exercises & Progress & Profile & Settings
+    Settings["Settings"] --> Preferences["Units, equivalent values and text scale"]
+    Settings --> Reminders["Opt-in reminders and local schedule"]
+    Settings --> Sync["Sync status, conflict review and sign-out"]
+    Notification["Workout reminder"] --> Workout
+    Activity["Rest Live Activity or alert"] --> Active
+    Note["Dark UI; native glass when supported<br/>Solid fallback, readable labels and text scaling"]
+    Note -.-> Tabs
 ```
 
 ## Persistent entity relationships
 
-Models workout/entry/set records, stable exercises, independent template lists, settings and local/server synchronization records.
+Models routine prescriptions and independent workout snapshots with typed actuals, set states and existing synchronization records.
 
-**Design value:** Prevents list templates from accidentally copying sets, preserves entered units, and makes deletion/deduplication data explicit.
+**Design value:** Keeps prescribed values separate from confirmed results and preserves historical records when routines change.
 
 [Edit Mermaid source](diagrams/04-data-model.mmd)
 
@@ -233,6 +264,7 @@ erDiagram
     WORKOUT ||--o{ WORKOUT_ENTRY : orders
     WORKOUT_ENTRY ||--o{ EXERCISE_SET : contains
     EXERCISE ||--o{ WORKOUT_ENTRY : identifies
+    TEMPLATE o|..o{ WORKOUT : snapshots_into
     TEMPLATE ||--o{ TEMPLATE_ENTRY : orders
     EXERCISE ||--o{ TEMPLATE_ENTRY : references
     ACCOUNT ||--o{ OUTBOX_OPERATION : local_queue
@@ -244,6 +276,9 @@ erDiagram
     WORKOUT {
       uuid id PK
       uuid owner_id FK
+      uuid template_id "optional historical reference"
+      int template_revision "optional historical source revision"
+      int default_rest_seconds "optional session snapshot"
       date workout_date
       string state
       datetime started_at
@@ -256,15 +291,27 @@ erDiagram
       uuid workout_id FK
       uuid exercise_id FK
       int position
+      string phase "warmup, work or mobility"
+      string rest_mode "inherit, duration or off"
+      int rest_seconds "snapshotted when applicable"
     }
     EXERCISE_SET {
       uuid id PK
       uuid entry_id FK
       int position
+      string state "pending, done or skipped"
+      int target_reps "optional snapshot"
+      int target_seconds "optional snapshot"
+      decimal target_load
+      string target_unit
+      int target_rir_min
+      int target_rir_max
       decimal entered_weight
       string entered_unit
       int reps
       int seconds
+      int actual_rir "optional for rep-based work"
+      datetime completed_at "optional for legacy data"
     }
     EXERCISE {
       uuid id PK
@@ -272,7 +319,7 @@ erDiagram
       string name
       string normalized_name
       string exercise_type
-      string muscle_group
+      string muscle_group "legacy filter group"
       boolean archived
       boolean ever_used
       int revision
@@ -290,6 +337,16 @@ erDiagram
       uuid template_id FK
       uuid exercise_id FK
       int position
+      string phase
+      int target_set_count "optional for legacy lists"
+      int target_reps
+      int target_seconds
+      decimal target_load
+      string target_unit
+      int target_rir_min
+      int target_rir_max
+      string rest_mode
+      int rest_seconds
     }
     USER_SETTINGS {
       uuid owner_id PK
@@ -335,6 +392,106 @@ erDiagram
       string aggregate_kind
       int revision
       string snapshot_or_tombstone
+    }
+```
+
+## Persistent entity relationships for profile, catalog and device state
+
+Models catalog provenance and region roles, owner goals and bodyweight, synced reminder preferences and device-local effects.
+
+**Design value:** Separates persisted inputs from derived reports and keeps OS request IDs off the sync feed.
+
+[Edit Mermaid source](diagrams/05-training-data.mmd)
+
+```mermaid
+erDiagram
+    ACCOUNT ||--o{ LIFT_GOAL : owns
+    ACCOUNT ||--o{ BODYWEIGHT_READING : owns
+    ACCOUNT ||--o| BODYWEIGHT_TARGET : owns
+    ACCOUNT ||--o| REMINDER_PREFERENCE : prefers
+    ACCOUNT ||--o| LOCAL_REST_STATE : device_partition
+    ACCOUNT ||--o{ LOCAL_NOTIFICATION : device_partition
+    WORKOUT ||..o| LOCAL_REST_STATE : session
+    EXERCISE_SET ||..o| LOCAL_REST_STATE : source_completion
+    EXERCISE ||--o{ LIFT_GOAL : exact_variant
+    EXERCISE ||--o{ EXERCISE_MUSCLE : maps
+    MUSCLE_REGION ||--o{ EXERCISE_MUSCLE : groups
+    CATALOG_RELEASE ||--o{ CATALOG_RECORD : pins
+    CATALOG_RECORD }o..|| EXERCISE : stable_mapping
+
+    LIFT_GOAL {
+      uuid id PK
+      uuid owner_id FK
+      uuid exercise_id FK
+      decimal target_load
+      string entered_unit
+      int minimum_reps
+      date deadline "optional"
+      int revision
+      datetime deleted_at
+    }
+    BODYWEIGHT_READING {
+      uuid id PK
+      uuid owner_id FK
+      date reading_date
+      datetime entered_at
+      decimal entered_weight
+      string entered_unit
+      int revision
+      datetime deleted_at
+    }
+    BODYWEIGHT_TARGET {
+      uuid owner_id PK
+      decimal target_weight
+      string entered_unit
+      date target_date "optional"
+      int revision
+      datetime deleted_at
+    }
+    REMINDER_PREFERENCE {
+      uuid owner_id PK
+      boolean enabled
+      string weekdays
+      string local_time
+      int revision
+    }
+    LOCAL_REST_STATE {
+      uuid owner_id PK
+      uuid workout_id
+      uuid source_set_id
+      string state
+      datetime ends_at "while running"
+      int remaining_seconds "while paused"
+      string os_alert_id
+      string live_activity_id
+    }
+    LOCAL_NOTIFICATION {
+      string os_request_id PK
+      uuid owner_id
+      date local_date
+      string kind
+    }
+    CATALOG_RELEASE {
+      string source_revision PK
+      string sha256
+      string license
+    }
+    CATALOG_RECORD {
+      string source_revision PK
+      string external_id PK
+      uuid exercise_id FK
+      string category
+      string equipment "unknown permitted"
+      string instructions
+    }
+    EXERCISE_MUSCLE {
+      uuid exercise_id PK
+      string region_id PK
+      string role "primary or secondary"
+    }
+    MUSCLE_REGION {
+      string id PK
+      string label
     }
 ```
 
@@ -386,13 +543,16 @@ classDiagram
       +addExercise(id)
       +showPrevious(id)
       +recordSet(input)
+      +markDone(rowId, actual)
+      +skip(rowId)
+      +showPreparation(phase)
       +editOrRemove(target)
       +undo(token)
       +finish()
       +resumeOrDiscard()
     }
     class ExerciseController {
-      +search(text, muscle)
+      +search(text, muscle, equipment, category)
       +create(input)
       +renameOrArchive(id)
       +restore(id)
@@ -409,7 +569,8 @@ classDiagram
       +selectPoint(id)
     }
     class TemplateController {
-      +saveWorkoutList(workoutId, name)
+      +reviewRoutineFromWorkout(workoutId)
+      +saveReviewedRoutine(input)
       +createOrEdit(input)
       +start(id)
       +deleteConfirmed(id)
@@ -418,6 +579,21 @@ classDiagram
       +chooseUnit(unit)
       +toggleEquivalent(enabled)
       +setTextScale(scale)
+    }
+    class ProfileController {
+      +muscleMap(period)
+      +monthlyReport(month)
+      +saveLiftGoal(input)
+      +saveBodyweight(input)
+      +exportData(selection)
+    }
+    class TrainingDeviceController {
+      +pauseRest()
+      +resumeRest()
+      +extendRest(seconds)
+      +skipRest()
+      +saveReminderPreference(input)
+      +openFromNotification(link)
     }
     class SyncController {
       +status()
@@ -439,12 +615,17 @@ classDiagram
     AuthService --> SyncCoordinator : pending-work guard
     AuthController --> AppBootstrap
     WorkoutController --> WorkoutService
+    WorkoutController --> TrainingDeviceController
     ExerciseController --> ExerciseService
     HistoryController --> HistoryService
     ProgressController --> ProgressService
     TemplateController --> TemplateService
     SettingsController --> SettingsService
     SyncController --> SyncCoordinator
+    ProfileController --> ProfileService
+    ProfileController --> ExportService
+    TrainingDeviceController --> TrainingDeviceService
+    AppBootstrap --> TrainingDeviceService : reconcile local OS requests
     AppBootstrap --> LocalDatabase
     AppBootstrap --> AuthService
     note for AuthService "First sign-in needs network. Cached account can work offline. No<br/>account mixing."
@@ -465,6 +646,9 @@ classDiagram
       +UUID id
       +UUID ownerId
       +Date workoutDate
+      +UUID sourceTemplateId
+      +int sourceTemplateRevision
+      +int defaultRestSeconds
       +WorkoutState state
       +DateTime startedAt
       +DateTime finishedAt
@@ -477,15 +661,21 @@ classDiagram
       +UUID id
       +UUID exerciseId
       +int position
+      +TrainingPhase phase
+      +RestRule restRule
       +ExerciseSet[] sets
     }
     class ExerciseSet {
       +UUID id
       +int position
+      +SetState state
+      +SetTarget targetSnapshot
       +Decimal enteredWeight
       +WeightUnit enteredUnit
       +int reps
       +int seconds
+      +int actualRir
+      +DateTime completedAt
     }
     class Exercise {
       +UUID id
@@ -494,6 +684,7 @@ classDiagram
       +String normalizedName
       +ExerciseType type
       +String muscleGroup
+      +MuscleRole[] muscleTags
       +bool archived
       +bool everUsed
       +int revision
@@ -503,11 +694,44 @@ classDiagram
       +UUID ownerId
       +String name
       +TemplateEntry[] entries
+      +int defaultRestSeconds
       +int revision
     }
     class TemplateEntry {
       +UUID exerciseId
       +int position
+      +TrainingPhase phase
+      +int targetSetCount
+      +SetTarget target
+      +RestRule restRule
+    }
+    class SetTarget {
+      +int reps
+      +int seconds
+      +Decimal load
+      +WeightUnit unit
+      +int rirMin
+      +int rirMax
+    }
+    class TrainingPhase {
+      <<enumeration>>
+      warmup
+      work
+      mobility
+    }
+    class SetState {
+      <<enumeration>>
+      pending
+      done
+      skipped
+    }
+    class RestRule {
+      +String mode
+      +int seconds
+    }
+    class MuscleRole {
+      +String regionId
+      +String role
     }
     class UserSettings {
       +WeightUnit preferredUnit
@@ -517,17 +741,20 @@ classDiagram
     }
     class WorkoutService {
       +start(date)
+      +startWithSnapshot(date, routine)
       +addExercise(id)
       +prefill(entryId)
       +recordSet(input)
+      +markDone(rowId, actual)
+      +skip(rowId)
       +mutateActive(patch)
       +undo(token)
-      +finish()
+      +finish(confirmSkipPending)
       +resume()
       +discard()
     }
     class ExerciseService {
-      +search(text, muscle)
+      +search(text, muscle, equipment, category)
       +create(input)
       +rename(id, name)
       +archiveOrRestore(id)
@@ -541,7 +768,8 @@ classDiagram
       +deleteWorkout(id)
     }
     class TemplateService {
-      +fromWorkout(id, name)
+      +reviewFromWorkout(id)
+      +saveReviewedRoutine(input)
       +save(input)
       +startWorkout(id)
       +delete(id)
@@ -558,6 +786,7 @@ classDiagram
     class InputValidator {
       +validateDate(date, timezone)
       +validateTypedSet(input, exercise)
+      +validateSetTarget(target, exercise)
       +validateName(name)
       +normalizeName(name)
     }
@@ -569,6 +798,14 @@ classDiagram
     Workout "1" *-- "0..*" WorkoutEntry
     WorkoutEntry "1" *-- "0..*" ExerciseSet
     WorkoutEntry --> Exercise
+    WorkoutEntry --> TrainingPhase
+    WorkoutEntry --> RestRule
+    ExerciseSet --> SetState
+    ExerciseSet "1" *-- "0..1" SetTarget : historical target
+    TemplateEntry "1" *-- "0..1" SetTarget : routine target
+    TemplateEntry --> TrainingPhase
+    TemplateEntry --> RestRule
+    Exercise "1" *-- "0..*" MuscleRole
     Template "1" *-- "1..*" TemplateEntry
     TemplateEntry --> Exercise
     WorkoutService --> InputValidator
@@ -576,6 +813,7 @@ classDiagram
     WorkoutService --> WorkoutRepository
     WorkoutService --> ExerciseRepository
     WorkoutService --> HistoryService
+    WorkoutService --> TrainingDeviceService : after confirmed work change
     ExerciseService --> InputValidator
     ExerciseService --> ExerciseRepository
     HistoryService --> InputValidator
@@ -587,8 +825,8 @@ classDiagram
     ProgressService --> WorkoutRepository
     ProgressService --> VolumeCalculator
     note for Exercise "Stable ID. Types: weight_reps, reps_only, seconds. Shared seed<br/>immutable; custom type locks after use."
-    note for ExerciseSet "Preserve original decimal and kg/lb unit. Reps-only has no weight;<br/>timed has seconds only."
-    note for Workout "One active per owner; finished requires a set. Date never future.<br/>Confirm mutations after SQLite commit."
+    note for ExerciseSet "Targets and actual values are separate. Only done rows have actuals.<br/>Typed fields and original kg/lb values are preserved."
+    note for Workout "One active per owner. Planned finish requires a completed working set.<br/>Pending rows are skipped only after confirmation. Dates cannot be future."
     class WorkoutState {
       <<enumeration>>
       in_progress
@@ -633,7 +871,7 @@ classDiagram
     }
     class ExerciseRepository {
       <<interface>>
-      +search(text, muscle)
+      +search(text, muscle, equipment, category)
       +get(id)
       +mutateAndEnqueue(snapshot)
     }
@@ -644,10 +882,26 @@ classDiagram
       +mutateAndEnqueue(snapshot)
       +deleteAndEnqueue(id)
     }
+    class ProfileRepository {
+      <<interface>>
+      +loadOwnerSnapshot(period)
+      +saveGoalAndEnqueue(input)
+      +saveBodyweightAndEnqueue(input)
+      +saveBodyweightTargetAndEnqueue(input)
+      +deleteAndEnqueue(id)
+    }
+    class DeviceStateRepository {
+      <<interface>>
+      +getRest(ownerId)
+      +saveRest(state)
+      +replaceAlertIds(ownerId, ids)
+    }
     class SettingsRepository {
       <<interface>>
       +get()
       +mutateAndEnqueue(snapshot)
+      +getReminderPreferences()
+      +saveReminderPreferencesAndEnqueue(input)
     }
     class SqliteRepositories {
       +ownerId
@@ -660,6 +914,10 @@ classDiagram
       +migrate()
       +transaction(work)
       +emitChanged()
+    }
+    class CatalogImporter {
+      +verifyPinnedRelease()
+      +mergeByStableId()
     }
     class OutboxOperation {
       +UUID operationId
@@ -715,6 +973,10 @@ classDiagram
     SqliteRepositories ..|> ExerciseRepository
     SqliteRepositories ..|> TemplateRepository
     SqliteRepositories ..|> SettingsRepository
+    SqliteRepositories ..|> ProfileRepository
+    SqliteRepositories ..|> DeviceStateRepository
+    CatalogImporter --> LocalDatabase
+    CatalogImporter --> ExerciseRepository
     SqliteRepositories --> LocalDatabase
     LocalDatabase --> OutboxOperation
     SyncCoordinator --> SyncStore
@@ -726,13 +988,15 @@ classDiagram
     MutationHandler --> RemoteDatabase
     ChangeFeedHandler --> RemoteDatabase
     note for MutationHandler "Logical PostgreSQL RPC handler. RLS reads; direct table writes<br/>blocked. Owner-checked narrow RPC, receipt dedupe, revision validation<br/>and child writes in one transaction."
+    note for DeviceStateRepository "Owner-partitioned timer and OS request state. Device effects stay<br/>on the device that started them."
+    note for ProfileRepository "Goals and bodyweight mutations enqueue owner-scoped snapshots.<br/>Reports, muscle scores and exports read confirmed local records."
     note for SyncStore "Local changes plus immutable outbox are atomic. Acks must not<br/>overwrite newer local edits."
     note for SyncCoordinator "Custom exercise dependencies first. Conflict preserves both versions;<br/>retry is idempotent. No guaranteed OS-background uploads."
 ```
 
 ## Class model: conversion, progress and readability
 
-Defines shared unit conversion, volume/reps aggregation, periods/points, summaries, chart tables and text-scale presentation.
+Defines unit conversion, progress and accessibility presentation alongside muscle scoring, monthly reports, CSV export and device adapters.
 
 **Design value:** Ensures graphs and plain summaries use the same numbers, and display conversion never corrupts originals.
 
@@ -776,11 +1040,58 @@ classDiagram
       +comparisonText(series)
       +emptyOrSparseMessage(series)
     }
+    class ProfileService {
+      +loadMuscleActivity(period)
+      +monthlyReport(month)
+      +saveLiftGoal(input)
+      +saveBodyweight(input)
+    }
+    class MuscleActivityPresenter {
+      +groupCompletedWork(snapshot)
+      +presentRegionsWithLegend(scores)
+      +regionBreakdown(regionId)
+    }
+    class MonthlyReportPresenter {
+      +summarizeMonth(snapshot, month)
+      +compareMatchedPeriods(current, previous)
+      +bestQualifyingSet(exerciseId, goal)
+    }
+    class ExportService {
+      +preview(selection)
+      +buildCsvFiles(selection)
+    }
+    class ShareGateway {
+      +openSystemShareSheet(files)
+    }
+    class TrainingDeviceService {
+      +afterSetCompletion(workout, rowId)
+      +changeRest(action)
+      +clearRest(workoutId)
+      +reconcileOnResume()
+      +reconcileReminders()
+    }
+    class DeviceActivityGateway {
+      +replaceRestAlert(deadline)
+      +upsertLiveActivity(workoutId, deadline)
+      +clearRestEffects()
+      +replaceWorkoutReminders(schedule)
+    }
     class ReadabilityPresenter {
       +applyTextScale(settings)
       +accessibleLabels()
       +reflowLayout()
     }
+    ProfileService --> ProfileRepository
+    ProfileService --> MuscleActivityPresenter
+    ProfileService --> MonthlyReportPresenter
+    MonthlyReportPresenter --> UnitConverter
+    MonthlyReportPresenter --> VolumeCalculator
+    ExportService --> ProfileRepository
+    ExportService --> MonthlyReportPresenter
+    ExportService --> ShareGateway
+    TrainingDeviceService --> DeviceStateRepository
+    TrainingDeviceService --> SettingsRepository
+    TrainingDeviceService --> DeviceActivityGateway
     ProgressService --> VolumeCalculator
     ProgressService --> Period
     VolumeCalculator --> UnitConverter
@@ -793,7 +1104,9 @@ classDiagram
     ProgressController --> ChartPresenter
     SettingsController --> ReadabilityPresenter
     note for UnitConverter "1 kg = 2.20462 lb. Convert before summing; round only display to one<br/>decimal. Never rewrite entered values."
-    note for VolumeCalculator "Finished nondeleted workouts only. Reps-only uses reps; seconds<br/>excluded. Weekly buckets start Monday and include empty weeks."
+    note for VolumeCalculator "Completed working sets in finished sessions. Reps-only uses reps.<br/>Timed work is separate from weighted volume. Weekly buckets start Monday and include empty weeks."
+    note for MuscleActivityPresenter "Deduplicate regions. Primary credits 1.0 and secondary 0.5.<br/>Front and back map share an exact-value list and legend."
+    note for TrainingDeviceService "Persist deadline or paused remainder. Replace prior OS requests.<br/>Unsupported Live Activity or denied alerts leave in-app rest usable."
     note for ReadabilityPresenter "Persistent scale through 200 percent. Wrap and scroll without missing<br/>controls; support OS accessibility."
 ```
 
@@ -889,6 +1202,7 @@ sequenceDiagram
     participant B as AppBootstrap
     participant D as LocalDatabase
     participant S as SyncCoordinator
+    participant N as TrainingDeviceService
     U->>C: Launch / sign in
     C->>A: restoreSession or signIn
     A->>G: Restore cached identity -  refresh online if possible
@@ -898,6 +1212,7 @@ sequenceDiagram
       G-->>A: Owner ID and session state
       A->>B: Bootstrap this owner
       B->>D: Open isolated partition -  migrate -  seed -  load settings
+      B->>N: Reconcile this owner’s rest and reminders on this device
       B-->>C: Main UI and offer resume
       B->>S: Start authenticated foreground/reconnect triggers
     end
@@ -908,7 +1223,8 @@ sequenceDiagram
       S-->>C: Block -  sync/resolve or explicitly confirm discard
     else Safe or explicit informed discard
       A->>G: Clear session
-      C->>D: Close partition -  clear in-memory records
+      C->>N: Cancel the outgoing owner’s scheduled effects
+      C->>D: Close partition and clear in-memory records
       C-->>U: Sign-in screen
     end
 ```
@@ -962,7 +1278,7 @@ sequenceDiagram
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
-    U->>C: Start workout for today
+    U->>C: Start ad hoc workout for today
     C->>S: start(today)
     S->>R: active()
     R-->>S: Existing active or none
@@ -977,14 +1293,14 @@ sequenceDiagram
      S->>R: mutateAndEnqueue(ordered empty entry)
      R-->>C: Committed -  entry ready
     end
-    Note over S,R: One active workout per owner -  date today or past. Empty active workout may be discarded, never finished.
+    Note over S,R: One active workout per owner -  date today or past. A planned start uses the TR-01 / TR-02 snapshot flow. An empty ad hoc workout can be discarded.
 ```
 
 ## FW-02: Record a set with prefill
 
 As an experienced lifter, I want to record a set by entering weight and reps, prefilled from my previous set, so that I can log between sets without losing rest time. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Makes prefill precedence and durable confirmation explicit for the central recording interaction.
+**Design value:** Separates the planned target from suggested and confirmed actuals.
 
 [Edit Mermaid source](diagrams/sequence/FW-02.mmd)
 
@@ -995,21 +1311,21 @@ sequenceDiagram
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
-    U->>C: Open next weighted set
-    C->>S: prefill(entryId)
+    U->>C: Open a pending weighted row or add an extra set
+    C->>S: prefill(entryId, rowId)
     S->>R: Current entry and latest finished performance
     R-->>S: Prior set or no history
-    S-->>C: Prefill current-entry last set -  else latest finished set
+    S-->>C: Show target separately from suggested actuals using current or previous performance
     U->>C: Confirm weight, unit and reps
-    C->>S: recordSet(input)
+    C->>S: markDone(rowId, actual) or recordSet(input) for extra work
     alt Invalid input
      S-->>C: Explain field -  keep input
     else Valid typed set
-     S->>R: mutateAndEnqueue(workout with appended set)
+     S->>R: mutateAndEnqueue(workout with confirmed actuals)
      R-->>S: Commit or storage error
      S-->>C: Confirm after commit -  else keep input and show not saved
     end
-    Note over C,S: Source validation choices: weight 0..999.9 entered-unit -  integer reps 1..999. No guessed load if history empty.
+    Note over C,S: Source validation choices: weight 0..999.9 entered-unit -  integer reps 1..999. An explicit target may prefill a suggestion. Leave load blank when the target and history are missing.
 ```
 
 ## FW-03: Set form matches exercise type
@@ -1033,13 +1349,13 @@ sequenceDiagram
     R-->>S: weight_reps, reps_only or seconds
     S-->>C: Matching field schema
     alt weight_reps
-     C-->>U: Weight + kg/lb + reps
+     C-->>U: Weight + kg/lb + reps with optional actual RIR for working sets
     else reps_only
-     C-->>U: Reps only
+     C-->>U: Reps with optional actual RIR for working sets
     else seconds
      C-->>U: Whole seconds only
     end
-    U->>C: Record set
+    U->>C: Mark planned set done or record extra set
     C->>S: recordSet(typed input)
     Note over C,S: Reject irrelevant fields -  require positive whole reps/seconds. Confirm via atomic WorkoutRepository mutation as FW-02.
 ```
@@ -1062,7 +1378,7 @@ sequenceDiagram
     U->>C: Add exercise while logging
     C->>S: latestPerformance(exerciseId)
     S->>R: Latest own finished nondeleted workout containing exercise
-    R-->>S: Date and ordered typed sets, or none
+    R-->>S: Date and ordered completed working sets, or none
     S-->>C: Current sets with original units
     C-->>U: Previous date and formatted sets -  else No previous record
     Note over S,R: Read current local records, including offline edits/deletions. Exclude active workout. UnitConverter supplies primary and equivalent values.
@@ -1083,7 +1399,7 @@ sequenceDiagram
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
-    U->>C: Edit set or remove set/entry
+    U->>C: Edit actuals, skip a planned row or remove an extra set/entry
     alt Remove
      C-->>U: Confirm removal
      U->>C: Confirm or cancel
@@ -1091,7 +1407,7 @@ sequenceDiagram
     opt Confirmed removal or valid edit
      C->>S: mutateActive(patch)
      S->>S: Validate -  capture prior snapshot in UndoToken
-     S->>R: mutateAndEnqueue(edited workout -  renumber positions)
+     S->>R: mutateAndEnqueue(edited workout -  renumber positions while retaining stable IDs)
      R-->>S: Local commit
      S-->>C: Updated sets and immediate undo option
      opt User selects immediate undo
@@ -1100,14 +1416,14 @@ sequenceDiagram
       R-->>C: Committed restored record
      end
     end
-    Note over C,S: Cancel changes nothing. Undo expires on subsequent mutation/navigation -  sync preserves operation order.
+    Note over C,S: Undo restores the prior state and expires after another mutation or navigation. If a change invalidates the current rest source, clear rest after commit.
 ```
 
 ## FW-06: Finish workout, see summary
 
 As a returning lifter, I want to finish a workout and see a short, plain summary, so that I know it is saved and can read what I did. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Distinguishes a locally saved finish from a successfully uploaded record.
+**Design value:** Separates planned-session eligibility and confirmed skips from the ad hoc finish path.
 
 [Edit Mermaid source](diagrams/sequence/FW-06.mmd)
 
@@ -1119,24 +1435,31 @@ sequenceDiagram
     participant S as WorkoutService
     participant R as WorkoutRepository
     U->>C: Finish workout
-    C->>S: finish()
-    S->>S: Drop empty entries -  validate remaining sets
-    alt No sets remain
-     S-->>C: Explain -  continue recording or discard
-    else At least one set
-     S->>R: mutateAndEnqueue(finished workout + finish timestamp)
-     R-->>S: Local commit
-     S-->>C: Finished workout and dropped-entry notice
-     C-->>U: Plain date, duration if known, exercises, sets, volume and sync status
+    C->>S: Validate confirmed results
+    alt Planned session has no completed working set or ad hoc has no set
+        S-->>C: Continue logging or discard
+    else Eligible to finish
+        opt Planned rows are still pending
+            C-->>U: Ask whether to mark pending rows skipped
+            U->>C: Confirm or decline
+            break Confirmation declined
+                C-->>U: Return to workout
+            end
+        end
+        C->>S: Finish with required confirmation
+        S->>R: Commit finished session, confirmed skips and outbox
+        R-->>S: Local commit
+        S-->>C: Clear local rest and show summary
+        C-->>U: Date, duration, planned/completed counts, preparation and working volume
     end
-    Note over C,R: A summary means saved locally -  uploaded is shown only after cloud receipt. Timed/reps-only values remain distinct from weighted volume.
+    Note over C,R: Report saved locally after commit and uploaded after receipt. Ad hoc sessions still drop empty entries.
 ```
 
 ## FW-07: Resume an unfinished workout
 
 As a beginner lifter, I want my unfinished workout to still be there if I switch apps or my phone locks, so that an interruption does not cost me the session. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Requires actual process-restart persistence rather than an in-memory resume flag.
+**Design value:** Restores plan snapshots, completion states and device-local rest after relaunch.
 
 [Edit Mermaid source](diagrams/sequence/FW-07.mmd)
 
@@ -1153,12 +1476,13 @@ sequenceDiagram
     R-->>S: Durable active workout or none
     alt Active exists
      S-->>C: Offer resume or discard
-     U->>C: Choose resume
-     C-->>U: Restore ordered entries and confirmed sets
-     opt User instead confirms discard
+     alt Resume
+      U->>C: Resume
+      C-->>U: Restore target snapshots, pending/done/skipped rows, actuals and local rest state
+     else Confirm discard
       C->>S: discard()
       S->>R: deleteAndEnqueue(active id)
-      R-->>C: Local commit -  no active session
+      R-->>C: Local commit -  clear rest alert and Live Activity
      end
     else None
      C-->>U: Start workout screen
@@ -1244,7 +1568,7 @@ sequenceDiagram
     H-->>G: Authorized change page
     G-->>S: Page and next cursor
     S->>R: Apply page + checkpoint atomically -  preserve dirty conflicts
-    Note over S,R: Retries use same operation ID -  conflict never silently overwrites. Sync runs while active, not guaranteed after OS termination.
+    Note over S,R: Sync routines, workouts, goals, bodyweight and preferences. Timer state and OS request IDs are device local.<br/>Retries use same operation ID -  conflict never silently overwrites. Sync runs while active, not guaranteed after OS termination.
     Note over H,DB: Block direct client table writes. Narrow RPC uses fixed search path and explicit authenticated owner checks -  receipt/feed changes commit with the root.
 ```
 
@@ -1276,7 +1600,7 @@ sequenceDiagram
 
 As a beginner lifter, I want to find an exercise by typing part of its name or filtering by muscle group, with recent ones first, so that I can add the right exercise without knowing its exact name. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Makes combined search/filter and offline recent ordering consistent for both implementations.
+**Design value:** Defines offline catalog search and stable exercise selection.
 
 [Edit Mermaid source](diagrams/sequence/FW-11.mmd)
 
@@ -1287,17 +1611,17 @@ sequenceDiagram
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
-    U->>C: Type part of name and optionally select muscle group
-    C->>S: search(text, muscle)
+    U->>C: Type part of name and optionally select muscle, equipment or category
+    C->>S: search(text, muscle, equipment, category)
     S->>R: Search shared + own active exercises locally
-    R-->>S: Case-insensitive substring plus muscle matches
+    R-->>S: Case-insensitive substring plus filter matches
     S-->>C: Results -  with empty text recent exercises first
     alt No matches
      C-->>U: No match -  offer create custom exercise
     else Matches
      C-->>U: Select exercise by stable ID
     end
-    Note over S,R: Search works offline using bundled/cached catalog. FW-11 requires predefined common gym and home exercises plus the user's own. Seed count is unspecified. Source default is up to 10 recent items first.
+    Note over S,R: Use the pinned offline catalog plus the user’s own records. Preserve stable IDs and recent-first behavior.
 ```
 
 ## FW-12: Create a custom exercise
@@ -1315,7 +1639,7 @@ sequenceDiagram
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
-    U->>C: Name, type and muscle group for custom exercise
+    U->>C: Name, logging type and optional primary and secondary tags
     C->>S: create(input)
     S->>S: Validate name -  ignore case and spaces for uniqueness (A-EX-2)
     S->>R: Check name against shared and own custom catalog
@@ -1407,8 +1731,8 @@ sequenceDiagram
      R-->>C: Explain and return to list
     else Found
      R-->>S: Current snapshot
-     S-->>C: Ordered exercises and typed sets
-     C-->>U: Date, duration if known, total volume, units and plain summary
+     S-->>C: Ordered exercises, planned targets and confirmed actuals
+     C-->>U: Date, duration if known, working volume, units and preparation breakdown
     end
     Note over C,S: WorkoutPresenter uses current unit/text preferences -  original weights remain intact. Unsynced edits are visible immediately.
 ```
@@ -1454,14 +1778,14 @@ sequenceDiagram
     participant R as WorkoutRepository
     U->>C: Edit finished workout date / entries / sets
     C->>S: editFinished(id, patch)
-    S->>S: Apply typed-set rules, nonfuture date, at least one set
+    S->>S: Validate actuals and date. Retain at least one completed working set for planned sessions.
     alt Invalid or empty result
      S-->>C: Explain -  keep saved version and editor input
     else Valid
      S->>R: mutateAndEnqueue(updated full snapshot)
      R-->>S: Local commit
      S-->>C: Updated summary
-     C-->>U: History, previous performance and graphs reflect edit
+     C-->>U: Refresh history, graphs, muscle activity, monthly report and goals
     end
     Note over S,R: Works offline -  local data event invalidates derived views. Later upload uses expected revision, with explicit conflict if remote changed.
 ```
@@ -1490,7 +1814,7 @@ sequenceDiagram
      S->>R: deleteAndEnqueue(tombstone)
      R-->>S: Local commit
      S-->>C: Deleted locally -  upload pending if offline
-     C-->>U: Remove from history, previous performance and all graphs
+     C-->>U: Refresh history, graphs, muscle activity, monthly report and goals
     end
     Note over S,R: No user-facing recycle bin. Keep sync tombstone so cloud deletion propagates and cannot be resurrected by a stale pull.
 ```
@@ -1542,7 +1866,7 @@ sequenceDiagram
     participant V as VolumeCalculator
     U->>C: Open weighted exercise graph
     C->>S: exerciseSeries(exerciseId, period)
-    S->>R: Current finished workouts and matching weighted sets
+    S->>R: Current finished workouts and matching completed working sets with weight
     R-->>S: Entered weights, units, reps and dates
     S->>V: Convert unrounded weights -  sum weight times reps per workout
     V-->>S: Points with workout IDs and metric unit
@@ -1595,7 +1919,7 @@ sequenceDiagram
     participant V as VolumeCalculator
     U->>C: Open overall weekly volume
     C->>S: weeklySeries(period)
-    S->>R: Finished weighted sets in date range
+    S->>R: Completed weighted working sets in finished workouts for date range
     R-->>S: Records and dates
     S->>V: Convert to preferred unit -  sum weight times reps by Monday-start week
     V-->>S: Weekly points including zero weeks and source workout IDs
@@ -1622,7 +1946,7 @@ sequenceDiagram
     participant V as VolumeCalculator
     U->>C: Open reps-only exercise progress
     C->>S: exerciseSeries(exerciseId, period)
-    S->>R: Finished matching reps-only sets
+    S->>R: Completed reps-only working sets in finished workouts
     R-->>S: Date, workout ID and reps
     S->>V: Sum reps per workout
     V-->>S: Reps series
@@ -1665,7 +1989,7 @@ sequenceDiagram
 
 As a home trainer, I want to save the exercises of a finished workout as a named template, so that I can start my usual routine again without re-entering it. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Makes templates independent exercise lists rather than copies of performed sets.
+**Design value:** Makes conversion of actual load and RIR into targets an explicit choice.
 
 [Edit Mermaid source](diagrams/sequence/FW-25.mmd)
 
@@ -1677,26 +2001,28 @@ sequenceDiagram
     participant S as TemplateService
     participant R as TemplateRepository
     participant W as HistoryService
-    U->>C: Save finished workout as named template
-    C->>S: fromWorkout(workoutId, name)
+    U->>C: Save finished workout as a routine
+    C->>S: reviewFromWorkout(workoutId)
     S->>W: getWorkout(workoutId)
-    W-->>S: Ordered finished workout entries
-    S->>R: Check normalized template name uniqueness
-    alt Invalid or duplicate name
-     S-->>C: Explain -  preserve name input
+    W-->>S: Ordered entries, available targets and confirmed results
+    S-->>U: Review name, exercise order and editable targets
+    U->>C: Confirm reviewed routine
+    C->>S: saveReviewedRoutine(input)
+    S->>R: Check unique owner name and validate targets
+    alt Invalid input
+        S-->>C: Explain and preserve editor
     else Valid
-     S->>R: mutateAndEnqueue(new template with ordered exercise IDs only)
-     R-->>S: Local commit
-     S-->>C: Template saved, upload pending if offline
+        S->>R: Commit new routine and outbox
+        R-->>C: Saved locally
     end
-    Note over S,R: Nonempty name up to source-proposed 60 chars. No sets, weights or reps copied -  source workout remains independent.
+    Note over S,R: Actual load and RIR become targets only by explicit choice. The source workout keeps its own results.
 ```
 
 ## FW-26: Start workout from template
 
 As an experienced lifter, I want to start a workout from a template, so that its exercises are already in the workout when I begin. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Defines archived exercise handling and avoids copying prescribed loads into a workout.
+**Design value:** Snapshots ordered targets while preserving legacy exercise-only routines.
 
 [Edit Mermaid source](diagrams/sequence/FW-26.mmd)
 
@@ -1708,23 +2034,24 @@ sequenceDiagram
     participant S as TemplateService
     participant R as TemplateRepository
     participant W as WorkoutService
-    U->>C: Start workout from template
+    U->>C: Select a saved routine and workout date
     C->>S: startWorkout(templateId)
-    S->>R: get(templateId) and resolve exercises
-    R-->>S: Ordered IDs with archive flags
+    S->>R: Load ordered entries, targets and archive flags
+    R-->>S: Routine and exercise references
     S-->>C: Mark archived exercises and offer skip
     U->>C: Confirm selection
-    S->>W: start(today) -  add retained exercises in order, including marked archived references
-    W-->>S: New active workout committed via local transaction/outbox
-    S-->>C: Empty typed entries -  previous performance available
-    Note over C,S: Template unchanged. Existing active workout triggers resume/discard. No load/reps prescription copied from template.
+    C->>S: Start with the approved entries
+    S->>W: Create independent target snapshot for retained entries
+    W-->>C: Commit active session and outbox
+    C-->>U: Show pending rows and actual fields
+    Note over C,S: Existing active workout offers resume or discard. Legacy exercise-only routines open with empty typed entries and previous performance.
 ```
 
 ## FW-27: Create and edit a template
 
 As a beginner lifter, I want to create and edit a template by choosing exercises myself, so that I can set up my plan at home before going to the gym. The flow identifies its UI controller, domain service and data boundary.
 
-**Design value:** Captures name validation, ordering and independent template edits.
+**Design value:** Applies routine changes only to future workouts.
 
 [Edit Mermaid source](diagrams/sequence/FW-27.mmd)
 
@@ -1735,15 +2062,15 @@ sequenceDiagram
     participant C as TemplateController
     participant S as TemplateService
     participant R as TemplateRepository
-    U->>C: Create or edit named template
-    C-->>U: Search exercise library, add, reorder, remove
-    U->>C: Save ordered list
-    C->>S: save(name, ordered exerciseIds)
-    S->>S: Validate name, unique per owner, nonempty exercise list
+    U->>C: Create or edit named routine
+    C-->>U: Search, add, reorder and set typed targets, RIR or rest
+    U->>C: Save ordered routine
+    C->>S: save(name, ordered entries and targets)
+    S->>S: Validate unique owner name, entries and target ranges
     S->>R: mutateAndEnqueue(template snapshot)
     R-->>S: Local commit or validation/storage failure
     S-->>C: Saved after commit -  else explain and keep editor
-    Note over C,R: Renaming/reordering changes this template only, not previous workouts. Archived references stay marked -  new selections must be active.
+    Note over C,R: Routine edits apply to later starts. Existing snapshots keep their targets. Archived references stay marked.
 ```
 
 ## FW-28: Delete a template
@@ -1771,7 +2098,7 @@ sequenceDiagram
      R-->>S: Local commit
      S-->>C: Template removed from list
     end
-    Note over S,R: Existing active and finished workouts are independent and unchanged. Tombstone uploads through the same durable queue.
+    Note over S,R: Active and finished sessions retain their independent snapshots. Tombstone uploads through the same durable queue.
 ```
 
 ## FW-29: Larger text size
@@ -1796,7 +2123,7 @@ sequenceDiagram
     R-->>S: Local commit
     S-->>C: Persistent preference
     C->>P: applyTextScale and reflowLayout
-    P-->>U: Readable entry, history, summary, template and settings controls
+    P-->>U: Readable entry, history, summary, routine, profile and settings controls
     Note over C,P: Wrap/scroll without losing content. Provide plain labels, screen-reader labels and text/table chart alternatives. Restore preference at launch.
 ```
 
@@ -1849,11 +2176,295 @@ sequenceDiagram
      C->>P: convertPrefill(value, old unit, new unit)
      P-->>C: Converted value -  explicit confirmation, no silent relabel
     end
-    C->>S: recordSet(enteredWeight, enteredUnit, reps)
+    C->>S: markDone(rowId, enteredWeight, enteredUnit, reps) or record extra set
     S->>S: Validate bounds in entered unit and typed fields
     S->>R: mutateAndEnqueue(set with original decimal and unit)
     R-->>S: Local commit
     S-->>C: Confirm set
     C-->>U: Preferred-unit value plus optional equivalent
-    Note over S,R: Prefill converts when source unit differs. History/graphs convert at read time. Switching display preference never rewrites originals.
+    Note over S,R: Prefill converts when source unit differs. History/graphs convert at read time. Switching display preference preserves original actuals and planned targets.
+```
+
+## TR-01 / TR-02: Plan a routine and complete working sets
+
+Shows reusable targets, durable session snapshots, typed actuals, skip, undo and finish.
+
+**Design value:** Makes the planned-row workflow and local confirmation explicit.
+
+[Edit Mermaid source](diagrams/sequence/TR-01-02-planned-training.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-01 / TR-02: Plan a routine and complete working sets
+    actor U as Lifter
+    participant T as TemplateController
+    participant P as TemplateService
+    participant C as WorkoutController
+    participant W as WorkoutService
+    participant R as WorkoutRepository
+    U->>T: Save ordered exercise targets and optional rest
+    T->>P: Validate typed targets, set count and optional RIR range
+    P-->>U: Saved after local routine commit
+    U->>T: Start the saved routine
+    T->>P: Load current routine and review archived entries
+    P->>W: Start with approved targets and stable pending rows
+    W->>R: Atomically save session snapshot and outbox
+    R-->>C: Show targets and editable actual fields
+    Note over T,R: Existing active session offers resume or discard. Older lists open with empty entries and no invented targets.
+    U->>C: Enter actual reps, load/unit or time, and optional actual RIR
+    C->>W: Mark done for existing row ID
+    alt Invalid actual or commit fails
+        W-->>C: Keep input. The row stays pending.
+    else Commit succeeds
+        W->>R: Persist typed actuals, done state and outbox
+        R-->>C: Update completed count
+        Note over C,W: Confirmed working-set completion can start rest in TR-03. Duplicate completion does not create another result.
+    end
+    opt Skip, undo, or add an extra set
+        U->>C: Change the current session
+        C->>W: Validate transition without changing the routine
+        W->>R: Atomically persist new session snapshot and outbox
+    end
+    U->>C: Finish workout
+    alt No working set done
+        C-->>U: Continue logging or discard
+    else Working set done
+        opt Rows are pending
+            C-->>U: Confirm marking pending rows skipped
+            U->>C: Confirm or decline
+            break Confirmation declined
+                C-->>U: Return to active workout
+            end
+        end
+        C->>W: Finish after required confirmation
+        W->>R: Persist finished session and outbox
+        R-->>U: Summary with planned and completed counts
+    end
+```
+
+## TR-03 / TR-13: Rest countdown and iOS Lock Screen
+
+Shows a device-local deadline, alert replacement, optional Live Activity, relaunch and cleanup.
+
+**Design value:** Explains how rest continues under OS control when the app is suspended.
+
+[Edit Mermaid source](diagrams/sequence/TR-03-13-rest-and-live-activity.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-03 / TR-13: Rest countdown and iOS Lock Screen
+    actor U as Lifter
+    participant W as WorkoutService
+    participant D as TrainingDeviceService
+    participant R as DeviceStateRepository
+    participant G as DeviceActivityGateway
+    W->>D: Working-set completion committed
+    alt Auto-rest enabled and another working set remains
+        D->>R: Replace local state with source set and absolute deadline
+        D->>G: Reconcile previous alert and activity
+        opt Alert permission granted
+            G->>G: Schedule one rest-end alert for deadline
+        end
+        opt iOS supports and permits Live Activities
+            G->>G: Upsert system countdown and active workout link
+        end
+        G-->>R: Save current OS request IDs locally
+        D-->>U: Show in-app countdown
+    else No eligible rest
+        D->>G: Clear prior rest effects
+        D->>R: Clear rest state
+    end
+    U->>G: Lock phone or leave app
+    Note over G: System renders deadline countdown and can deliver its scheduled alert while the app is suspended.
+    U->>D: Reopen workout, optionally through the activity or alert
+    D->>R: Read persisted deadline or paused remainder
+    D-->>U: Restore countdown or show rest complete
+    opt Pause, resume, extend or skip
+        U->>D: Change rest
+        D->>R: Persist remaining time, updated deadline or ended state
+        D->>G: Replace or cancel old alert and update or end activity
+    end
+    opt Undo the triggering completion, finish or discard
+        W->>D: Source is no longer active
+        D->>G: Cancel alert and end activity
+        D->>R: Clear rest state
+    end
+    Note over D,R: Effects belong to the starting device. Reconcile OS requests after interruption. Timer state stays on the device.
+```
+
+## TR-04 / TR-05: Warm-up and targeted mobility
+
+Shows editable warm-up and mobility steps before or after working sets.
+
+**Design value:** Preserves preparation in history and excludes it from working-set totals.
+
+[Edit Mermaid source](diagrams/sequence/TR-04-05-preparation.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-04 / TR-05: Warm-up and targeted mobility
+    actor U as Lifter
+    participant C as WorkoutController
+    participant E as ExerciseService
+    participant W as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Review optional preparation for the selected routine
+    C->>E: Find matching warm-up and mobility content by exercise or area
+    E-->>C: General movement, lighter lift steps and targeted mobility
+    C-->>U: Instructions and editable rep or duration targets
+    alt Lifter edits or substitutes a step
+        U->>C: Select replacement and confirm targets
+        C->>W: Validate and save preparation on this session
+    else Lifter skips the step
+        U->>C: Skip
+        C->>W: Persist skipped state
+    else Lifter completes the step
+        U->>C: Confirm actual load and reps, reps only or elapsed seconds
+        C->>W: Persist done state and typed actuals
+    end
+    W->>R: Commit session snapshot and outbox
+    R-->>U: Continue to working sets or optional post-workout mobility
+    Note over C,R: Warm-up and mobility have separate phases in the summary. They add zero to working volume, muscle scores and lift goals.
+```
+
+## TR-06 / TR-07: Offline catalog and profile muscle map
+
+Shows a pinned catalog import, offline search and estimated muscle scores with source links.
+
+**Design value:** Separates catalog roles from calculated set-equivalents and provides exact values alongside color.
+
+[Edit Mermaid source](diagrams/sequence/TR-06-07-catalog-and-muscles.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-06 / TR-07: Offline catalog and profile muscle map
+    actor U as Lifter
+    participant I as CatalogImporter
+    participant E as ExerciseController
+    participant R as ExerciseRepository
+    participant P as ProfileController
+    participant S as ProfileService
+    participant D as ProfileRepository
+    participant M as MuscleActivityPresenter
+    I->>R: Verify pinned metadata and merge by stable mapped ID
+    Note over I,R: Preserve prior exercise IDs. Catalog category is separate from logging type.
+    U->>E: Search offline by name, equipment, muscle or category
+    E->>R: Search shared and owned active entries
+    R-->>U: Matching exercises or custom exercise option
+    U->>P: Open front/back muscle map and select period
+    P->>S: loadMuscleActivity(period)
+    S->>D: Read finished sessions and completed working sets by workout date
+    D-->>S: Set IDs, variants and region tags
+    S->>M: Deduplicate tags by region with primary precedence
+    M->>M: Sum 1.0 per primary region and 0.5 per secondary region
+    M-->>U: Darker bands, legend, exact totals and unmapped count
+    U->>P: Open a region from the map or accessible list
+    P-->>U: Contributing exercises, sets and workout links
+    Note over S,M: Default last 7 calendar days. Recompute after corrections or deletion.
+```
+
+## TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight
+
+Shows owner-scoped monthly comparisons, exact-variant lift goals and optional dated bodyweight readings.
+
+**Design value:** Keeps goals and reports derived from confirmed work while preserving entered units.
+
+[Edit Mermaid source](diagrams/sequence/TR-08-09-11-profile-progress.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight
+    actor U as Lifter
+    participant C as ProfileController
+    participant S as ProfileService
+    participant R as ProfileRepository
+    participant P as MonthlyReportPresenter
+    U->>C: Choose a month
+    C->>S: monthlyReport(month)
+    S->>R: Read current owner records by workout calendar date
+    R-->>P: Finished sessions and completed working sets
+    P-->>U: Counts, weighted volume, milestones and previous-month comparison
+    Note over R,P: In-progress comparisons use equal elapsed days. Edits and deletions invalidate derived values.
+    opt Lifter saves a goal
+        U->>C: Exact exercise, target load/unit, minimum reps, optional deadline
+        C->>S: Validate and save goal
+        S->>R: Commit goal and outbox
+        S->>P: Find best qualifying set for exact variant in a common unit
+        P-->>U: Progress and link to source workout or empty state
+    end
+    opt Lifter uses bodyweight tracking
+        U->>C: Log or edit a dated reading in kg or lb, or remove a reading
+        C->>S: Validate reading or optional target
+        S->>R: Commit measurement, target or tombstone and outbox
+        R-->>U: Trend and target in preferred display unit
+    end
+```
+
+## TR-10: Export my data
+
+Shows date and file selection, owner-scoped local reads, CSV creation and the system share sheet.
+
+**Design value:** Makes sharing and optional bodyweight selection explicit.
+
+[Edit Mermaid source](diagrams/sequence/TR-10-export.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-10: Export my data
+    actor U as Lifter
+    participant C as ProfileController
+    participant E as ExportService
+    participant R as ProfileRepository
+    participant H as ShareGateway
+    U->>C: Open Export my data
+    C-->>U: Last 30 calendar days, custom dates or all time
+    U->>C: Choose workout sets, monthly summaries and optional bodyweight
+    C->>E: Preview selection
+    E->>R: Read owner snapshot locally for the selected dates
+    R-->>E: Confirmed records and pending-sync indicator
+    E-->>U: Preview files, date bounds and pending-sync status
+    alt Cancel
+        C-->>U: Return to Profile
+    else Confirm
+        C->>E: Build versioned UTF-8 CSV files from the preview snapshot
+        E->>E: Keep targets and actuals distinct, escape values and protect text cells
+        E->>H: Open system share sheet with selected files
+        H-->>U: Save or share to a destination the lifter chooses
+    end
+    Note over E,R: Works offline. One row per completed set in finished workouts. Bodyweight requires explicit selection.
+```
+
+## TR-12: Opt-in workout reminders
+
+Shows permission checks, local day/time scheduling, rotating messages and reconciliation after completion.
+
+**Design value:** Separates user preferences from device request IDs and prevents duplicate reminders.
+
+[Edit Mermaid source](diagrams/sequence/TR-12-reminders.mmd)
+
+```mermaid
+sequenceDiagram
+    title TR-12: Opt-in workout reminders
+    actor U as Lifter
+    participant C as TrainingDeviceController
+    participant D as TrainingDeviceService
+    participant R as SettingsRepository
+    participant W as WorkoutRepository
+    participant G as DeviceActivityGateway
+    U->>C: Enable reminders and select weekdays and local time
+    C->>D: Validate schedule and request notification permission
+    D->>R: Save desired preferences in the owner partition
+    alt Disabled or permission denied
+        D->>G: Cancel existing workout reminder requests
+        D-->>U: Show effective status
+    else Enabled and allowed
+        D->>W: Check completed workouts on candidate local dates
+        D->>G: Replace owned requests with one per eligible date
+        G-->>U: Deliver a rotating original message and today's workout link
+    end
+    opt Open app, change schedule, or learn of completed workout
+        D->>W: Read current completion by workout date
+        D->>G: Remove satisfied or outdated requests and reconcile schedule
+    end
+    Note over R,G: Preference may sync. Pending requests and platform permission are local to each device.
 ```
