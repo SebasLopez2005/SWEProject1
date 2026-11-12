@@ -1,0 +1,14 @@
+.DS_Store
+.build/
+DerivedData/
+xcuserdata/
+*.xcresult
+.env
+node_modules/
+.expo/
+dist/
+ios/
+android/
+supabase/.temp/
+.env.local
+.env.*.local

@@ -21,6 +21,6 @@ The local Supabase integration and native API-outage tests were skipped for this
 
 ## Follow-up requirements and diagrams
 
-Later on November 8, the student paused the next generation to define plan-first workouts. The design added routine prescriptions such as 4 × 12 at 1–3 reps in reserve, in-workout set completion, rest timers and iOS Lock Screen Live Activities, warm-up and mobility, a larger exercise catalog and muscle map, monthly reports, lift goals, CSV export, reminders, and optional bodyweight tracking. Those 13 requirements were mapped to seven sequence diagrams. [Training requirements](../../../design/TRAINING_REQUIREMENTS_DRAFT.md) · [Diagram traceability](../../../design/TRACEABILITY.md)
+Later on November 8, the student paused the next generation to define plan-first workouts. The design added routine prescriptions such as 4 × 12 at 1–3 reps in reserve, in-workout set completion, rest timers and iOS Lock Screen Live Activities, warm-up and mobility, a larger exercise catalog and muscle map, monthly reports, lift goals, CSV export, reminders, and optional bodyweight tracking. Those 13 requirements were mapped to seven sequence diagrams and used in the separate [One Shot 3 Formwork generation](../../../../../apps/formwork/README.md). [Training requirements](../../../design/TRAINING_REQUIREMENTS_DRAFT.md) · [Diagram traceability](../../../design/TRACEABILITY.md)
 
 [Previous · One Shot 1](../../round-01/chatgpt/README.md)

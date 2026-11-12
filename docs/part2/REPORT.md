@@ -25,7 +25,7 @@ The user selected Expo for mobile development, TestFlight for iOS distribution, 
 | Detailed iterations, failures and diagram changes | [One Shot 1](experiments/round-01/chatgpt/README.md) · [One Shot 2](experiments/round-02/chatgpt/README.md) · [Run log](experiments/RUN_LOG.md) |
 | Public GitHub pointers and instructor access | Remote is https://github.com/SebasLopez2005/SWEProject1 ; GitHub visibility verified PUBLIC on November 2, 2026; instructor link check pending |
 | Prompts used for generation | [Shared prompt](prompts/ONE_SHOT.md) · [One Shot 1 brief](experiments/round-01/chatgpt/USER_BRIEF.txt) · [One Shot 2 brief](experiments/round-02/chatgpt/USER_BRIEF.txt) |
-| Deployment | [TestFlight/Supabase plan](DEPLOYMENT.md) |
+| Deployment | [TestFlight/Supabase plan](DEPLOYMENT.md) · [Formwork internal TestFlight release](experiments/RUN_LOG.md#formwork-hosted-release-november-9-2026) |
 | Remaining backlog and hypothetical sprint | [Backlog](BACKLOG.md); observed implementation gaps added after runs |
 | 10-minute presentation/demo | Outline below; live demo evidence pending |
 | Individual teammate evaluations | Each student submits directly under assignment instructions; no email is sent by this repo workflow |
@@ -40,6 +40,7 @@ The initial design stack (#2–#45) covers the selected Claude Fitness & Workout
 
 - **One Shot 1** built the first app and verified core workout flows on the iOS simulator, including saving offline and uploading to local Supabase after an outage. PR #46 merged the result. [One Shot 1 write-up](experiments/round-01/chatgpt/README.md)
 - **One Shot 2** revised that app with a graphite and champagne palette and native iOS Liquid Glass controls. Simulator and bundle checks are recorded for the revision. [One Shot 2 write-up](experiments/round-02/chatgpt/README.md)
+- **One Shot 3** generated Formwork from the planned-training design. The app directory preserves the assessed source. The run log records the set-entry feedback and the internal TestFlight release from the separate phone release branch. [Formwork](../../apps/formwork/README.md) · [Attempt 3 record](experiments/RUN_LOG.md#chatgpt-attempt-3-evaluation-november-9-2026)
 
 For every paired round, record the design commit, merged PR, exact model/version, exact prompt, generated code commit, commands, real test results, reproducible failures and deployment evidence. Both models use the same frozen design and clean independent output. Only diagram changes may improve behavior between rounds, followed by a fresh full generation. Use at most three paired generation rounds as the conservative team protocol. [Experiment procedure](experiments/README.md) explains the boundary between setup, assessment and diagram revisions.
 
