@@ -1,6 +1,6 @@
 # Backlog and hypothetical first sprint
 
-Status: **provisional planning, before code generation**. All 31 selected stories remain in the design and one-shot target. Nothing is deferred merely to shrink the diagram set. The actual post-attempt backlog must be based on observed gaps; no failed implementation is claimed here.
+Status: **Attempt 3 feedback recorded**. Candidate items remain provisional unless their failures are reproduced. Observed issues are listed separately.
 
 ## How to record remaining work after the final assessed round
 
@@ -20,8 +20,14 @@ The source 101 points are initial Part 1 estimates. Re-estimate remaining work a
 
 Add specific gaps for the other FW stories if observed; this table does not replace comprehensive coverage. External distribution prerequisites belong in deployment preparation unless an actual app defect prevents deployment.
 
+## Observed after Attempt 3
+
+| ID | Story and affected requirements | Observed gap | Acceptance and status |
+| --- | --- | --- | --- |
+| BL-06 | As a lifter, I want to enter weight and reps on the set row and check it off so I can keep the workout visible while logging. FW-02 and TR-02. | The one-shot app opened a form for each set. The student confirmed it worked but found the repeated steps too slow. | Show editable fields on each pending row. Leave unknown actuals blank, allow the lifter to change suggestions, and record by tapping the row checkmark. Keep the planned target intact. The separate phone release branch passed this flow in the iPhone simulator. Physical iPhone verification remains open. |
+
 ## Hypothetical first sprint after this milestone
 
 **Goal:** make a recorded offline workout dependable from local confirmation through later upload. If the observed backlog contains BL-01 and BL-02, select them first because every higher-level view relies on trustworthy data. Split BL-02 into (a) durable outbox/idempotent upload and (b) explicit conflict resolution if it cannot be demonstrated within a sprint. Acceptance remains end-to-end with a real device and test backend.
 
-Use remaining capacity for BL-04 only after the recording/sync slice is dependable. Conversion and accessibility defects may be release blockers and should be reprioritized if evidence warrants. There is no measured team velocity or agreed sprint capacity; this is an ordered candidate selection, not a promise to complete 13 or 18 points. Replace candidates with the actual tested backlog before the final hand-in. These future fixes are not implemented during Part 2 after the allowed generation rounds.
+Use remaining capacity for BL-04 only after the recording/sync slice is dependable. Conversion and accessibility defects may be release blockers and should be reprioritized if evidence warrants. There is no measured team velocity or agreed sprint capacity; this is an ordered candidate selection, not a promise to complete 13 or 18 points. Replace candidates with the actual tested backlog before the final hand-in. The assessed one-shot output is frozen. The phone release branch tracks follow-up changes separately.

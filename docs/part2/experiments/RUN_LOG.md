@@ -1,6 +1,6 @@
 # Generation and diagram-iteration log
 
-ChatGPT's original app and its dark interface revision are recorded below. The independent Claude Repwise runs have their own records.
+The three ChatGPT runs and both Claude Repwise runs are recorded below. Formwork's internal TestFlight build came from its separate phone release branch.
 
 ## Preparation D0
 
@@ -15,7 +15,8 @@ ChatGPT's original app and its dark interface revision are recorded below. The i
 | Round | Frozen design / merged PR | ChatGPT model + code commit | Claude model + code commit | Acceptance evidence / gaps | Decision |
 | --- | --- | --- | --- | --- | --- |
 | [1 · initial implementation](round-01/chatgpt/README.md) | `9dc200da72010ef32dd43b7864c268d2bb058f28`, through #45 | Codex, GPT-6 family. Commit `86b9c83` merged in [PR #46](https://github.com/SebasLopez2005/SWEProject1/pull/46). | [Claude One Shot 1](round-01/claude/README.md), [PR #47](https://github.com/SebasLopez2005/SWEProject1/pull/47) | [Story evidence](../../../apps/chatgpt/REQUIREMENTS.md) | Paired comparison pending. This invocation used the student brief. |
-| [2 · interface revision](round-02/chatgpt/README.md) | Round 1 merge `492476f` + [UI-01–03](../design/ROUND_02_UI.md) | Codex, GPT-6 family. Interface revision in [apps/chatgpt](../../../apps/chatgpt/README.md). | [Claude One Shot 2](round-02/claude/README.md), [PR #48](https://github.com/SebasLopez2005/SWEProject1/pull/48) | iOS build and workout UI test, bundle exports, palette contrast and local tests | Student requested an interface revision of the existing app. |
+| [2 · interface revision](round-02/chatgpt/README.md) | Round 1 merge `492476f` + [UI-01–03](../design/ROUND_02_UI.md) | Codex, GPT-6 family. Interface revision in [apps/chatgpt](../../../apps/chatgpt/README.md), [PR #49](https://github.com/SebasLopez2005/SWEProject1/pull/49). | [Claude One Shot 2](round-02/claude/README.md), [PR #48](https://github.com/SebasLopez2005/SWEProject1/pull/48) | iOS build and workout UI test, bundle exports, palette contrast and local tests | Student requested an interface revision of the existing app. |
+| 3 | November 8 planned-training working tree, based on `492476f` | Codex, GPT-6 family. [Formwork snapshot](../../../apps/formwork/README.md), imported from source tag `attempt-3-one-shot` at `b918cde`. | Pending | iPhone simulator and local Supabase validated. Student found per-set modal entry impractical (BL-06). | Preserve the generated output for assessment. Track phone release work separately. |
 
 ## Per-run evidence template
 
@@ -60,3 +61,18 @@ The iPhone 17 Pro iOS 26.5 demo XCTest and separate local Supabase API-outage XC
 ## Planned training requirements, November 8, 2026
 
 The student put the next one-shot generation on hold and requested a plan-first workout workflow. The [requirements draft](../design/TRAINING_REQUIREMENTS_DRAFT.md) records TR-01–13, the catalog source, and research. The [updated diagram guide](../design/README.md) and [traceability matrix](../design/TRACEABILITY.md) map those requirements to the design. All 50 Mermaid diagrams rendered to SVG and PNG. See the [verification record](../design/VERIFICATION.md).
+
+## ChatGPT Attempt 3 evaluation, November 9, 2026
+
+- The student requested a fresh one-shot app based on the planned-training design. The output was Formwork in a separate Attempt 3 directory. The exact model variant was unavailable. The [imported Formwork app](../../../apps/formwork/README.md) matches source tag `attempt-3-one-shot` at `b918cde`, including its original requirements evidence.
+- The assessed build ran on the iPhone 17 Pro simulator. It saved and recovered a planned set and paused rest after force-close, then synced a finished workout after a local API outage. Its TypeScript suite passed nine tests. Physical device and TestFlight checks were open.
+- Student evaluation, FW-02 and TR-02: recording a set worked, but opening and saving a separate form for every set made the workflow too slow in practice. Expected behavior is a workout row with editable weight and reps and a checkmark that records actuals in place. The fields may start blank or show editable suggestions. See [BL-06](../BACKLOG.md#observed-after-attempt-3).
+- Follow-up on the separate `phone-release` branch at `9f65c04`: the simulator edited the bench row to 11 reps and confirmed it with one tap. The 12-rep target stayed intact and rest started. TypeScript, 11 tests, the iOS bundle, and the EAS production profile check passed.
+- Release status: [Formwork was created and linked in Expo](https://expo.dev/accounts/swiftlycrdev/projects/formwork-attempt-3). Supabase project creation awaits account authentication. EAS detected the app and its Live Activity extension and requested Apple Developer authentication to provision them. No TestFlight build has been submitted.
+
+## Formwork hosted release, November 9, 2026
+
+- Apple accepted both bundle registrations after the account holder resolved the agreement. EAS provisioned the app and Live Activity extension using the existing distribution certificate and their shared App Group.
+- Created the [Formwork Supabase project](https://supabase.com/dashboard/project/lelqzaknhtpgidemdlgy) in US East Ohio on the Free plan. Applied both migrations and verified that a repeat dry run found no pending migrations. Disposable confirmed accounts passed hosted sign-in, workout write and pull, replay, account isolation, conflict, and tombstone checks. The test accounts were removed after verification. Expo production uses the hosted URL and publishable key.
+- The signed [EAS build 1](https://expo.dev/accounts/swiftlycrdev/projects/formwork-attempt-3/builds/712d9ffb-478e-4bd4-aa9f-a4f82e0e04cc) for version 1.0 completed. Expo reused the team’s existing App Store Connect submission key. The [submission](https://expo.dev/accounts/swiftlycrdev/projects/formwork-attempt-3/submissions/bd61e458-447b-4308-b4c1-9fde26909cd3) targets [Formwork (c23fbc)](https://appstoreconnect.apple.com/apps/6832569257/testflight/ios), the name assigned because Formwork was taken. The account holder is in the automatic **Team (Expo)** internal group.
+- Apple processed version 1.0 (build 1) as valid. Added it to **Team (Expo)** and verified that the group includes the build and Apple reports `IN_BETA_TESTING`. Physical iPhone installation remains a tester step.

@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Formwork",
+    "slug": "formwork-attempt-3",
+    "scheme": "formwork3",
+    "version": "1.0",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#131412",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "com.sweproject.formwork.attempt3",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.sweproject.formwork.attempt3"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      "expo-notifications",
+      "expo-sharing",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-widgets",
+        {
+          "bundleIdentifier": "com.sweproject.formwork.attempt3.widgets",
+          "groupIdentifier": "group.com.sweproject.formwork.attempt3"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

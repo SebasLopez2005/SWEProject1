@@ -2,7 +2,7 @@
 
 CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, reviewing previous performance, and tracking training volume.
 
-[One Shot 1](docs/part2/experiments/round-01/chatgpt/README.md) built the initial workout log and merged in PR #46. [One Shot 2](docs/part2/experiments/round-02/chatgpt/README.md) revised its interface with a dark palette and native Liquid Glass. The design covers 31 original stories and 13 planned training requirements across 50 Mermaid diagrams. The [run log](docs/part2/experiments/RUN_LOG.md) also records the independent Claude builds.
+[One Shot 1](docs/part2/experiments/round-01/chatgpt/README.md) built the initial workout log and merged in PR #46. [One Shot 2](docs/part2/experiments/round-02/chatgpt/README.md) revised its interface with a dark palette and native Liquid Glass. The design covers 31 original stories and 13 planned training requirements across 50 Mermaid diagrams. [One Shot 3](apps/formwork/README.md) generated Formwork from the planned-training design. The [run log](docs/part2/experiments/RUN_LOG.md) also records the independent Claude builds.
 
 ## Project documents
 

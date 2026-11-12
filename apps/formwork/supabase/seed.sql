@@ -1,0 +1,3 @@
+-- The public catalog is installed by migration. No accounts or passwords are seeded.
+-- Sign up two local accounts to test isolation. An offline demonstration is
+-- available only in a development build and has its own seeded SQLite partition.

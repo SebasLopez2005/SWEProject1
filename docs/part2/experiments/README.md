@@ -6,6 +6,7 @@ This follows the supplied Part 2 assignment. Generated app code must not be manu
 
 - [One Shot 1](round-01/chatgpt/README.md) covers the first implementation, the merged revision, and the original acceptance evidence.
 - [One Shot 2](round-02/chatgpt/README.md) covers the dark Liquid Glass revision, its verification, and the later training design changes.
+- [One Shot 3](../../../apps/formwork/README.md) preserves the original Formwork app. The [run log](RUN_LOG.md#chatgpt-attempt-3-evaluation-november-9-2026) records the assessment and later phone release.
 - [Claude One Shot 1](round-01/claude/README.md) and [Claude One Shot 2](round-02/claude/README.md) cover the independent Repwise implementation.
 
 ## Before round 1
