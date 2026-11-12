@@ -14,6 +14,7 @@ export default function WorkoutHome() {
   const active = model!.workouts.find(w => w.state === 'active');
   const completed = finished(model!.workouts);
   const last = completed[0];
+  const lastSetCount = last ? setCount(last) : 0;
   const open = (id: string) => router.push({ pathname: '/workout', params: { id } });
   function start(on: string) {
     try {
@@ -26,13 +27,13 @@ export default function WorkoutHome() {
   }
   return <Page kicker="FITNESS & WORKOUT LOG" title="Workout" subtitle={formatDate(dateKey())}>
     <Notice message={!choosing ? error : ''} error />
-    <Card dark>
+    <Card featured>
       <Row between>
         <Icon name="flash" color={c.accent} size={28} />
         <Txt variant="label" color={c.accent}>{owner?.demo ? 'CLASSROOM DEMO' : 'TRAINING LOG'}</Txt>
       </Row>
-      <Txt variant="display" color={c.surface}>{active ? 'Pick up where you left off.' : 'Ready to train?'}</Txt>
-      <Txt color={c.onDark}>{active
+      <Txt variant="display">{active ? 'Pick up where you left off.' : 'Ready to train?'}</Txt>
+      <Txt color={c.muted}>{active
         ? formatDate(active.date) + ' · ' + setCount(active) + ' recorded sets'
         : 'Start a session, add an exercise, and record your first set.'}</Txt>
       <Button label={active ? 'Resume workout' : 'Start workout'} icon={active ? 'play' : 'add'}
@@ -48,8 +49,8 @@ export default function WorkoutHome() {
         onPress={() => { setError(''); setDate(dateKey()); setChoosing(true); }} />
     </>}
     {last && <>
-      <Txt variant="label" color={c.green}>LAST SESSION</Txt>
-      <Item title={formatDate(last.date)} detail={setCount(last) + ' sets · ' +
+      <Txt variant="label" color={c.accent}>LAST SESSION</Txt>
+      <Item title={formatDate(last.date)} detail={lastSetCount + (lastSetCount === 1 ? ' set · ' : ' sets · ') +
         display(volume(allSets(last), model!.settings.unit)) + ' ' + model!.settings.unit + ' total volume'}
         icon="checkmark-circle-outline" onPress={() => open(last.id)} />
       <SyncLabel root={last} />

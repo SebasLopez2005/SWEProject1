@@ -2,7 +2,7 @@
 
 CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, reviewing previous performance, and tracking training volume.
 
-**Current status:** the initial design PR stack (#2–#45) is merged. The revised report with professor feedback is the requirements baseline: **31 stories, 101 original story points, and 42 Mermaid diagrams**. No application generation or deployment has run.
+[One Shot 1](docs/part2/experiments/round-01/chatgpt/README.md) built the initial workout log and merged in PR #46. [One Shot 2](docs/part2/experiments/round-02/chatgpt/README.md) revised its interface with a dark palette and native Liquid Glass. The design covers 31 original stories and 13 planned training requirements across 50 Mermaid diagrams. The [run log](docs/part2/experiments/RUN_LOG.md) also records the independent Claude builds.
 
 ## Project documents
 
@@ -10,13 +10,13 @@ CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, 
 | --- | --- | --- |
 | Revised requirements | [Source report](docs/part2/design/source/Fitness_Workout_Log_App_Revised_v2.docx) | Professor-reviewed fitness specification |
 | Design | [Diagram guide](docs/part2/design/README.md) | Context, architecture, navigation, data, classes and story sequences |
-| Requirements coverage | [Traceability](docs/part2/design/TRACEABILITY.md) | All 31 stories and unexecuted acceptance checks |
+| Requirements coverage | [Traceability](docs/part2/design/TRACEABILITY.md) | Original story checks and planned training coverage |
 | Scope and behavior | [Decisions](docs/part2/design/SCOPE.md) · [Contracts](docs/part2/design/CONTRACTS.md) | Product boundary and implementation rules |
 | Revision review | [Report alignment](docs/part2/design/REVISED_REPORT_REVIEW.md) | Corrections and remaining design proposals |
 | Assignment | [Part 2 report](docs/part2/REPORT.md) · [Backlog](docs/part2/BACKLOG.md) | Deliverables, presentation and future work |
-| Generation evidence | [Procedure](docs/part2/experiments/README.md) · [Run log](docs/part2/experiments/RUN_LOG.md) | Two independent model outputs; no runs yet |
+| Generation evidence | [Procedure](docs/part2/experiments/README.md) · [Run log](docs/part2/experiments/RUN_LOG.md) | Generation procedure and recorded runs |
 | Review history | [PR index](docs/part2/experiments/PR_HISTORY.md) | Individual PRs, merge commits and superseded wording |
-| Deployment | [Deployment plan](docs/part2/DEPLOYMENT.md) | Expo, Supabase and TestFlight; not deployed |
+| Deployment | [Deployment plan](docs/part2/DEPLOYMENT.md) | Expo, Supabase and TestFlight setup |
 | Part 1 | [Archive](docs/part1/README.md) | Original requirements, reviews, finals and prompt records |
 
 ## Repository layout
@@ -31,8 +31,8 @@ docs/
       source/            Revised requirements report
       diagrams/
         classes/         Five class-model sheets
-        sequence/        31 story sequences and two supporting flows
-      README.md          All 42 diagrams with explanations
+        sequence/        31 story sequences, two supporting flows and seven training sequences
+      README.md          All 50 diagrams with explanations
     experiments/         PR history, model procedure and result records
     prompts/             Shared application-generation prompt
     REPORT.md            Assignment report draft
@@ -59,4 +59,4 @@ The design checks validate source parity, coverage, mirrors, links and archive i
 
 ## Next milestone
 
-Use the [app setup](apps/chatgpt/README.md) to launch the iOS simulator or run local Supabase. The [generation log](docs/part2/experiments/RUN_LOG.md) separates this implementation from the independent Claude output and eventual TestFlight distribution.
+Use the [app setup](apps/chatgpt/README.md) to launch the workout log on the iOS simulator or run local Supabase. See the [run log](docs/part2/experiments/RUN_LOG.md) for evidence from both models.

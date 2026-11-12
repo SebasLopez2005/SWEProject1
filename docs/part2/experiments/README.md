@@ -1,6 +1,12 @@
 # Two-model generation and evidence protocol
 
-This follows the supplied Part 2 assignment. Generated app code must not be manually repaired for the assessed one-shot result. Diagram revisions are the mechanism for improving a result, and each merged design PR must be followed by a full generation. Diagram review precedes application generation; no application-generation run has occurred yet.
+This follows the supplied Part 2 assignment. Generated app code must not be manually repaired for the assessed one-shot result. Diagram revisions are the mechanism for improving a result, and each merged design PR must be followed by a full generation. Diagram review precedes application generation. Completed work is recorded in the run log.
+
+## ChatGPT run summaries
+
+- [One Shot 1](round-01/chatgpt/README.md) covers the first implementation, the merged revision, and the original acceptance evidence.
+- [One Shot 2](round-02/chatgpt/README.md) covers the dark Liquid Glass revision, its verification, and the later training design changes.
+- [Claude One Shot 1](round-01/claude/README.md) and [Claude One Shot 2](round-02/claude/README.md) cover the independent Repwise implementation.
 
 ## Before round 1
 

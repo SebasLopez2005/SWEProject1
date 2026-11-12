@@ -38,7 +38,7 @@ export default function Progress() {
     {exercise?.type === 'seconds' ? <Empty title="Timed exercise" detail="View recorded seconds in exercise history." /> :
       !points.length ? <Empty title="No chart data" detail="Finish a workout with logged sets to see your progress." icon="stats-chart-outline" /> : <>
         <Card>
-          <Txt variant="label" color={c.green}>{period.toUpperCase()}</Txt>
+          <Txt variant="label" color={c.accent}>{period.toUpperCase()}</Txt>
           <Txt variant="h2">{exercise?.name ?? 'Overall weekly volume'}</Txt>
           <Txt variant="small">{metric} · {exercise ? 'Workout date' : 'Week starting Monday'}</Txt>
           {exercise && points.length < 2 ? <Txt color={c.muted}>Log at least two workouts with this exercise to see a trend.</Txt> :
@@ -81,13 +81,13 @@ function Chart({ points, weekly, onPoint }: { points: Point[]; weekly: boolean; 
       <Svg width={width} height={158}>
         {[top, (bottom + top) / 2, bottom].map(at => <Line key={at} x1="0" x2={width} y1={at} y2={at}
           stroke={c.line} strokeDasharray={at === bottom ? undefined : '4 4'} />)}
-        {!weekly && <Polyline fill="none" stroke={c.green} strokeWidth="2.5" points={points.map((p, i) => x(i) + ',' + y(p.value)).join(' ')} />}
+        {!weekly && <Polyline fill="none" stroke={c.accent} strokeWidth="2.5" points={points.map((p, i) => x(i) + ',' + y(p.value)).join(' ')} />}
         {points.map((p, i) => weekly
           ? <Rect key={p.id} x={x(i) - Math.min(19, step * .35)} y={Math.min(y(p.value), bottom - 2)}
             width={Math.min(38, step * .7)} height={Math.max(2, bottom - y(p.value))}
-            rx={Math.min(5, step * .2)} fill={p.partial ? '#6B8151' : c.green} onPress={() => onPoint(p.id)} />
+            rx={Math.min(5, step * .2)} fill={p.partial ? c.chartPartial : c.accent} onPress={() => onPoint(p.id)} />
           : <Circle key={p.id} cx={x(i)} cy={y(p.value)} r={Math.min(5, Math.max(2, step * .22))}
-            stroke={c.surface} strokeWidth={1} fill={c.green} onPress={() => onPoint(p.id)} />)}
+            stroke={c.surface} strokeWidth={1} fill={c.accent} onPress={() => onPoint(p.id)} />)}
         {points.map((p, i) => <Rect key={'target-' + p.id} x={x(i) - step / 2} y={0} width={step} height={156}
           fill="transparent" onPress={() => onPoint(p.id)} />)}
       </Svg>

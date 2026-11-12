@@ -27,7 +27,7 @@ export default function ExerciseDetail() {
     subtitle={exercise.muscle + ' · ' + typeLabels[exercise.type] + (exercise.archived ? ' · Archived' : '')}>
     <Notice message={error} error /><Notice message={note} />
     {!exercise.shared && <Card>
-      <Txt variant="label" color={c.green}>CUSTOM EXERCISE</Txt>
+      <Txt variant="label" color={c.accent}>CUSTOM EXERCISE</Txt>
       <SyncLabel root={exercise} />
       <Button label="Edit custom exercise" icon="create-outline" tone="secondary" onPress={() => setEditing(true)} />
       <Button label={exercise.archived ? 'Restore exercise' : 'Archive exercise'} tone={exercise.archived ? 'primary' : 'danger'}

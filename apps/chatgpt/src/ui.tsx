@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { GlassView, isGlassEffectAPIAvailable, isLiquidGlassAvailable } from 'expo-glass-effect';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 import {
-  ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet,
+  AccessibilityInfo, ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet,
   Text, TextInput, View, type TextInputProps, type TextStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,26 +15,67 @@ import {
 import { useApp } from './session';
 
 export const c = {
-  bg: '#F5F6F0', surface: '#FFFFFF', ink: '#151D18', muted: '#505D53', accent: '#D5FB70',
-  line: '#DDE2D8', soft: '#EBEFE5', darkSoft: '#354337', onDark: '#D1DDCF', warning: '#85451C',
-  error: '#9A2828', paleError: '#FFF2EF', green: '#225237',
+  bg: '#101115',
+  surface: '#191B21',
+  raised: '#252832',
+  line: '#383B46',
+  text: '#F5F2EE',
+  muted: '#B6B9C4',
+  accent: '#E3BF89',
+  accentSurface: '#3B3026',
+  accentLine: '#745A3E',
+  chartPartial: '#A58966',
+  error: '#FFB8B8',
+  errorSurface: '#3B2228',
+  warning: '#F6CB8F',
 };
+const buttonMaterial = {
+  primary: { foreground: '#FFE8C5', fill: '#493623', pressed: '#5B442C', rim: '#795A3C', tint: '#936C42A8' },
+  secondary: { foreground: c.text, fill: c.raised, pressed: '#333744', rim: '#454954', tint: '#53566488' },
+  quiet: { foreground: c.text, fill: c.surface, pressed: c.raised, rim: c.line, tint: undefined },
+  danger: { foreground: c.error, fill: c.errorSurface, pressed: '#532C35', rim: '#70434A', tint: '#75424A99' },
+  dark: { foreground: c.accent, fill: c.surface, pressed: c.raised, rim: c.line, tint: undefined },
+};
+
+const GlassControls = createContext(false);
+export function GlassControlsProvider({ children }: { children: ReactNode }) {
+  const [useGlass, setUseGlass] = useState(false);
+  useEffect(() => {
+    if (Platform.OS !== 'ios' || !isGlassEffectAPIAvailable() || !isLiquidGlassAvailable()) return;
+    let awaitingInitialPreference = true;
+    const subscription = AccessibilityInfo.addEventListener('reduceTransparencyChanged', reduceTransparency => {
+      awaitingInitialPreference = false;
+      setUseGlass(!reduceTransparency);
+    });
+    void AccessibilityInfo.isReduceTransparencyEnabled().then(reduceTransparency => {
+      if (awaitingInitialPreference) setUseGlass(!reduceTransparency);
+    }, () => {
+      // Keep the opaque treatment when the system preference cannot be read.
+    });
+    return () => {
+      awaitingInitialPreference = false;
+      subscription.remove();
+    };
+  }, []);
+  return <GlassControls.Provider value={useGlass}>{children}</GlassControls.Provider>;
+}
+
 type IconName = ComponentProps<typeof Ionicons>['name'];
-export function Icon({ name, size = 22, color = c.ink }: { name: IconName; size?: number; color?: string }) {
+export function Icon({ name, size = 22, color = c.text }: { name: IconName; size?: number; color?: string }) {
   return <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
     <Ionicons name={name} size={size} color={color} accessible={false} />
   </View>;
 }
 const variants = {
-  display: { fontSize: 40, fontWeight: '800', letterSpacing: -1.8 },
-  title: { fontSize: 31, fontWeight: '800', letterSpacing: -1 },
+  display: { fontSize: 40, fontWeight: '700', letterSpacing: -1.7 },
+  title: { fontSize: 34, fontWeight: '700', letterSpacing: -1.2 },
   h2: { fontSize: 22, fontWeight: '800', letterSpacing: -0.5 },
   body: { fontSize: 16, fontWeight: '400' },
   strong: { fontSize: 16, fontWeight: '700' },
   small: { fontSize: 14, fontWeight: '500' },
   label: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2 },
 } satisfies Record<string, TextStyle>;
-export function Txt({ children, variant = 'body', color = c.ink, style, live }: {
+export function Txt({ children, variant = 'body', color = c.text, style, live }: {
   children: ReactNode; variant?: keyof typeof variants; color?: string; style?: TextStyle; live?: boolean;
 }) {
   const scale = useApp()?.model?.settings.scale ?? 1;
@@ -44,27 +87,41 @@ export function Txt({ children, variant = 'body', color = c.ink, style, live }: 
 export function Row({ children, between = false }: { children: ReactNode; between?: boolean }) {
   return <View style={[styles.row, between && { justifyContent: 'space-between' }]}>{children}</View>;
 }
-export function Card({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
-  return <View style={[styles.card, dark && styles.dark]}>{children}</View>;
+export function Card({ children, featured = false }: { children: ReactNode; featured?: boolean }) {
+  return <View style={[styles.card, featured && styles.featured]}>
+    {featured && <LinearGradient colors={['#362C25', '#222127', '#191B21']}
+      start={{ x: 1, y: 0 }} end={{ x: 0, y: 1 }} pointerEvents="none" style={StyleSheet.absoluteFill} />}
+    {children}
+  </View>;
 }
 export function Button({ label, onPress, icon, tone = 'primary', disabled, compact }: {
-  label: string; onPress(): void; icon?: IconName; tone?: 'primary' | 'secondary' | 'danger' | 'quiet' | 'dark';
+  label: string; onPress(): void; icon?: IconName; tone?: keyof typeof buttonMaterial;
   disabled?: boolean; compact?: boolean;
 }) {
-  const foreground = tone === 'danger' ? c.error : tone === 'dark' ? c.accent : c.ink;
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}
-    style={({ pressed }) => [styles.button, {
-      alignSelf: compact ? 'flex-start' : 'stretch', opacity: disabled ? .45 : pressed ? .75 : 1,
-      backgroundColor: { primary: c.accent, secondary: c.soft, danger: c.paleError, quiet: c.surface, dark: c.ink }[tone],
-    }]}>
+  const useGlass = useContext(GlassControls) && !disabled;
+  const { foreground, fill, pressed, rim, tint } = buttonMaterial[tone];
+  const alignment = compact ? styles.compactControl : styles.fullControl;
+  const control = <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }}
+    disabled={disabled} onPress={onPress}
+    style={({ pressed: isPressed }) => [
+      styles.button,
+      !useGlass && [alignment, styles.opaqueButton, {
+        backgroundColor: isPressed ? pressed : fill, borderColor: rim, opacity: disabled ? .48 : 1,
+      }],
+    ]}>
     {icon && <Icon name={icon} size={19} color={foreground} />}
     <Txt variant="strong" color={foreground} style={{ flexShrink: 1, textAlign: 'center' }}>{label}</Txt>
   </Pressable>;
+
+  if (!useGlass) return control;
+  return <GlassView style={[alignment, styles.glass]} colorScheme="dark" tintColor={tint} isInteractive>
+    {control}
+  </GlassView>;
 }
 export function Chip({ label, selected, onPress }: { label: string; selected?: boolean; onPress(): void }) {
   return <Pressable accessibilityRole="button" accessibilityState={{ selected: !!selected }} onPress={onPress}
-    style={[styles.chip, selected && { backgroundColor: c.ink, borderColor: c.ink }]}>
-    <Txt variant="small" color={selected ? c.accent : c.ink}>{label}</Txt>
+    style={[styles.chip, selected && { backgroundColor: c.accentSurface, borderColor: c.accentLine }]}>
+    <Txt variant="small" color={selected ? c.accent : c.text}>{label}</Txt>
   </Pressable>;
 }
 export function Field({ label, ...props }: TextInputProps & { label: string }) {
@@ -72,7 +129,7 @@ export function Field({ label, ...props }: TextInputProps & { label: string }) {
   const scale = useApp()?.model?.settings.scale ?? 1;
   return <View style={{ gap: 6 }}>
     <Txt variant="small" color={c.muted}>{label}</Txt>
-    <TextInput accessibilityLabel={label} placeholderTextColor={c.muted} {...props} defaultValue={initialValue.current}
+    <TextInput accessibilityLabel={label} placeholderTextColor={c.muted} keyboardAppearance="dark" selectionColor={c.accent} {...props} defaultValue={initialValue.current}
       style={[styles.input, { fontSize: 16 * scale }, props.style]} />
   </View>;
 }
@@ -94,7 +151,7 @@ export function DateField({ label, value, onChange, clear }: {
         if (selected) onChange(dateKey(selected));
       }} />
       : <View style={{ gap: 8 }}>
-        <DateTimePicker value={localDate(draft)} maximumDate={new Date()} mode="date" display="inline"
+        <DateTimePicker value={localDate(draft)} maximumDate={new Date()} mode="date" display="inline" themeVariant="dark" accentColor={c.accent}
           onChange={(_, selected) => { if (selected) setDraft(dateKey(selected)); }} />
         <Row><Button label="Use date" compact onPress={() => { onChange(draft); setOpen(false); }} />
           <Button label="Cancel date" compact tone="quiet" onPress={() => setOpen(false)} /></Row>
@@ -116,7 +173,7 @@ export function Page({ title, kicker, subtitle, back = false, children, onEnd }:
         {back && <Button label="Back" icon="chevron-back" compact tone="quiet"
           onPress={() => router.canGoBack() ? router.back() : router.replace('/')} />}
         <View style={{ gap: 7 }}>
-          {kicker && <Txt variant="label" color={c.green}>{kicker}</Txt>}
+          {kicker && <Txt variant="label" color={c.accent}>{kicker}</Txt>}
           <Txt variant="title">{title}</Txt>
           {subtitle && <Txt color={c.muted}>{subtitle}</Txt>}
         </View>
@@ -142,14 +199,14 @@ export function Sheet({ title, children, onClose }: { title: string; children: R
 }
 export function Notice({ message, error = false }: { message: string; error?: boolean }) {
   if (!message) return null;
-  return <View style={[styles.notice, { backgroundColor: error ? c.paleError : c.soft }]}>
-    <Icon name={error ? 'alert-circle-outline' : 'information-circle-outline'} color={error ? c.error : c.green} />
-    <Txt live color={error ? c.error : c.green} style={{ flex: 1 }}>{message}</Txt>
+  return <View style={[styles.notice, { backgroundColor: error ? c.errorSurface : c.raised }]}>
+    <Icon name={error ? 'alert-circle-outline' : 'information-circle-outline'} color={error ? c.error : c.accent} />
+    <Txt live color={error ? c.error : c.accent} style={{ flex: 1 }}>{message}</Txt>
   </View>;
 }
 export function Empty({ title, detail, icon = 'file-tray-outline' }: { title: string; detail: string; icon?: IconName }) {
   return <Card>
-    <Icon name={icon} color={c.green} size={28} />
+    <Icon name={icon} color={c.accent} size={28} />
     <Txt variant="h2">{title}</Txt>
     <Txt color={c.muted}>{detail}</Txt>
   </Card>;
@@ -157,7 +214,7 @@ export function Empty({ title, detail, icon = 'file-tray-outline' }: { title: st
 export function Item({ title, detail, icon, onPress }: { title: string; detail?: string; icon?: IconName; onPress(): void }) {
   return <Pressable accessibilityRole="button" accessibilityLabel={detail ? title + ', ' + detail : title} onPress={onPress}
     style={({ pressed }) => [styles.item, { opacity: pressed ? .68 : 1 }]}>
-    {icon && <View style={styles.tile}><Icon name={icon} color={c.green} /></View>}
+    {icon && <View style={styles.tile}><Icon name={icon} color={c.accent} /></View>}
     <View style={{ flex: 1, gap: 4 }}>
       <Txt variant="strong">{title}</Txt>
       {!!detail && <Txt variant="small" color={c.muted}>{detail}</Txt>}
@@ -171,7 +228,7 @@ export function SyncLabel({ root }: { root: Root }) {
   const pending = model?.pending.has(rootKey(root.kind, root.id));
   const text = owner?.demo ? 'Saved on this device · Demo' : conflict ? 'Needs attention' :
     pending ? (status === 'Needs sign-in' ? 'Saved on this device · Needs sign-in' : 'Saved on this device · Waiting to upload') : 'Uploaded';
-  return <Txt variant="small" color={conflict ? c.warning : c.green}>{text}</Txt>;
+  return <Txt variant="small" color={conflict ? c.warning : c.accent}>{text}</Txt>;
 }
 export function ExercisePicker({ title = 'Choose an exercise', onPick, onClose, onCreate, showArchived = false }: {
   title?: string; onPick(exercise: Exercise): void; onClose(): void; onCreate?(): void; showArchived?: boolean;
@@ -193,7 +250,7 @@ export function ExercisePicker({ title = 'Choose an exercise', onPick, onClose, 
   </Sheet>;
 }
 export function Busy() {
-  return <View style={[styles.page, { alignItems: 'center', justifyContent: 'center' }]}><ActivityIndicator color={c.green} /></View>;
+  return <View style={[styles.page, { alignItems: 'center', justifyContent: 'center' }]}><ActivityIndicator color={c.accent} /></View>;
 }
 export function confirm(title: string, body: string, label: string, action: () => void) {
   Alert.alert(title, body, [{ text: 'Cancel', style: 'cancel' }, { text: label, style: 'destructive', onPress: action }]);
@@ -203,16 +260,20 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: c.bg },
   content: { width: '100%', maxWidth: 720, alignSelf: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32, gap: 14 },
   row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
-  card: { padding: 16, gap: 10, backgroundColor: c.surface, borderColor: c.line, borderWidth: 1, borderRadius: 20 },
-  dark: { backgroundColor: c.ink, borderColor: c.ink, padding: 20 },
+  card: { padding: 17, gap: 11, backgroundColor: c.surface, borderColor: c.line, borderWidth: 1, borderRadius: 21 },
+  featured: { padding: 23, gap: 15, borderRadius: 26, borderColor: '#534437', overflow: 'hidden' },
   button: { minHeight: 48, minWidth: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingHorizontal: 14, paddingVertical: 11, borderRadius: 13, gap: 8 },
+    paddingHorizontal: 16, paddingVertical: 11, gap: 8 },
+  glass: { borderRadius: 999 },
+  opaqueButton: { borderRadius: 999, borderWidth: 1 },
+  compactControl: { alignSelf: 'flex-start', maxWidth: '100%' },
+  fullControl: { alignSelf: 'stretch' },
   chip: { alignSelf: 'flex-start', minHeight: 44, minWidth: 44, paddingHorizontal: 13, paddingVertical: 9,
     justifyContent: 'center', borderWidth: 1, borderColor: c.line, backgroundColor: c.surface, borderRadius: 22 },
-  input: { minHeight: 48, color: c.ink, borderWidth: 1, borderColor: c.line, borderRadius: 13,
+  input: { minHeight: 48, color: c.text, borderWidth: 1, borderColor: c.line, borderRadius: 13,
     paddingHorizontal: 12, paddingVertical: 10, backgroundColor: c.surface },
   notice: { padding: 13, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 12 },
   item: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 11,
     padding: 12, borderRadius: 15, backgroundColor: c.surface, borderColor: c.line, borderWidth: 1 },
-  tile: { width: 37, height: 37, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: c.soft },
+  tile: { width: 37, height: 37, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: c.raised },
 });
