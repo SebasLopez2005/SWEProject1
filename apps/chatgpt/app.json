@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "scheme": "fitnessworkoutlog",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "edu.cs3365.fitnessworkoutlog",

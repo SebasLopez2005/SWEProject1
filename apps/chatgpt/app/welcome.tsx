@@ -23,10 +23,10 @@ export default function Welcome() {
   if (app.loading) return <Busy />;
   return <Page kicker="FITNESS & WORKOUT LOG" title={app.owner ? 'Choose your unit' : 'Your training log'}
     subtitle={app.owner ? 'Use the unit you train in most often. You can enter either unit on any weighted set.' : undefined}>
-    {!app.owner && <Card dark>
+    {!app.owner && <Card featured>
       <Icon name="barbell-outline" size={40} color={c.accent} />
-      <Txt variant="display" color={c.surface}>Know what you lifted.</Txt>
-      <Txt color={c.onDark}>Record sets between lifts, see what you did last time, and follow your training over time.</Txt>
+      <Txt variant="display">Know what you lifted.</Txt>
+      <Txt color={c.muted}>Record sets between lifts, see what you did last time, and follow your training over time.</Txt>
     </Card>}
     <Notice message={app.bootError || error} error />
     <Notice message={note} />

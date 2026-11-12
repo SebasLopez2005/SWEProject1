@@ -1,6 +1,6 @@
 # Part 2 - High-level Design and MVP
 
-**Draft report, November 2, 2026.** Team: Sebastian and Diego. Submission/presentation date in the supplied assignment: **November 12, 2026**. This is a planning document, not a claim that generation, deployment or user validation has happened.
+**Draft report, November 2, 2026.** Team: Sebastian and Diego. Submission/presentation date in the supplied assignment: **November 12, 2026**. The implementation summaries below record the work completed after this draft was started.
 
 ## Cover: selection and problem
 
@@ -21,11 +21,11 @@ The user selected Expo for mobile development, TestFlight for iOS distribution, 
 | Detailed classes incl. controllers and database handlers | Five class-model sheets in design guide; logical RPC handlers included |
 | Diagrams in Mermaid with descriptions/justifications | `.mmd` sources and design guide; syntax/render verification required |
 | PR history of design modifications | Initial stack #2–#45 merged; [PR history and merge records](experiments/PR_HISTORY.md) |
-| Same design exercised with two coding models | Shared prompt ready; neither model has run |
-| Detailed iterations, failures and diagram changes | [Experiment log](experiments/RUN_LOG.md), currently unexecuted |
+| Same design exercised with two coding models | ChatGPT and Claude outputs are recorded. A paired comparison using the same frozen input remains pending. |
+| Detailed iterations, failures and diagram changes | [One Shot 1](experiments/round-01/chatgpt/README.md) · [One Shot 2](experiments/round-02/chatgpt/README.md) · [Run log](experiments/RUN_LOG.md) |
 | Public GitHub pointers and instructor access | Remote is https://github.com/SebasLopez2005/SWEProject1 ; GitHub visibility verified PUBLIC on November 2, 2026; instructor link check pending |
-| Prompts used for generation | [Shared prompt](prompts/ONE_SHOT.md); exact submitted prompts will be archived per run |
-| Deployment | [TestFlight/Supabase plan](DEPLOYMENT.md); not deployed |
+| Prompts used for generation | [Shared prompt](prompts/ONE_SHOT.md) · [One Shot 1 brief](experiments/round-01/chatgpt/USER_BRIEF.txt) · [One Shot 2 brief](experiments/round-02/chatgpt/USER_BRIEF.txt) |
+| Deployment | [TestFlight/Supabase plan](DEPLOYMENT.md) |
 | Remaining backlog and hypothetical sprint | [Backlog](BACKLOG.md); observed implementation gaps added after runs |
 | 10-minute presentation/demo | Outline below; live demo evidence pending |
 | Individual teammate evaluations | Each student submits directly under assignment instructions; no email is sent by this repo workflow |
@@ -36,7 +36,10 @@ The [design guide](design/README.md) contains every diagram inline, with its own
 
 ## Iteration and model comparison
 
-No implementation results exist yet. The initial design covers the selected Claude requirements. This preparatory design work is not an application generation round. The initial design stack (#2–#45) is merged, retaining one PR per diagram and the final professor-feedback alignment in #45; see the [PR history](experiments/PR_HISTORY.md). Record the exact merged baseline commit before the first generation.
+The initial design stack (#2–#45) covers the selected Claude Fitness & Workout Log requirements and includes the professor-feedback alignment in #45. The merged design at `9dc200d` served as the input for the initial implementation. [PR history](experiments/PR_HISTORY.md)
+
+- **One Shot 1** built the first app and verified core workout flows on the iOS simulator, including saving offline and uploading to local Supabase after an outage. PR #46 merged the result. [One Shot 1 write-up](experiments/round-01/chatgpt/README.md)
+- **One Shot 2** revised that app with a graphite and champagne palette and native iOS Liquid Glass controls. Simulator and bundle checks are recorded for the revision. [One Shot 2 write-up](experiments/round-02/chatgpt/README.md)
 
 For every paired round, record the design commit, merged PR, exact model/version, exact prompt, generated code commit, commands, real test results, reproducible failures and deployment evidence. Both models use the same frozen design and clean independent output. Only diagram changes may improve behavior between rounds, followed by a fresh full generation. Use at most three paired generation rounds as the conservative team protocol. [Experiment procedure](experiments/README.md) explains the boundary between setup, assessment and diagram revisions.
 

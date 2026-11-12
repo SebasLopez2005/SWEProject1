@@ -4,6 +4,8 @@ An iOS-first workout journal for logging weighted, reps-only, and timed sets, re
 
 See [DEMO.md](DEMO.md) for the four persona walkthroughs, [REQUIREMENTS.md](REQUIREMENTS.md) for acceptance evidence, and [ASSUMPTIONS.md](ASSUMPTIONS.md) for design decisions.
 
+Round 2 adds a graphite and champagne appearance with native Liquid Glass buttons on iOS 26. Devices without native glass and users who enable Reduce Transparency get solid buttons with the same labels and actions.
+
 ## Classroom demo on macOS
 
 Use Xcode with an installed iOS simulator runtime, CocoaPods, and an even-numbered Node LTS release that meets `package.json`'s engine range. The demo requires no Supabase account, Apple Developer membership, or credentials.
@@ -20,6 +22,8 @@ Leave Metro running. Boot one simulator in Simulator and run this in another ter
 ```sh
 npm run ios
 ```
+
+If you already generated an iOS project for Round 1, run `npx expo prebuild --platform ios` after installing dependencies so the native glass and gradient modules are linked.
 
 If several simulators are booted, run `xcrun simctl list devices booted` and pass the intended UUID to `npm run ios -- DEVICE_UUID`. Choose **Open classroom demo**. Leave both Supabase variables unset for this mode.
 

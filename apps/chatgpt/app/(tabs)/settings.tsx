@@ -102,7 +102,7 @@ function ConflictReview({ conflict, onClose }: { conflict: Conflict; onClose(): 
   }
   function snapshot(title: string, root?: Root | null) {
     return <Card>
-      <Txt variant="label" color={c.green}>{title}</Txt>
+      <Txt variant="label" color={c.accent}>{title}</Txt>
       <Txt variant="strong">{describe(root)}</Txt>
       {root?.kind === 'workout' && root.entries.map(e => <Txt key={e.id}>
         {app.model!.exercises.find(x => x.id === e.exerciseId)?.name ?? 'Exercise'}{'\n'}

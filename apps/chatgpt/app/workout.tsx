@@ -87,13 +87,13 @@ function WorkoutScreen({ workout }: { workout: Workout }) {
       else save(undo, workout, new Set(undo.entries.map(e => e.exerciseId)));
       setUndo(undefined); setInfo('Removal undone.');
     })} />}
-    {!active && !draft && <Card dark>
+    {!active && !draft && <Card featured>
       <Txt variant="label" color={c.accent}>SESSION TOTALS</Txt>
-      <Txt variant="h2" color={c.surface}>{workout.entries.length} {workout.entries.length === 1 ? 'exercise' : 'exercises'} · {setCount(workout)} {setCount(workout) === 1 ? 'set' : 'sets'}</Txt>
-      <Txt color={c.onDark}>{workout.duration !== undefined
+      <Txt variant="h2">{workout.entries.length} {workout.entries.length === 1 ? 'exercise' : 'exercises'} · {setCount(workout)} {setCount(workout) === 1 ? 'set' : 'sets'}</Txt>
+      <Txt color={c.muted}>{workout.duration !== undefined
         ? 'Duration: ' + (workout.duration < 60 ? workout.duration + ' seconds' : Math.floor(workout.duration / 60) + ' minutes')
         : 'Duration unavailable for this session'}</Txt>
-      <Txt color={c.onDark}>Total volume: {weightLabel(volume(allSets(workout), settings.unit), settings.unit, settings)}</Txt>
+      <Txt color={c.muted}>Total volume: {weightLabel(volume(allSets(workout), settings.unit), settings.unit, settings)}</Txt>
     </Card>}
     <SyncLabel root={workout} />
     {draft && <DateField label="Workout date" value={draft.date} onChange={date => { setDraft({ ...draft, date }); setUndo(undefined); }} />}
@@ -103,7 +103,7 @@ function WorkoutScreen({ workout }: { workout: Workout }) {
       if (!exercise) return <Notice key={entry.id} message="An exercise is still waiting to sync." />;
       const last = previous(model!.workouts, exercise.id, workout.id);
       return <Card key={entry.id}>
-        <Txt variant="label" color={c.green}>{String(index + 1).padStart(2, '0')} · {typeLabels[exercise.type].toUpperCase()}</Txt>
+        <Txt variant="label" color={c.accent}>{String(index + 1).padStart(2, '0')} · {typeLabels[exercise.type].toUpperCase()}</Txt>
         <Txt variant="h2">{exercise.name}</Txt>
         {exercise.archived && <Txt color={c.warning}>Archived exercise</Txt>}
         {editing && <Txt variant="small" color={c.muted}>{last
