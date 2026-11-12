@@ -14,7 +14,7 @@ CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, 
 | Scope and behavior | [Decisions](docs/part2/design/SCOPE.md) · [Contracts](docs/part2/design/CONTRACTS.md) | Product boundary and implementation rules |
 | Revision review | [Report alignment](docs/part2/design/REVISED_REPORT_REVIEW.md) | Corrections and remaining design proposals |
 | Assignment | [Part 2 report](docs/part2/REPORT.md) · [Backlog](docs/part2/BACKLOG.md) | Deliverables, presentation and future work |
-| Presentation | [Slides (PDF)](docs/part2/presentation/CS3365_Project2_Presentation.pdf) | 26-slide class presentation: design, diagram zoom-ins, both models' one-shot rounds, comparison, demo script and backlog |
+| Presentation | [Full slides (PDF)](docs/part2/presentation/CS3365_Project2_Presentation.pdf) · [Balanced slides (PDF)](docs/part2/presentation/CS3365_Project2_Presentation_Balanced.pdf) | Full: 26 slides with every diagram zoom-in. Balanced: 17 slides in plainer language with the four key diagrams. Both cover both models' one-shot rounds, the comparison, demo script and backlog |
 | Generation evidence | [Procedure](docs/part2/experiments/README.md) · [Run log](docs/part2/experiments/RUN_LOG.md) | Generation procedure and recorded runs |
 | Review history | [PR index](docs/part2/experiments/PR_HISTORY.md) | Individual PRs, merge commits and superseded wording |
 | Deployment | [Deployment plan](docs/part2/DEPLOYMENT.md) | Expo, Supabase and TestFlight setup |
