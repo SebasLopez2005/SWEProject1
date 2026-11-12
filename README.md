@@ -8,7 +8,7 @@ CS3365 project by Sebastian and Diego. A mobile workout log for recording sets, 
 
 | Area | Start here | Contents |
 | --- | --- | --- |
-| Revised requirements | [Source report](docs/part2/design/source/Fitness_Workout_Log_App_Revised_v2.docx) | Professor-reviewed fitness specification |
+| Revised requirements | [Source report v3](docs/part2/design/source/Fitness_Workout_Log_App_Revised_v3.docx) | Final revision after professor feedback: personas identified by role, not name. [v2](docs/part2/design/source/Fitness_Workout_Log_App_Revised_v2.docx) is kept as the input used for the generation rounds. |
 | Design | [Diagram guide](docs/part2/design/README.md) | Context, architecture, navigation, data, classes and story sequences |
 | Requirements coverage | [Traceability](docs/part2/design/TRACEABILITY.md) | Original story checks and planned training coverage |
 | Scope and behavior | [Decisions](docs/part2/design/SCOPE.md) · [Contracts](docs/part2/design/CONTRACTS.md) | Product boundary and implementation rules |
