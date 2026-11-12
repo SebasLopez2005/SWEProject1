@@ -11,7 +11,7 @@ classDiagram
     }
     class ExerciseRepository {
       <<interface>>
-      +search(text, muscle)
+      +search(text, muscle, equipment, category)
       +get(id)
       +mutateAndEnqueue(snapshot)
     }
@@ -22,10 +22,26 @@ classDiagram
       +mutateAndEnqueue(snapshot)
       +deleteAndEnqueue(id)
     }
+    class ProfileRepository {
+      <<interface>>
+      +loadOwnerSnapshot(period)
+      +saveGoalAndEnqueue(input)
+      +saveBodyweightAndEnqueue(input)
+      +saveBodyweightTargetAndEnqueue(input)
+      +deleteAndEnqueue(id)
+    }
+    class DeviceStateRepository {
+      <<interface>>
+      +getRest(ownerId)
+      +saveRest(state)
+      +replaceAlertIds(ownerId, ids)
+    }
     class SettingsRepository {
       <<interface>>
       +get()
       +mutateAndEnqueue(snapshot)
+      +getReminderPreferences()
+      +saveReminderPreferencesAndEnqueue(input)
     }
     class SqliteRepositories {
       +ownerId
@@ -38,6 +54,10 @@ classDiagram
       +migrate()
       +transaction(work)
       +emitChanged()
+    }
+    class CatalogImporter {
+      +verifyPinnedRelease()
+      +mergeByStableId()
     }
     class OutboxOperation {
       +UUID operationId
@@ -93,6 +113,10 @@ classDiagram
     SqliteRepositories ..|> ExerciseRepository
     SqliteRepositories ..|> TemplateRepository
     SqliteRepositories ..|> SettingsRepository
+    SqliteRepositories ..|> ProfileRepository
+    SqliteRepositories ..|> DeviceStateRepository
+    CatalogImporter --> LocalDatabase
+    CatalogImporter --> ExerciseRepository
     SqliteRepositories --> LocalDatabase
     LocalDatabase --> OutboxOperation
     SyncCoordinator --> SyncStore
@@ -104,5 +128,7 @@ classDiagram
     MutationHandler --> RemoteDatabase
     ChangeFeedHandler --> RemoteDatabase
     note for MutationHandler "Logical PostgreSQL RPC handler. RLS reads; direct table writes<br/>blocked. Owner-checked narrow RPC, receipt dedupe, revision validation<br/>and child writes in one transaction."
+    note for DeviceStateRepository "Owner-partitioned timer and OS request state. Device effects stay<br/>on the device that started them."
+    note for ProfileRepository "Goals and bodyweight mutations enqueue owner-scoped snapshots.<br/>Reports, muscle scores and exports read confirmed local records."
     note for SyncStore "Local changes plus immutable outbox are atomic. Acks must not<br/>overwrite newer local edits."
     note for SyncCoordinator "Custom exercise dependencies first. Conflict preserves both versions;<br/>retry is idempotent. No guaranteed OS-background uploads."

@@ -7,7 +7,7 @@ sequenceDiagram
     participant V as VolumeCalculator
     U->>C: Open overall weekly volume
     C->>S: weeklySeries(period)
-    S->>R: Finished weighted sets in date range
+    S->>R: Completed weighted working sets in finished workouts for date range
     R-->>S: Records and dates
     S->>V: Convert to preferred unit -  sum weight times reps by Monday-start week
     V-->>S: Weekly points including zero weeks and source workout IDs

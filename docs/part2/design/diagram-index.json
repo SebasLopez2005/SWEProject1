@@ -1,23 +1,28 @@
 {
   "01-context.mmd": [
     "Context and functional modules",
-    "Shows the four user situations, functional modules, account/data services and the mobile distribution boundary.",
+    "Shows lifter roles, planned training, profile insights, device alerts, export and the hosted account and sync boundaries.",
     "Makes product responsibilities explicit without confusing TestFlight with a runtime workout service."
   ],
   "02-architecture.mmd": [
     "Runtime architecture and distribution",
-    "Separates device UI/controllers, local repositories/SQLite/outbox and hosted Supabase Auth/API/PostgreSQL. EAS and TestFlight are a separate build path.",
+    "Connects local records and the sync outbox to Supabase, with separate device timers, ActivityKit and the system share sheet.",
     "Explains why confirming a set is local and why the API still needs owner checks, idempotency and atomic writes."
   ],
   "03-navigation.mmd": [
     "Screen navigation",
-    "Maps launch, authentication, resume, main areas, typed entry, summary, history drill-down, templates and sync review.",
+    "Maps routine planning, preparation, set completion, rest, profile insights, export and reminder entry points.",
     "Gives both coding models the same reachable screen flows; no story should exist only as an isolated service method."
   ],
   "04-data-model.mmd": [
     "Persistent entity relationships",
-    "Models workout/entry/set records, stable exercises, independent template lists, settings and local/server synchronization records.",
-    "Prevents list templates from accidentally copying sets, preserves entered units, and makes deletion/deduplication data explicit."
+    "Models routine prescriptions and independent workout snapshots with typed actuals, set states and existing synchronization records.",
+    "Keeps prescribed values separate from confirmed results and preserves historical records when routines change."
+  ],
+  "05-training-data.mmd": [
+    "Persistent entity relationships for profile, catalog and device state",
+    "Models catalog provenance and region roles, owner goals and bodyweight, synced reminder preferences and device-local effects.",
+    "Separates persisted inputs from derived reports and keeps OS request IDs off the sync feed."
   ],
   "classes/01-ui-and-auth.mmd": [
     "Class model: controllers and account access",
@@ -36,7 +41,7 @@
   ],
   "classes/04-presentation.mmd": [
     "Class model: conversion, progress and readability",
-    "Defines shared unit conversion, volume/reps aggregation, periods/points, summaries, chart tables and text-scale presentation.",
+    "Defines unit conversion, progress and accessibility presentation alongside muscle scoring, monthly reports, CSV export and device adapters.",
     "Ensures graphs and plain summaries use the same numbers, and display conversion never corrupts originals."
   ],
   "classes/05-sync-records.mmd": [
@@ -62,7 +67,7 @@
   "sequence/FW-02.mmd": [
     "FW-02: Record a set with prefill",
     "As an experienced lifter, I want to record a set by entering weight and reps, prefilled from my previous set, so that I can log between sets without losing rest time. The flow identifies its UI controller, domain service and data boundary.",
-    "Makes prefill precedence and durable confirmation explicit for the central recording interaction."
+    "Separates the planned target from suggested and confirmed actuals."
   ],
   "sequence/FW-03.mmd": [
     "FW-03: Set form matches exercise type",
@@ -82,12 +87,12 @@
   "sequence/FW-06.mmd": [
     "FW-06: Finish workout, see summary",
     "As a returning lifter, I want to finish a workout and see a short, plain summary, so that I know it is saved and can read what I did. The flow identifies its UI controller, domain service and data boundary.",
-    "Distinguishes a locally saved finish from a successfully uploaded record."
+    "Separates planned-session eligibility and confirmed skips from the ad hoc finish path."
   ],
   "sequence/FW-07.mmd": [
     "FW-07: Resume an unfinished workout",
     "As a beginner lifter, I want my unfinished workout to still be there if I switch apps or my phone locks, so that an interruption does not cost me the session. The flow identifies its UI controller, domain service and data boundary.",
-    "Requires actual process-restart persistence rather than an in-memory resume flag."
+    "Restores plan snapshots, completion states and device-local rest after relaunch."
   ],
   "sequence/FW-08.mmd": [
     "FW-08: Record a workout on an earlier date",
@@ -107,7 +112,7 @@
   "sequence/FW-11.mmd": [
     "FW-11: Find an exercise; recent first",
     "As a beginner lifter, I want to find an exercise by typing part of its name or filtering by muscle group, with recent ones first, so that I can add the right exercise without knowing its exact name. The flow identifies its UI controller, domain service and data boundary.",
-    "Makes combined search/filter and offline recent ordering consistent for both implementations."
+    "Defines offline catalog search and stable exercise selection."
   ],
   "sequence/FW-12.mmd": [
     "FW-12: Create a custom exercise",
@@ -177,17 +182,17 @@
   "sequence/FW-25.mmd": [
     "FW-25: Save workout as template",
     "As a home trainer, I want to save the exercises of a finished workout as a named template, so that I can start my usual routine again without re-entering it. The flow identifies its UI controller, domain service and data boundary.",
-    "Makes templates independent exercise lists rather than copies of performed sets."
+    "Makes conversion of actual load and RIR into targets an explicit choice."
   ],
   "sequence/FW-26.mmd": [
     "FW-26: Start workout from template",
     "As an experienced lifter, I want to start a workout from a template, so that its exercises are already in the workout when I begin. The flow identifies its UI controller, domain service and data boundary.",
-    "Defines archived exercise handling and avoids copying prescribed loads into a workout."
+    "Snapshots ordered targets while preserving legacy exercise-only routines."
   ],
   "sequence/FW-27.mmd": [
     "FW-27: Create and edit a template",
     "As a beginner lifter, I want to create and edit a template by choosing exercises myself, so that I can set up my plan at home before going to the gym. The flow identifies its UI controller, domain service and data boundary.",
-    "Captures name validation, ordering and independent template edits."
+    "Applies routine changes only to future workouts."
   ],
   "sequence/FW-28.mmd": [
     "FW-28: Delete a template",
@@ -208,5 +213,40 @@
     "FW-31: Enter a set in either unit",
     "As a returning lifter, I want to enter a set in either kg or lb, so that I can log what the plates say without converting. The flow identifies its UI controller, domain service and data boundary.",
     "Prevents a unit switch from silently reinterpreting a number without conversion."
+  ],
+  "sequence/TR-01-02-planned-training.mmd": [
+    "TR-01 / TR-02: Plan a routine and complete working sets",
+    "Shows reusable targets, durable session snapshots, typed actuals, skip, undo and finish.",
+    "Makes the planned-row workflow and local confirmation explicit."
+  ],
+  "sequence/TR-03-13-rest-and-live-activity.mmd": [
+    "TR-03 / TR-13: Rest countdown and iOS Lock Screen",
+    "Shows a device-local deadline, alert replacement, optional Live Activity, relaunch and cleanup.",
+    "Explains how rest continues under OS control when the app is suspended."
+  ],
+  "sequence/TR-04-05-preparation.mmd": [
+    "TR-04 / TR-05: Warm-up and targeted mobility",
+    "Shows editable warm-up and mobility steps before or after working sets.",
+    "Preserves preparation in history and excludes it from working-set totals."
+  ],
+  "sequence/TR-06-07-catalog-and-muscles.mmd": [
+    "TR-06 / TR-07: Offline catalog, form guidance and muscle map",
+    "Shows a pinned catalog import, offline search, per-exercise form guidance and estimated muscle scores on a male or female anatomical figure.",
+    "Separates catalog roles from calculated set-equivalents, keeps exact values alongside colour, and gives each exercise an offline text equivalent of its photo demonstration."
+  ],
+  "sequence/TR-08-09-11-profile-progress.mmd": [
+    "TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight",
+    "Shows owner-scoped monthly comparisons, exact-variant lift goals and optional dated bodyweight readings.",
+    "Keeps goals and reports derived from confirmed work while preserving entered units."
+  ],
+  "sequence/TR-10-export.mmd": [
+    "TR-10: Export my data",
+    "Shows date and file selection, owner-scoped local reads, CSV creation and the system share sheet.",
+    "Makes sharing and optional bodyweight selection explicit."
+  ],
+  "sequence/TR-12-reminders.mmd": [
+    "TR-12: Opt-in workout reminders",
+    "Shows permission checks, local day/time scheduling, rotating messages and reconciliation after completion.",
+    "Separates user preferences from device request IDs and prevents duplicate reminders."
   ]
 }

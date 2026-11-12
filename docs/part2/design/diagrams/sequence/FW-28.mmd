@@ -14,4 +14,4 @@ sequenceDiagram
      R-->>S: Local commit
      S-->>C: Template removed from list
     end
-    Note over S,R: Existing active and finished workouts are independent and unchanged. Tombstone uploads through the same durable queue.
+    Note over S,R: Active and finished sessions retain their independent snapshots. Tombstone uploads through the same durable queue.

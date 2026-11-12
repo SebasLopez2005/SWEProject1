@@ -281,3 +281,43 @@ describe('routines from workouts, goals and bodyweight (FW-25, TR-09, TR-11)', (
     expect(await repo.listBodyweight()).toEqual([]);
   });
 });
+
+describe('round 2: scoped change events and body figure (UI-05, TR-07A)', () => {
+  it('recording a set in the active workout does not invalidate finished history; finishing does', async () => {
+    const repo = await makeRepo();
+    const seen: string[][] = [];
+    repo.subscribe((s) => seen.push([...s].sort()));
+    const w = await repo.startWorkout({ date: todayLocal() });
+    await repo.addEntry(w.id, await exId(repo, BENCH));
+    const before = await repo.finishedWorkouts();
+    const s = (await repo.getWorkout(w.id))!.entries[0].sets[0].id;
+    seen.length = 0;
+    await repo.completeSet(s, { weight: '60', unit: 'kg', reps: '5' });
+    expect(seen).toEqual([['active']]);
+    expect(await repo.finishedWorkouts()).toBe(before); // cache kept: no history reload while logging
+    seen.length = 0;
+    await repo.finishWorkout(w.id, false);
+    expect(seen).toEqual([['finished']]);
+    expect((await repo.finishedWorkouts()).length).toBe(1);
+  });
+
+  it('upload acknowledgements only signal sync, never a data reload', async () => {
+    const repo = await makeRepo();
+    await repo.saveBodyweight({ readingDate: todayLocal(), weight: 80, unit: 'kg' });
+    const op = (await repo.nextReadyOp())!;
+    const seen: string[][] = [];
+    repo.subscribe((s) => seen.push([...s]));
+    await repo.ack(op, 1);
+    expect(seen).toEqual([['sync']]);
+  });
+
+  it('body figure is a synced setting that survives in the snapshot', async () => {
+    const repo = await makeRepo();
+    expect((await repo.getSettings()).bodyFigure).toBe('male');
+    await repo.updateSettings({ bodyFigure: 'female' });
+    expect((await repo.getSettings()).bodyFigure).toBe('female');
+    expect(await repo.snapshot('settings', repo.singletonId('settings'))).toMatchObject({ bodyFigure: 'female' });
+    const ex = (await repo.exerciseMap()).get(await exId(repo, BENCH))!;
+    expect(ex.media).toEqual(['Barbell_Bench_Press_-_Medium_Grip/0.jpg', 'Barbell_Bench_Press_-_Medium_Grip/1.jpg']);
+  });
+});

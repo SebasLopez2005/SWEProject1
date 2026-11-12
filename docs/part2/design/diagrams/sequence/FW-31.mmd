@@ -12,10 +12,10 @@ sequenceDiagram
      C->>P: convertPrefill(value, old unit, new unit)
      P-->>C: Converted value -  explicit confirmation, no silent relabel
     end
-    C->>S: recordSet(enteredWeight, enteredUnit, reps)
+    C->>S: markDone(rowId, enteredWeight, enteredUnit, reps) or record extra set
     S->>S: Validate bounds in entered unit and typed fields
     S->>R: mutateAndEnqueue(set with original decimal and unit)
     R-->>S: Local commit
     S-->>C: Confirm set
     C-->>U: Preferred-unit value plus optional equivalent
-    Note over S,R: Prefill converts when source unit differs. History/graphs convert at read time. Switching display preference never rewrites originals.
+    Note over S,R: Prefill converts when source unit differs. History/graphs convert at read time. Switching display preference preserves original actuals and planned targets.

@@ -104,7 +104,9 @@ export function formatDuration(seconds: number | null): string {
 
 export function formatClock(totalSeconds: number): string {
   const s = Math.max(0, Math.round(totalSeconds));
-  return `${Math.floor(s / 60)}:${pad(s % 60)}`;
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return h > 0 ? `${h}:${pad(m)}:${pad(s % 60)}` : `${m}:${pad(s % 60)}`;
 }
 
 export function timezone(): string {

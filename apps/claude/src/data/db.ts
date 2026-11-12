@@ -63,6 +63,7 @@ export class DB {
   }
 }
 
+/** Outbox payload schema accepted by the server (unchanged by local-only migrations). */
 export const SCHEMA_VERSION = 1;
 
 export const MIGRATIONS: string[] = [
@@ -208,6 +209,11 @@ export const MIGRATIONS: string[] = [
     created_at TEXT NOT NULL
   );
   CREATE TABLE IF NOT EXISTS device_state (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+  `,
+  // v2 (Claude round 2): exercise form media and the male/female body figure preference.
+  `
+  ALTER TABLE exercises ADD COLUMN media TEXT NOT NULL DEFAULT '[]';
+  ALTER TABLE settings ADD COLUMN body_figure TEXT NOT NULL DEFAULT 'male';
   `,
 ];
 

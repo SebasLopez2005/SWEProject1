@@ -7,7 +7,7 @@ sequenceDiagram
     U->>C: Add exercise while logging
     C->>S: latestPerformance(exerciseId)
     S->>R: Latest own finished nondeleted workout containing exercise
-    R-->>S: Date and ordered typed sets, or none
+    R-->>S: Date and ordered completed working sets, or none
     S-->>C: Current sets with original units
     C-->>U: Previous date and formatted sets -  else No previous record
     Note over S,R: Read current local records, including offline edits/deletions. Exclude active workout. UnitConverter supplies primary and equivalent values.

@@ -94,6 +94,16 @@ export interface RoutineInput {
   entries: Omit<RoutineEntry, 'id' | 'routineId' | 'position'>[];
 }
 
+export type ChangeScope = 'active' | 'finished' | 'exercises' | 'routines' | 'settings' | 'profile' | 'sync';
+export const DATA_SCOPES: ChangeScope[] = ['active', 'finished', 'exercises', 'routines', 'settings', 'profile'];
+const ALL_SCOPES: ChangeScope[] = [...DATA_SCOPES, 'sync'];
+const SCOPE_OF_KIND: Record<AggregateKind, ChangeScope> = {
+  workout: 'finished', exercise: 'exercises', routine: 'routines', settings: 'settings', reminder: 'settings', goal: 'profile', bodyweight: 'profile', bodyweight_target: 'profile',
+};
+function scopesOfKind(kind: AggregateKind): ChangeScope[] {
+  return kind === 'workout' ? ['active', 'finished'] : [SCOPE_OF_KIND[kind]];
+}
+
 const bool = (v: any) => v === 1 || v === true;
 const json = <T>(s: string | null, fallback: T): T => {
   if (!s) return fallback;
@@ -108,7 +118,7 @@ function mapExercise(r: Row): Exercise {
   return {
     id: r.id, ownerId: r.owner_id ?? null, name: r.name, normalizedName: r.normalized_name, type: r.type, category: r.category,
     equipment: r.equipment, primaryMuscles: json(r.primary_muscles, []), secondaryMuscles: json(r.secondary_muscles, []),
-    instructions: r.instructions ?? '', sourceId: r.source_id ?? null, archived: bool(r.archived), everUsed: bool(r.ever_used), revision: r.revision,
+    instructions: r.instructions ?? '', sourceId: r.source_id ?? null, media: json(r.media, []), archived: bool(r.archived), everUsed: bool(r.ever_used), revision: r.revision,
   };
 }
 
@@ -133,23 +143,31 @@ const SET_COLS = 'id, entry_id, position, state, target_reps, target_seconds, ta
 export class Repository {
   private exCache: Map<string, Exercise> | null = null;
   private finishedCache: Workout[] | null = null;
-  private listeners = new Set<() => void>();
+  private listeners = new Set<(scopes: ChangeScope[]) => void>();
   private undoTokens = new Map<string, UndoToken>();
+  private touched = new Set<ChangeScope>();
+  /** Increments on every data change (not sync bookkeeping); used for undo expiry. */
   version = 0;
+  /** Per-scope versions so views reload only when the records they read change (UI-05). */
+  versions: Record<ChangeScope, number> = { active: 0, finished: 0, exercises: 0, routines: 0, settings: 0, profile: 0, sync: 0 };
 
   constructor(public readonly db: DB, public readonly ownerId: string, private deps: RepoDeps) {}
 
   // ---------- change events ----------
-  subscribe(fn: () => void): () => void {
+  subscribe(fn: (scopes: ChangeScope[]) => void): () => void {
     this.listeners.add(fn);
     return () => this.listeners.delete(fn);
   }
 
-  private changed() {
-    this.version += 1;
-    this.exCache = null;
-    this.finishedCache = null;
-    for (const fn of this.listeners) fn();
+  private changed(scopes: Iterable<ChangeScope> = ALL_SCOPES) {
+    const list = [...new Set(scopes)];
+    if (!list.length) return;
+    if (list.some((s) => s !== 'sync')) this.version += 1;
+    for (const s of list) this.versions[s] += 1;
+    if (list.includes('exercises')) this.exCache = null;
+    if (list.includes('finished')) this.finishedCache = null;
+    this.versions = { ...this.versions };
+    for (const fn of this.listeners) fn(list);
   }
 
   private now() {
@@ -164,9 +182,14 @@ export class Repository {
 
   /** Run a mutation atomically; emit change event only after commit. */
   private async mutate<T>(fn: () => Promise<T>): Promise<T> {
-    const out = await this.db.tx(fn);
-    this.changed();
-    return out;
+    this.touched.clear();
+    try {
+      const out = await this.db.tx(fn);
+      this.changed(this.touched);
+      return out;
+    } finally {
+      this.touched.clear();
+    }
   }
 
   // ---------- outbox ----------
@@ -179,6 +202,10 @@ export class Repository {
 
   /** Must be called inside a transaction, after the aggregate rows are written. */
   private async enqueue(kind: AggregateKind, id: string): Promise<void> {
+    if (kind === 'workout') {
+      const w = await this.db.first<{ state: string }>('SELECT state FROM workouts WHERE id = ?', [id]);
+      this.touched.add(w?.state === 'finished' ? 'finished' : 'active');
+    } else this.touched.add(SCOPE_OF_KIND[kind]);
     const snapshot = await this.snapshot(kind, id);
     const payload = JSON.stringify(snapshot);
     const hash = await this.deps.sha256(`${kind}|${id}|${payload}`);
@@ -216,7 +243,7 @@ export class Repository {
       }
       case 'settings': {
         const s = await this.getSettings();
-        return { unit: s.unit, unitChosen: s.unitChosen, showEquivalent: s.showEquivalent, textScale: s.textScale };
+        return { unit: s.unit, unitChosen: s.unitChosen, showEquivalent: s.showEquivalent, textScale: s.textScale, bodyFigure: s.bodyFigure };
       }
       case 'reminder': {
         const p = await this.getReminder();
@@ -974,15 +1001,16 @@ export class Repository {
   // ---------- settings ----------
   async getSettings(): Promise<Settings> {
     const r = (await this.db.first<Row>('SELECT * FROM settings WHERE id = 1'))!;
-    return { unit: r.unit, unitChosen: bool(r.unit_chosen), showEquivalent: bool(r.show_equivalent), textScale: r.text_scale, revision: r.revision };
+    return { unit: r.unit, unitChosen: bool(r.unit_chosen), showEquivalent: bool(r.show_equivalent), textScale: r.text_scale, bodyFigure: r.body_figure === 'female' ? 'female' : 'male', revision: r.revision };
   }
 
-  async updateSettings(patch: Partial<Pick<Settings, 'unit' | 'showEquivalent' | 'textScale' | 'unitChosen'>>): Promise<void> {
+  async updateSettings(patch: Partial<Pick<Settings, 'unit' | 'showEquivalent' | 'textScale' | 'unitChosen' | 'bodyFigure'>>): Promise<void> {
     if (patch.textScale != null && (patch.textScale < 1 || patch.textScale > 2)) throw new DomainError('Text size must be between 100% and 200%.');
     await this.mutate(async () => {
       const s = await this.getSettings();
-      await this.db.run('UPDATE settings SET unit = ?, unit_chosen = ?, show_equivalent = ?, text_scale = ? WHERE id = 1', [
+      await this.db.run('UPDATE settings SET unit = ?, unit_chosen = ?, show_equivalent = ?, text_scale = ?, body_figure = ? WHERE id = 1', [
         patch.unit ?? s.unit, (patch.unitChosen ?? s.unitChosen) ? 1 : 0, (patch.showEquivalent ?? s.showEquivalent) ? 1 : 0, patch.textScale ?? s.textScale,
+        patch.bodyFigure ?? s.bodyFigure,
       ]);
       await this.enqueue('settings', this.singletonId('settings'));
     });
@@ -1146,7 +1174,7 @@ export class Repository {
       const deleted = JSON.parse(op.payload)?.deleted === true;
       if (deleted && !(await this.isAggregatePending(op.aggregateId))) await this.purgeTombstoned(op.kind, op.aggregateId);
     });
-    this.changed();
+    this.changed(['sync']); // revision bookkeeping only: data screens do not redraw
   }
 
   private async setLocalRevision(kind: AggregateKind, id: string, revision: number) {
@@ -1174,7 +1202,7 @@ export class Repository {
       );
       await this.db.run("UPDATE outbox SET status = 'blocked' WHERE aggregate_id = ?", [op.aggregateId]);
     });
-    this.changed();
+    this.changed(['sync']);
   }
 
   async listConflicts(): Promise<ConflictRecord[]> {
@@ -1199,7 +1227,7 @@ export class Repository {
         else await this.db.run('DELETE FROM outbox WHERE aggregate_id = ?', [aggregateId]);
         await this.db.run('DELETE FROM conflicts WHERE aggregate_id = ?', [aggregateId]);
       });
-      this.changed();
+      this.changed(['sync']);
       return;
     }
     if (choice === 'copy_local' && c.kind !== 'workout') throw new DomainError('Copies are available for workouts only.');
@@ -1221,7 +1249,7 @@ export class Repository {
       }
       await this.db.run('DELETE FROM conflicts WHERE aggregate_id = ?', [aggregateId]);
     });
-    this.changed();
+    this.changed([...scopesOfKind(c.kind), 'sync']);
   }
 
   private recloneWorkout(snap: any): any {
@@ -1241,7 +1269,7 @@ export class Repository {
       await this.db.run('DELETE FROM outbox');
       await this.db.run('DELETE FROM conflicts');
     });
-    this.changed();
+    this.changed(['sync']);
   }
 
   async getCursor(): Promise<number> {
@@ -1252,6 +1280,7 @@ export class Repository {
   /** Apply a pulled page and advance the checkpoint in one transaction. Dirty aggregates are left for push-time conflict detection. */
   async applyPulledPage(events: ChangeEvent[], nextCursor: number): Promise<number> {
     let applied = 0;
+    const scopes = new Set<ChangeScope>();
     await this.db.tx(async () => {
       for (const ev of events) {
         if (await this.isAggregatePending(ev.aggregateId)) continue;
@@ -1259,11 +1288,12 @@ export class Repository {
         const local = await this.revisionOf(ev.kind, ev.aggregateId);
         if (ev.revision <= local) continue;
         await this.applyRemoteSnapshot(ev.kind, ev.aggregateId, ev.snapshot, ev.revision);
+        scopesOfKind(ev.kind).forEach((x) => scopes.add(x));
         applied++;
       }
       await this.db.run("INSERT OR REPLACE INTO meta (key, value) VALUES ('sync_cursor', ?)", [String(nextCursor)]);
     });
-    if (applied) this.changed();
+    if (applied) this.changed(scopes);
     return applied;
   }
 
@@ -1336,7 +1366,10 @@ export class Repository {
         return;
       }
       case 'settings':
-        if (!deleted) await this.db.run('UPDATE settings SET unit = ?, unit_chosen = ?, show_equivalent = ?, text_scale = ?, revision = ? WHERE id = 1', [snap.unit, snap.unitChosen ? 1 : 0, snap.showEquivalent ? 1 : 0, snap.textScale, revision]);
+        if (!deleted)
+          await this.db.run('UPDATE settings SET unit = ?, unit_chosen = ?, show_equivalent = ?, text_scale = ?, body_figure = ?, revision = ? WHERE id = 1', [
+            snap.unit, snap.unitChosen ? 1 : 0, snap.showEquivalent ? 1 : 0, snap.textScale, snap.bodyFigure === 'female' ? 'female' : 'male', revision,
+          ]);
         return;
       case 'reminder':
         if (!deleted) await this.db.run('UPDATE reminder SET enabled = ?, weekdays = ?, time = ?, revision = ? WHERE id = 1', [snap.enabled ? 1 : 0, JSON.stringify(snap.weekdays ?? []), snap.time, revision]);

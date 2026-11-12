@@ -1,0 +1,23 @@
+sequenceDiagram
+    title TR-10: Export my data
+    actor U as Lifter
+    participant C as ProfileController
+    participant E as ExportService
+    participant R as ProfileRepository
+    participant H as ShareGateway
+    U->>C: Open Export my data
+    C-->>U: Last 30 calendar days, custom dates or all time
+    U->>C: Choose workout sets, monthly summaries and optional bodyweight
+    C->>E: Preview selection
+    E->>R: Read owner snapshot locally for the selected dates
+    R-->>E: Confirmed records and pending-sync indicator
+    E-->>U: Preview files, date bounds and pending-sync status
+    alt Cancel
+        C-->>U: Return to Profile
+    else Confirm
+        C->>E: Build versioned UTF-8 CSV files from the preview snapshot
+        E->>E: Keep targets and actuals distinct, escape values and protect text cells
+        E->>H: Open system share sheet with selected files
+        H-->>U: Save or share to a destination the lifter chooses
+    end
+    Note over E,R: Works offline. One row per completed set in finished workouts. Bodyweight requires explicit selection.

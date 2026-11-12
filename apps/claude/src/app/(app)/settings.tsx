@@ -6,7 +6,7 @@ import { cloudHost } from '../../auth/config';
 import { CATALOG_RELEASE } from '../../data/catalog';
 import { seedDemoData } from '../../data/demo';
 import { weekdayShort } from '../../domain/dates';
-import type { Unit } from '../../domain/types';
+import type { BodyFigure, Unit } from '../../domain/types';
 import { reconcileReminders, type ReminderStatus } from '../../device/reminders';
 import { useApp, useSession } from '../../state/session';
 import { Banner, Button, Card, Chip, Field, Row, Screen, Section, Segmented, StatusPill, T } from '../../ui/kit';
@@ -70,6 +70,14 @@ export default function SettingsScreen() {
             </View>
             <Switch value={settings.showEquivalent} onValueChange={(v) => repo.updateSettings({ showEquivalent: v })} accessibilityLabel="Show equivalent weight in the other unit" trackColor={{ true: colors.accent }} />
           </Row>
+        </Card>
+      </Section>
+
+      <Section title="Body figure">
+        <Card>
+          <Segmented label="Body figure" value={settings.bodyFigure} onChange={(f: BodyFigure) => repo.updateSettings({ bodyFigure: f })}
+            options={[{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }]} />
+          <T variant="caption" color={colors.faint}>Used for the muscle map and “How to perform”. Display only.</T>
         </Card>
       </Section>
 

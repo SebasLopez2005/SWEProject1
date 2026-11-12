@@ -50,3 +50,13 @@ Consequential decisions made while implementing the design autonomously. Each na
 
 - **Hosted Supabase project**: created after the student confirmed it in chat (Free plan, $0/month) and paused SwiftlyCR to stay within the free limit. Email confirmation is off for the demo.
 - Background upload while iOS has suspended/terminated the app is not promised (per `SCOPE.md`).
+
+## Round 2 (One Shot 2)
+
+| # | Topic | Decision |
+| --- | --- | --- |
+| R2-1 | Process | The student asked to update the diagrams and "one shot the thing again". Following the ChatGPT Round 2 precedent, Round 2 revises the Claude app in place on branch `claude/one-shot-2`; Round 1 is preserved by tag `claude-one-shot-1`. |
+| R2-2 | Body figure | `react-native-body-highlighter` (MIT). Its figures have no separate abductor region, so hip abductors shade the gluteal region. Lats and middle back share the upper-back region, shaded by the larger score; the list keeps every tag separate. |
+| R2-3 | Form media | Pinned Free Exercise DB photos (start and end positions) load on demand and cache; they are not bundled. A looping two-frame demonstration stands in for video. Reduce Motion starts it paused. |
+| R2-4 | Responsiveness | Each mutation records which data it touched (active workout, finished history, exercises, routines, settings, profile, sync). Screens reload only for their scopes and only while visible; upload acknowledgements no longer trigger data reloads. |
+| R2-5 | Unit switch | The kg/lb switch moved from each row to the exercise card's weight column header. Every set still stores the unit it was entered in, and switching with typed values asks to convert or keep the numbers (FW-31). |

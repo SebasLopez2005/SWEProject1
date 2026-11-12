@@ -4,7 +4,7 @@ sequenceDiagram
     participant C as ExerciseController
     participant S as ExerciseService
     participant R as ExerciseRepository
-    U->>C: Name, type and muscle group for custom exercise
+    U->>C: Name, logging type and optional primary and secondary tags
     C->>S: create(input)
     S->>S: Validate name -  ignore case and spaces for uniqueness (A-EX-2)
     S->>R: Check name against shared and own custom catalog

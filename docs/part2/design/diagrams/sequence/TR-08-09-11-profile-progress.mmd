@@ -1,0 +1,26 @@
+sequenceDiagram
+    title TR-08 / TR-09 / TR-11: Reports, lift goals and optional bodyweight
+    actor U as Lifter
+    participant C as ProfileController
+    participant S as ProfileService
+    participant R as ProfileRepository
+    participant P as MonthlyReportPresenter
+    U->>C: Choose a month
+    C->>S: monthlyReport(month)
+    S->>R: Read current owner records by workout calendar date
+    R-->>P: Finished sessions and completed working sets
+    P-->>U: Counts, weighted volume, milestones and previous-month comparison
+    Note over R,P: In-progress comparisons use equal elapsed days. Edits and deletions invalidate derived values.
+    opt Lifter saves a goal
+        U->>C: Exact exercise, target load/unit, minimum reps, optional deadline
+        C->>S: Validate and save goal
+        S->>R: Commit goal and outbox
+        S->>P: Find best qualifying set for exact variant in a common unit
+        P-->>U: Progress and link to source workout or empty state
+    end
+    opt Lifter uses bodyweight tracking
+        U->>C: Log or edit a dated reading in kg or lb, or remove a reading
+        C->>S: Validate reading or optional target
+        S->>R: Commit measurement, target or tombstone and outbox
+        R-->>U: Trend and target in preferred display unit
+    end

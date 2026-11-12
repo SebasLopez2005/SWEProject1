@@ -1,0 +1,24 @@
+sequenceDiagram
+    title TR-04 / TR-05: Warm-up and targeted mobility
+    actor U as Lifter
+    participant C as WorkoutController
+    participant E as ExerciseService
+    participant W as WorkoutService
+    participant R as WorkoutRepository
+    U->>C: Review optional preparation for the selected routine
+    C->>E: Find matching warm-up and mobility content by exercise or area
+    E-->>C: General movement, lighter lift steps and targeted mobility
+    C-->>U: Instructions and editable rep or duration targets
+    alt Lifter edits or substitutes a step
+        U->>C: Select replacement and confirm targets
+        C->>W: Validate and save preparation on this session
+    else Lifter skips the step
+        U->>C: Skip
+        C->>W: Persist skipped state
+    else Lifter completes the step
+        U->>C: Confirm actual load and reps, reps only or elapsed seconds
+        C->>W: Persist done state and typed actuals
+    end
+    W->>R: Commit session snapshot and outbox
+    R-->>U: Continue to working sets or optional post-workout mobility
+    Note over C,R: Warm-up and mobility have separate phases in the summary. They add zero to working volume, muscle scores and lift goals.

@@ -1,6 +1,7 @@
 // Builds the bundled offline catalog and the Supabase catalog seed migration
 // from the pinned Free Exercise DB snapshot (Unlicense).
 // Usage: node scripts/build-catalog.mjs /path/to/exercises.json
+import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 
@@ -47,12 +48,13 @@ const out = data.map((x) => {
     pm: [...new Set(x.primaryMuscles)],
     sm: [...new Set(x.secondaryMuscles)].filter((m) => !x.primaryMuscles.includes(m)),
     ins: x.instructions.join('\n'),
+    img: x.images, // start/end form photos, relative to MEDIA_BASE
   };
 });
 out.sort((a, b) => a.name.localeCompare(b.name));
 writeFileSync(
   new URL('../src/data/catalog.json', import.meta.url),
-  JSON.stringify({ release: { sourceRevision: SOURCE_REVISION, sha256: EXPECTED_SHA, license: 'Unlicense', source: 'https://github.com/yuhonas/free-exercise-db' }, exercises: out }),
+  JSON.stringify({ release: { sourceRevision: SOURCE_REVISION, sha256: EXPECTED_SHA, license: 'Unlicense', source: 'https://github.com/yuhonas/free-exercise-db', mediaBase: `https://raw.githubusercontent.com/yuhonas/free-exercise-db/${SOURCE_REVISION}/exercises/` }, exercises: out }),
 );
 const esc = (s) => s.replace(/'/g, "''");
 const rows = out.map((e) => `('${e.id}','${esc(e.name)}','${e.type}','${esc(e.src)}')`);

@@ -1,35 +1,41 @@
-// UI-01: graphite canvas, charcoal surfaces, warm champagne accents, light text.
-// Solid pairings were chosen for >= 4.5:1 contrast against their surfaces.
+// UI-01 palette with UI-04 density: graphite canvas, charcoal grouped
+// surfaces, warm champagne accent, light text; iOS-like type sizes.
 export const colors = {
-  canvas: '#121214',
-  surface: '#1C1C20',
-  surfaceRaised: '#25252B',
-  border: '#34343C',
-  text: '#F2EFE9', // 15.9:1 on canvas
-  muted: '#B4AEA4', // 8.4:1 on canvas, 7.6:1 on surface
-  faint: '#8C877F', // 5.3:1 on canvas (labels only)
-  accent: '#E3C58F', // champagne, 11.1:1 on canvas
-  accentText: '#1A1610', // on champagne fills
-  accentSoft: 'rgba(227,197,143,0.14)',
-  success: '#86D3A9',
+  canvas: '#0E0E10',
+  surface: '#1A1A1E',
+  surfaceRaised: '#242429',
+  surfacePressed: '#2B2B31',
+  separator: 'rgba(255,255,255,0.08)',
+  border: '#303037',
+  text: '#F4F1EB', // 17.5:1 on canvas
+  muted: '#A9A49B', // 7.9:1 on canvas
+  faint: '#827D75', // 4.9:1 on canvas (secondary labels only)
+  accent: '#E3C58F', // champagne, 11.6:1 on canvas
+  accentText: '#17130C',
+  accentSoft: 'rgba(227,197,143,0.12)',
+  success: '#7FD3A2',
+  successSoft: 'rgba(127,211,162,0.10)',
   warning: '#F2B266',
   danger: '#FF8A80',
-  dangerFill: '#4A1F1D',
+  dangerSoft: 'rgba(255,138,128,0.12)',
   info: '#9CC3F0',
-  chart: ['#E3C58F', '#9CC3F0', '#86D3A9', '#F2B266', '#C9A7F0'],
-  heat: ['transparent', '#4B3F2A', '#7A6338', '#B08D4F', '#E3C58F'],
+  // Muscle heat bands 1..4 (0 = untrained, drawn as the figure's base tone).
+  heat: ['#2A2A30', '#5B4A2C', '#8A6E3D', '#B99257', '#E3C58F'],
+  figureBase: '#2E2E35',
+  figureSkin: '#3D3D45',
 };
 
-export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
-export const radius = { sm: 8, md: 12, lg: 18, pill: 999 };
+export const space = { xxs: 2, xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 28 };
+export const radius = { sm: 8, md: 10, lg: 14, xl: 18, pill: 999 };
 export const minTouch = 44;
 
+/** Close to iOS defaults (UI-04); multiplied by the text-scale setting. */
 export const typeScale = {
-  display: 32,
-  title: 26,
-  h2: 20,
-  h3: 17,
-  body: 16,
-  small: 14,
-  caption: 12.5,
+  display: 30,
+  title: 22,
+  h2: 17,
+  h3: 15,
+  body: 15,
+  small: 13,
+  caption: 11.5,
 };

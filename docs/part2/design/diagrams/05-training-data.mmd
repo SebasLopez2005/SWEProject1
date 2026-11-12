@@ -1,0 +1,90 @@
+erDiagram
+    ACCOUNT ||--o{ LIFT_GOAL : owns
+    ACCOUNT ||--o{ BODYWEIGHT_READING : owns
+    ACCOUNT ||--o| BODYWEIGHT_TARGET : owns
+    ACCOUNT ||--o| REMINDER_PREFERENCE : prefers
+    ACCOUNT ||--o| LOCAL_REST_STATE : device_partition
+    ACCOUNT ||--o{ LOCAL_NOTIFICATION : device_partition
+    WORKOUT ||..o| LOCAL_REST_STATE : session
+    EXERCISE_SET ||..o| LOCAL_REST_STATE : source_completion
+    EXERCISE ||--o{ LIFT_GOAL : exact_variant
+    EXERCISE ||--o{ EXERCISE_MUSCLE : maps
+    MUSCLE_REGION ||--o{ EXERCISE_MUSCLE : groups
+    CATALOG_RELEASE ||--o{ CATALOG_RECORD : pins
+    CATALOG_RECORD }o..|| EXERCISE : stable_mapping
+
+    LIFT_GOAL {
+      uuid id PK
+      uuid owner_id FK
+      uuid exercise_id FK
+      decimal target_load
+      string entered_unit
+      int minimum_reps
+      date deadline "optional"
+      int revision
+      datetime deleted_at
+    }
+    BODYWEIGHT_READING {
+      uuid id PK
+      uuid owner_id FK
+      date reading_date
+      datetime entered_at
+      decimal entered_weight
+      string entered_unit
+      int revision
+      datetime deleted_at
+    }
+    BODYWEIGHT_TARGET {
+      uuid owner_id PK
+      decimal target_weight
+      string entered_unit
+      date target_date "optional"
+      int revision
+      datetime deleted_at
+    }
+    REMINDER_PREFERENCE {
+      uuid owner_id PK
+      boolean enabled
+      string weekdays
+      string local_time
+      int revision
+    }
+    LOCAL_REST_STATE {
+      uuid owner_id PK
+      uuid workout_id
+      uuid source_set_id
+      string state
+      datetime ends_at "while running"
+      int remaining_seconds "while paused"
+      string os_alert_id
+      string live_activity_id
+    }
+    LOCAL_NOTIFICATION {
+      string os_request_id PK
+      uuid owner_id
+      date local_date
+      string kind
+    }
+    CATALOG_RELEASE {
+      string source_revision PK
+      string sha256
+      string license
+    }
+    CATALOG_RECORD {
+      string source_revision PK
+      string external_id PK
+      uuid exercise_id FK
+      string category
+      string equipment "unknown permitted"
+      string instructions
+      string media_paths "start/end form photos at the pinned revision"
+    }
+    EXERCISE_MUSCLE {
+      uuid exercise_id PK
+      string region_id PK
+      string role "primary or secondary"
+    }
+    MUSCLE_REGION {
+      string id PK
+      string label
+    }

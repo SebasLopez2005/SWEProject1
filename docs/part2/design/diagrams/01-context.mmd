@@ -1,25 +1,27 @@
 flowchart TB
     User["Experienced lifter / Beginner lifter / Home trainer / Returning lifter"]
-    subgraph System["Fitness and Workout Log - system boundary"]
-      Log["Recording and resume"]
-      Library["Exercise library"]
+    subgraph System["Fitness and Workout Log"]
+      Plan["Routine planning and presets"]
+      Log["Warm-up, planned set completion, rest and resume"]
+      Library["Offline exercise and mobility catalog"]
       History["History and correction"]
-      Progress["Volume and reps progress"]
-      Templates["Reusable exercise lists"]
-      Settings["Units and readability"]
-      Data["Local-first persistence and sync"]
+      Profile["Muscle activity, monthly reports, goals and optional bodyweight"]
+      Export["Export my data"]
+      Settings["Display, units, reminder preferences"]
+      Data["Owner-scoped local storage and sync"]
       Identity["Account access"]
+      Device["Local alerts and iOS Live Activity adapter"]
+      Plan --> Library
+      Log --> Plan & Library & Device
+      Settings --> Device
+      Profile --> Export
+      Plan & Log & Library & History & Profile & Export & Settings & Identity --> Data
     end
-    User --> Log & Library & History & Progress & Templates & Settings
-    Log --> Library & Templates & Data
-    History --> Data
-    Progress --> Data
-    Library --> Data
-    Templates --> Data
-    Settings --> Data
-    Identity --> Data
+    User --> Plan & Log & Library & History & Profile & Settings & Identity
     Identity --> Auth["Supabase Auth"]
     Data --> Cloud["Supabase hosted data services"]
-    User --> Identity
+    Device --> OS["OS notifications / iOS Lock Screen"]
+    Export --> Share["System share sheet / user-selected destination"]
+    Seed["Pinned exercise metadata snapshot"] --> Library
     Instructor["Instructor / beta tester"] --> TF["TestFlight distribution"]
     TF -. "installs mobile app; no workout traffic" .-> System

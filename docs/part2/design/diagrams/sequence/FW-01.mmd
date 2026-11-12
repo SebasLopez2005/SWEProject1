@@ -4,7 +4,7 @@ sequenceDiagram
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
-    U->>C: Start workout for today
+    U->>C: Start ad hoc workout for today
     C->>S: start(today)
     S->>R: active()
     R-->>S: Existing active or none
@@ -19,4 +19,4 @@ sequenceDiagram
      S->>R: mutateAndEnqueue(ordered empty entry)
      R-->>C: Committed -  entry ready
     end
-    Note over S,R: One active workout per owner -  date today or past. Empty active workout may be discarded, never finished.
+    Note over S,R: One active workout per owner -  date today or past. A planned start uses the TR-01 / TR-02 snapshot flow. An empty ad hoc workout can be discarded.

@@ -4,18 +4,18 @@ sequenceDiagram
     participant C as WorkoutController
     participant S as WorkoutService
     participant R as WorkoutRepository
-    U->>C: Open next weighted set
-    C->>S: prefill(entryId)
+    U->>C: Open a pending weighted row or add an extra set
+    C->>S: prefill(entryId, rowId)
     S->>R: Current entry and latest finished performance
     R-->>S: Prior set or no history
-    S-->>C: Prefill current-entry last set -  else latest finished set
+    S-->>C: Show target separately from suggested actuals using current or previous performance
     U->>C: Confirm weight, unit and reps
-    C->>S: recordSet(input)
+    C->>S: markDone(rowId, actual) or recordSet(input) for extra work
     alt Invalid input
      S-->>C: Explain field -  keep input
     else Valid typed set
-     S->>R: mutateAndEnqueue(workout with appended set)
+     S->>R: mutateAndEnqueue(workout with confirmed actuals)
      R-->>S: Commit or storage error
      S-->>C: Confirm after commit -  else keep input and show not saved
     end
-    Note over C,S: Source validation choices: weight 0..999.9 entered-unit -  integer reps 1..999. No guessed load if history empty.
+    Note over C,S: Source validation choices: weight 0..999.9 entered-unit -  integer reps 1..999. An explicit target may prefill a suggestion. Leave load blank when the target and history are missing.

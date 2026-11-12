@@ -5,6 +5,14 @@ Independent Claude implementation of the CS3365 Fitness & Workout Log design (31
 - Requirements traceability: [REQUIREMENTS.md](REQUIREMENTS.md)
 - Decisions and documentation conflicts: [ASSUMPTIONS.md](ASSUMPTIONS.md)
 - 10-minute professor walkthrough: [DEMO.md](DEMO.md)
+- One Shot 2 record and screenshots: [round-02/claude](../../docs/part2/experiments/round-02/claude/README.md)
+
+## One Shot 2 changes
+
+- **Look and density (UI-04):** compact iOS type scale, native large-title headers, the native iOS 26 tab bar (Liquid Glass, minimizes on scroll), grouped list rows, and a compact set table (SET · PREVIOUS · KG · REPS · RIR · ✓).
+- **Responsiveness (UI-05):** the repository emits scoped change events (`active`, `finished`, `exercises`, `routines`, `settings`, `profile`, `sync`). Screens reload only for the scopes they read and only while focused; upload acknowledgements emit `sync` only. Recording a set no longer reloads History, Progress or the muscle map.
+- **Body figure (TR-07A):** anatomical male/female front and back figures from `react-native-body-highlighter` (MIT). The choice is a synced setting (Settings, Profile and the muscle screen).
+- **How to perform (TR-06A):** every exercise has a guide with a start/end photo loop from the pinned Free Exercise DB revision (cached with `expo-image`), numbered steps that work offline, and muscles worked on the figure. Open it from the library (ⓘ), the picker, or an exercise's menu during a workout.
 
 ## Architecture
 
@@ -15,7 +23,7 @@ src/data/           SQLite schema/migrations, pinned catalog seeding, owner-scop
 src/sync/           SyncGateway (Supabase RPC) + SyncCoordinator (push outbox, pull change feed, conflict preservation).
 src/auth/           Supabase email/password auth, offline reopen, gated device-only profile.
 src/device/         Rest timer (absolute deadline), local notifications, reminders, iOS Live Activity.
-src/ui/             Theme, accessible components, charts, body map, inline set editor.
+src/ui/             Theme, compact component kit, charts, anatomical body figure, form guide, set table.
 supabase/           config.toml + migrations: schema/RLS, generated catalog seed, apply_mutation/pull_changes RPCs.
 tests/              Vitest: domain, repository on real SQLite (node:sqlite), sync protocol, backend integration.
 scripts/            build-catalog.mjs (pinned Free Exercise DB → app + SQL seed), make-icon.py.
@@ -85,7 +93,7 @@ The backend suite creates throwaway users on the **local** stack and checks offl
 
 ## Hosted backend (configured)
 
-- Supabase project **repwise-claude** (`chazdxtlttcotisfoopd`, us-east-2, Free plan). All four migrations are applied (`npx supabase@3.1.0 db push --remote`); a dry run reports it up to date.
+- Supabase project **repwise-claude** (`chazdxtlttcotisfoopd`, us-east-2, Free plan). All five migrations are applied (`npx supabase@3.1.0 db push --remote`); a dry run reports it up to date.
 - Email confirmation is **off** for the classroom demo, so a professor can create an account instantly. For real users, turn it back on and configure SMTP (the app already shows "check your inbox").
 - EAS `production` environment variables: `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key only; never the secret key).
 - The backend suite also passes against the hosted project (9/9 on Nov 11, 2026); its disposable accounts were deleted afterwards. Run it again with `SUPABASE_TEST_EMAIL_DOMAIN=<real domain>` because hosted Auth rejects `example.*` addresses.

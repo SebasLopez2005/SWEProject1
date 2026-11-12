@@ -7,7 +7,7 @@ sequenceDiagram
     participant V as VolumeCalculator
     U->>C: Open weighted exercise graph
     C->>S: exerciseSeries(exerciseId, period)
-    S->>R: Current finished workouts and matching weighted sets
+    S->>R: Current finished workouts and matching completed working sets with weight
     R-->>S: Entered weights, units, reps and dates
     S->>V: Convert unrounded weights -  sum weight times reps per workout
     V-->>S: Points with workout IDs and metric unit

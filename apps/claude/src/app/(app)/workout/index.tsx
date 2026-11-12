@@ -34,10 +34,10 @@ function RestBar() {
   return (
     <View style={{ backgroundColor: colors.surfaceRaised, borderRadius: radius.lg, padding: space.md, gap: space.sm, borderWidth: 1, borderColor: done ? colors.success : colors.accent }}
       accessibilityRole="timer" accessibilityLabel={done ? 'Rest complete' : `Rest ${restState.state === 'paused' ? 'paused' : ''}, ${formatClock(remaining)} remaining before ${restState.exercise}`}>
-      <Row style={{ justifyContent: 'space-between' }}>
-        <View>
-          <T variant="caption" color={colors.muted}>{done ? 'Rest complete' : restState.state === 'paused' ? 'Rest paused' : 'Resting'} · next {restState.exercise}</T>
-          <T variant="title" color={done ? colors.success : colors.accent}>{done ? 'Go!' : formatClock(remaining)}</T>
+      <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+        <View style={{ flexShrink: 1 }}>
+          <T variant="caption" color={colors.muted} numberOfLines={1}>{done ? 'Rest complete' : restState.state === 'paused' ? 'Rest paused' : 'Resting'} · next {restState.exercise}</T>
+          <T variant="title" tabular color={done ? colors.success : colors.accent}>{done ? 'Go' : formatClock(remaining)}</T>
         </View>
         <Row gap={2}>
           {!done ? (
@@ -67,7 +67,7 @@ export default function ActiveWorkout() {
     const ex = await repo.exerciseMap();
     const prev = new Map(await Promise.all([...new Set(w.entries.map((e) => e.exerciseId))].map(async (id) => [id, await repo.previousPerformance(id, w.id)] as const)));
     return { w, ex, prev };
-  });
+  }, [], ['active', 'finished', 'exercises']);
   const w = data?.w ?? null;
 
   const ea = useEntryActions(w, {
@@ -152,7 +152,7 @@ export default function ActiveWorkout() {
       <Card>
         <Row style={{ justifyContent: 'space-between' }}>
           <View style={{ flexShrink: 1 }}>
-            <T variant="h2">{w.routineName ?? 'Workout'}</T>
+            <T variant="h2" numberOfLines={1}>{w.routineName ?? 'Workout'}</T>
             <Pressable onPress={() => setChangingDate((c) => !c)} accessibilityRole="button" accessibilityLabel={`Workout date ${formatDateLong(w.workoutDate)}. Change date`} style={{ minHeight: 32, justifyContent: 'center' }}>
               <T variant="small" color={colors.accent}>{formatDateLong(w.workoutDate)} ✎</T>
             </Pressable>
@@ -163,7 +163,7 @@ export default function ActiveWorkout() {
           </View>
         </Row>
         {changingDate ? <DateField label="Workout date (today or earlier)" value={w.workoutDate} onChange={async (d) => { try { await repo.setWorkoutDate(w.id, d); } catch (e) { setError((e as Error).message); } }} /> : null}
-        <StatusPill status={syncState.status === 'device_only' ? 'device_only' : 'saved_on_device'} label={syncState.status === 'device_only' ? undefined : 'Each set is saved on this device as you record it'} />
+        <StatusPill status={syncState.status === 'device_only' ? 'device_only' : 'saved_on_device'} label="Every set is saved on this device as you record it" />
       </Card>
       <RestBar />
       {ea.undo ? (
