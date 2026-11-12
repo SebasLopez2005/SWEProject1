@@ -4,7 +4,7 @@
 
 ## Cover: selection and problem
 
-We selected the **Claude Fitness & Workout Log App**, one of the four Part 1 product/provider options. The [revised report with professor feedback](design/source/Fitness_Workout_Log_App_Revised_v2.docx) contains 31 stories across nine initiatives and four proto-personas. The other gym alternative and both meal-planning alternatives remain in the Part 1 archive.
+We selected the **Claude Fitness & Workout Log App**, one of the four Part 1 product/provider options. The [revised report with professor feedback](design/source/Fitness_Workout_Log_App_Revised_v3.docx) contains 31 stories across nine initiatives and four proto-personas, identified by role (experienced lifter, beginner lifter, home trainer, returning lifter) rather than by name. The earlier [v2](design/source/Fitness_Workout_Log_App_Revised_v2.docx), which still used persona names, was the input to the generation rounds. The other gym alternative and both meal-planning alternatives remain in the Part 1 archive.
 
 People need a reliable workout record they can enter between sets, consult for previous performance and understand through history and volume graphs. The nine 1-pagers add important design consequences: typed sets for weight/reps, reps-only and timed exercises; offline local persistence; editable history; a stable exercise catalog; repeatable exercise lists; readable text; and mixed kg/lb input. This requires offline synchronization and consistent derived views, not only a set-entry form.
 

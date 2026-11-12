@@ -1,7 +1,7 @@
 # Fitness & Workout Log - Mermaid design guide
 
 **Planned training design, November 8, 2026.** The original 31 FW stories and point estimates are retained for traceability. The [training draft](TRAINING_REQUIREMENTS_DRAFT.md) adds TR-01–13 and supersedes conflicting behavior in the original scope. See the [interface requirements](ROUND_02_UI.md) for the dark theme. Claude round 2 adds [density, responsiveness, a realistic body figure and form guidance](ROUND_02_CLAUDE.md).
-See [the requirements alignment review](REVISED_REPORT_REVIEW.md) and [source report](source/Fitness_Workout_Log_App_Revised_v2.docx).
+See [the requirements alignment review](REVISED_REPORT_REVIEW.md) and [source report v3](source/Fitness_Workout_Log_App_Revised_v3.docx) (v2, used for the generation rounds, is kept alongside it).
 Proposed stack: Expo / React Native, local SQLite and Supabase. Intended iOS
 distribution: TestFlight. This is design, not generated implementation evidence.
 
