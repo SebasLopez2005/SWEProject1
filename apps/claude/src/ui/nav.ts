@@ -1,12 +1,12 @@
 import { colors } from './theme';
 
-/** Native iOS large-title header that blurs content scrolling beneath it (UI-04). */
+/** Native iOS large-title header on the canvas colour (UI-04). */
 export const largeTitleOptions = {
   headerLargeTitle: true,
-  headerTransparent: true,
-  headerBlurEffect: 'systemChromeMaterialDark' as const,
   headerLargeTitleShadowVisible: false,
   headerShadowVisible: false,
+  headerStyle: { backgroundColor: colors.canvas },
+  headerLargeStyle: { backgroundColor: colors.canvas },
   headerTintColor: colors.accent,
   headerTitleStyle: { color: colors.text },
   headerLargeTitleStyle: { color: colors.text },
@@ -14,11 +14,10 @@ export const largeTitleOptions = {
   contentStyle: { backgroundColor: colors.canvas },
 };
 
-/** Standard translucent header for pushed screens. */
+/** Standard header for pushed screens. */
 export const pushedOptions = {
-  headerTransparent: true,
-  headerBlurEffect: 'systemChromeMaterialDark' as const,
   headerShadowVisible: false,
+  headerStyle: { backgroundColor: colors.canvas },
   headerTintColor: colors.accent,
   headerTitleStyle: { color: colors.text },
   headerBackButtonDisplayMode: 'minimal' as const,

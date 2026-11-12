@@ -5,7 +5,7 @@ import type { UndoToken } from '../data/repository';
 import type { Workout, WorkoutEntry } from '../domain/types';
 import { setPickerTarget } from '../state/picker';
 import { useSession } from '../state/session';
-import type { SetRowActions } from './SetRowEditor';
+import type { EntryMenuChoice, SetActions } from './EntryCard';
 
 /** Shared set/entry handlers for the active workout and finished-workout editing. */
 export function useEntryActions(w: Workout | null, hooks: { afterComplete?: (setId: string) => Promise<void>; afterReopen?: (setId: string) => Promise<void> } = {}) {
@@ -28,7 +28,7 @@ export function useEntryActions(w: Workout | null, hooks: { afterComplete?: (set
     }
   };
 
-  const setActions: SetRowActions = useMemo(
+  const setActions: SetActions = useMemo(
     () => ({
       complete: async (setId, input) => {
         setUndo(null);
@@ -49,12 +49,13 @@ export function useEntryActions(w: Workout | null, hooks: { afterComplete?: (set
     [repo, rest, hooks.afterComplete, hooks.afterReopen],
   );
 
-  const addSet = (entryId: string, input?: Parameters<SetRowActions['complete']>[1]) =>
+  const addSet = (entryId: string, input?: Parameters<SetActions['complete']>[1]) =>
     input ? repo.addSet(entryId, input).then(() => undefined) : guard(async () => { setUndo(null); await repo.addSet(entryId); });
 
-  const entryMenu = (entry: WorkoutEntry, choice: 'history' | 'info' | 'rest' | 'replace' | 'remove') => {
+  const entryMenu = (entry: WorkoutEntry, choice: EntryMenuChoice) => {
     if (!w) return;
-    if (choice === 'history' || choice === 'info') return router.push({ pathname: '/exercises/[id]', params: { id: entry.exerciseId, tab: choice } });
+    if (choice === 'info') return router.push({ pathname: '/form/[id]', params: { id: entry.exerciseId } });
+    if (choice === 'history') return router.push({ pathname: '/exercises/[id]', params: { id: entry.exerciseId } });
     if (choice === 'rest') {
       const set = (mode: 'inherit' | 'duration' | 'off', s: number | null) => guard(() => repo.setEntryRest(entry.id, mode, s));
       return Alert.alert('Rest timer', `Workout default: ${w.defaultRestSeconds ?? 90} s`, [

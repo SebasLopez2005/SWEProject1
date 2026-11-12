@@ -1,9 +1,10 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { muscleActivity, muscleBand, MUSCLE_BANDS } from '../../../../domain/analytics';
 import { addDays, formatDateLong, formatDateShort, todayLocal } from '../../../../domain/dates';
 import { MUSCLE_LABEL } from '../../../../domain/preparation';
+import type { BodyFigure } from '../../../../domain/types';
 import { useLoad, useSession } from '../../../../state/session';
 import { BodyMap } from '../../../../ui/BodyMap';
 import { Banner, Button, Card, DateField, Loading, Row, Screen, Section, Segmented, T } from '../../../../ui/kit';
@@ -11,13 +12,14 @@ import { colors, space } from '../../../../ui/theme';
 
 /** TR-07: estimated training volume by region with exact totals and contributing sets. */
 export default function Muscles() {
-  const { repo } = useSession();
+  const { repo, settings } = useSession();
+  const params = useLocalSearchParams<{ region?: string }>();
   const today = todayLocal();
   const [period, setPeriod] = useState<'7' | '30' | 'custom'>('7');
   const [from, setFrom] = useState(addDays(today, -13));
   const [to, setTo] = useState(today);
-  const [selected, setSelected] = useState<string | null>(null);
-  const { data } = useLoad(async () => ({ ws: await repo.finishedWorkouts(), ex: await repo.exerciseMap() }));
+  const [selected, setSelected] = useState<string | null>(params.region ?? null);
+  const { data } = useLoad(async () => ({ ws: await repo.finishedWorkouts(), ex: await repo.exerciseMap() }), [], ['finished', 'exercises']);
   if (!data) return <Loading />;
   const start = period === '7' ? addDays(today, -6) : period === '30' ? addDays(today, -29) : from;
   const end = period === 'custom' ? to : today;
@@ -43,7 +45,10 @@ export default function Muscles() {
       ) : null}
       <T variant="small" color={colors.muted}>{formatDateShort(start)} – {formatDateShort(end)} · {act.totalSets} completed working sets</T>
       <Card>
-        <BodyMap scores={scores} selected={selected} onSelect={setSelected} />
+        <Segmented label="Body figure" value={settings.bodyFigure} onChange={(f: BodyFigure) => repo.updateSettings({ bodyFigure: f })}
+          options={[{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }]} />
+        <BodyMap scores={scores} selected={selected} onSelect={setSelected} figure={settings.bodyFigure} />
+        <T variant="caption" color={colors.faint} center>Tap a muscle to see what trained it.</T>
       </Card>
       <Banner tone="info">Estimated training volume by region, from your set logs and the exercise catalog’s muscle tags. It is not a measurement of muscle activation.</Banner>
       {act.unmappedSets ? <T variant="small" color={colors.warning}>{act.unmappedSets} sets used exercises without muscle tags and are not shown.</T> : null}

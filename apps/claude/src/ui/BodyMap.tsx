@@ -13,7 +13,7 @@ import { colors, space } from './theme';
 /** Catalog muscle tag → figure regions. */
 export const SLUGS_FOR_MUSCLE: Record<string, Slug[]> = {
   abdominals: ['abs', 'obliques'],
-  abductors: ['abductors'],
+  abductors: ['gluteal'], // the figure has no separate abductor region; hip abductors sit at the lateral glute
   adductors: ['adductors'],
   biceps: ['biceps'],
   calves: ['calves'],

@@ -1,18 +1,19 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import type { HistoryRow } from '../../../../data/repository';
 import { addDays, formatDateLong, formatDuration, todayLocal } from '../../../../domain/dates';
 import { setPickerTarget } from '../../../../state/picker';
 import { useApp, useSession } from '../../../../state/session';
 import { namesWithMore, plural } from '../../../../ui/format';
-import { Banner, Button, Card, DateField, Empty, Row, StatusPill, T } from '../../../../ui/kit';
-import { colors, space } from '../../../../ui/theme';
+import { Banner, Button, Screen, Card, DateField, Empty, Row, StatusPill, T } from '../../../../ui/kit';
+import { colors, radius, space } from '../../../../ui/theme';
 
 /** FW-14 list with keyset paging; FW-19 combinable date-range and exercise filters. */
 export default function History() {
   const { repo, syncState } = useSession();
-  const { version } = useApp();
+  const { versions } = useApp();
+  const dataKey = `${versions.finished}.${versions.exercises}.${versions.sync}`;
   const [rows, setRows] = useState<HistoryRow[]>([]);
   const [next, setNext] = useState<{ date: string; id: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ export default function History() {
 
   // State is set only after the async page read resolves (reload on filter or data-change events).
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { void load(); }, [load, version]);
+  useEffect(() => { void load(); }, [load, dataKey]);
 
   const more = async () => {
     if (!next || loading) return;
@@ -55,14 +56,7 @@ export default function History() {
   };
 
   return (
-    <FlatList
-      style={{ flex: 1, backgroundColor: colors.canvas }}
-      contentContainerStyle={{ padding: space.lg, gap: space.sm, paddingBottom: 40 }}
-      data={rows}
-      keyExtractor={(r) => r.id}
-      onEndReached={more}
-      onEndReachedThreshold={0.4}
-      ListHeaderComponent={
+    <Screen>
         <View style={{ gap: space.sm }}>
           <Row style={{ justifyContent: 'space-between' }}>
             <Button title={filtered ? 'Filters (on)' : 'Filter'} compact variant="ghost" icon="line.3.horizontal.decrease.circle" onPress={() => setShowFilters((s) => !s)} />
@@ -83,28 +77,31 @@ export default function History() {
           {from && to && from > to ? <Banner tone="warning">The start date is after the end date.</Banner> : null}
           {error ? <Banner tone="danger">{error}</Banner> : null}
         </View>
-      }
-      ListEmptyComponent={
+      {rows.length === 0 ? (
         loading ? <ActivityIndicator color={colors.accent} /> : filtered ? (
           <Empty title="No matching workouts" body="No finished workouts match these filters." action={<Button title="Clear filters" variant="secondary" onPress={() => { setFrom(null); setTo(null); setExercise(null); }} />} />
         ) : (
           <Empty title="No workouts yet" body="Finish a workout on the Train tab and it will appear here. You can also log an earlier session." action={<Button title="Go to Train" variant="secondary" onPress={() => router.navigate('/')} />} />
         )
-      }
-      renderItem={({ item }) => (
-        <Card onPress={() => router.push(`/workout/${item.id}`)} accessibilityLabel={`${formatDateLong(item.workoutDate)}, ${namesWithMore(item.exerciseNames)}, ${plural(item.setCount, 'set')}`}>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <T weight="700">{formatDateLong(item.workoutDate)}</T>
-            <T variant="small" color={colors.muted}>{plural(item.setCount, 'set')}</T>
+      ) : null}
+      {rows.map((item) => (
+        <Pressable key={item.id} onPress={() => router.push(`/workout/${item.id}`)} accessibilityRole="button"
+          accessibilityLabel={`${formatDateLong(item.workoutDate)}, ${namesWithMore(item.exerciseNames)}, ${plural(item.setCount, 'set')}`}
+          style={({ pressed }) => [{ backgroundColor: pressed ? colors.surfacePressed : colors.surface, borderRadius: radius.lg, paddingVertical: space.md, paddingHorizontal: space.lg, gap: 3 }]}>
+          <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+            <T weight="600">{formatDateLong(item.workoutDate)}</T>
+            <T variant="small" color={colors.muted} tabular>{plural(item.setCount, 'set')}</T>
           </Row>
-          <T color={colors.muted}>{namesWithMore(item.exerciseNames) || 'No exercises'}</T>
-          <Row style={{ justifyContent: 'space-between' }}>
+          <T variant="small" color={colors.muted} numberOfLines={2}>{namesWithMore(item.exerciseNames) || 'No exercises'}</T>
+          <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
             <T variant="caption" color={colors.faint}>{item.routineName ?? 'Ad hoc'} · {formatDuration(item.durationSeconds)}</T>
-            {syncState.status !== 'device_only' ? <StatusPill status={item.pendingUpload ? 'waiting' : 'uploaded'} /> : null}
+            {syncState.status !== 'device_only' && item.pendingUpload ? <StatusPill status="waiting" short /> : null}
           </Row>
-        </Card>
-      )}
-      ListFooterComponent={next ? <ActivityIndicator color={colors.accent} /> : undefined}
-    />
+        </Pressable>
+      ))}
+      {next ? (
+        loading ? <ActivityIndicator color={colors.accent} /> : <Button title="Show older workouts" variant="ghost" compact onPress={() => void more()} />
+      ) : null}
+    </Screen>
   );
 }

@@ -2,7 +2,7 @@
 // pinned catalog photos (loaded on demand, cached), numbered text steps that
 // work offline, and the muscles worked on the selected body figure.
 import { Image } from 'expo-image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, View } from 'react-native';
 import { mediaUrls } from '../data/catalog';
 import { MUSCLE_LABEL } from '../domain/preparation';
@@ -18,7 +18,7 @@ export function FormDemo({ exercise }: { exercise: Exercise }) {
   const [playing, setPlaying] = useState(true);
   const [frame, setFrame] = useState(0);
   const [failed, setFailed] = useState(false);
-  const fade = useRef(new Animated.Value(0)).current;
+  const [fade] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     // Respect Reduce Motion: show a still start position until the lifter presses play.

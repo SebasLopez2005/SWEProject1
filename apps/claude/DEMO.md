@@ -16,7 +16,7 @@ Professor-facing script covering the major stories. Story IDs are in brackets. E
 3. Bench row 1: the fields are prefilled from last time; change reps to **7**, add RIR **2**, tap ✓ [FW-02, TR-02, BL-06]. "Target: 70 kg … 8 reps" stays unchanged. A rest countdown starts [TR-03]: pause, +30, resume, skip.
 4. Tap the **kg** button on a row → choose **Convert** (shows lb) [FW-31]. Rows display "60 kg (132.3 lb)" [FW-30].
 5. Row menu → **Delete set** → confirm → **Undo** [FW-05]. Numbers renumber.
-6. Entry ⋯ → **Exercise history** [FW-16]; back. Note "Last time · date" line [FW-04].
+6. Entry ⋯ → **How to perform**: the start/end photos alternate (pause button), numbered steps, muscles worked on the figure [TR-06A]. Then entry ⋯ → **Exercise history** [FW-16]; back. Note "Last time · date" line [FW-04].
 7. **Finish workout** → "N planned sets will be saved as skipped" → confirm [TR-02]. Summary shows date, duration, exercises, sets x of y planned, volume with equivalent, preparation counted separately [FW-06]. **Save as routine** → toggle "use results as targets" → Save [FW-25].
 
 ## 2. Interruptions and offline (Elena — home trainer)
@@ -38,7 +38,7 @@ Professor-facing script covering the major stories. Story IDs are in brackets. E
 
 1. Progress → **Weekly volume**: one bar per Monday week, zero weeks included, sentence comparing the last two weeks [FW-22]. Period: 4 weeks / 12 weeks / 1 year / All time [FW-21]. Tap a bar → "List this week's workouts" [FW-24].
 2. **One exercise** → Bench Press: line of volume per workout with axis units and dates [FW-20]; tap a point → **Open the workout** [FW-24]. Pushups shows "Total reps per workout" [FW-23]; Plank says timed exercises are not graphed. The value list under each chart is the accessible alternative.
-3. Profile → **Muscle activity**: front/back map, legend, exact list; tap Chest to see contributing exercises and sets with workout links [TR-07].
+3. Profile → **Muscle activity**: anatomical front/back figure, legend, exact list; tap Chest to see contributing exercises and sets with workout links [TR-07]. Switch **Male / Female**; the choice is remembered and synced [TR-07A].
 4. **Monthly report**: current month "in progress" compared over equal elapsed days, milestones [TR-08].
 5. **Lift goals**: Bench 225 lb × 5 shows best qualifying set and opens it [TR-09].
 6. **Bodyweight**: log a reading in lb; trend shows in kg; edit/delete [TR-11].

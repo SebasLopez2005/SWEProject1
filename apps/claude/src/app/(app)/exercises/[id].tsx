@@ -2,10 +2,10 @@ import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useLayoutEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { formatDateLong } from '../../../domain/dates';
-import { MUSCLE_LABEL } from '../../../domain/preparation';
 import { EXERCISE_TYPE_LABEL, PHASE_LABEL, type ExerciseType } from '../../../domain/types';
 import { useLoad, useSession } from '../../../state/session';
 import { formatActual } from '../../../ui/format';
+import { FormGuide } from '../../../ui/FormGuide';
 import { Banner, Button, Card, Empty, Field, Loading, Row, Screen, Section, Segmented, T } from '../../../ui/kit';
 import { colors, space } from '../../../ui/theme';
 
@@ -16,7 +16,7 @@ export default function ExerciseDetail() {
   const navigation = useNavigation();
   const [renaming, setRenaming] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { data } = useLoad(async () => ({ ex: await repo.getExercise(id), history: await repo.exerciseHistory(id), used: await repo.exerciseIsUsed(id) }), [id]);
+  const { data } = useLoad(async () => ({ ex: await repo.getExercise(id), history: await repo.exerciseHistory(id), used: await repo.exerciseIsUsed(id) }), [id], ['exercises', 'finished']);
   useLayoutEffect(() => navigation.setOptions({ title: data?.ex?.name ?? 'Exercise' }), [navigation, data?.ex?.name]);
   if (!data) return <Loading />;
   const ex = data.ex;
@@ -26,18 +26,9 @@ export default function ExerciseDetail() {
 
   return (
     <Screen>
-      <Card>
-        <T variant="h2">{ex.name}</T>
-        {ex.archived ? <Banner tone="warning">Archived: hidden from search and pickers. History is kept.</Banner> : null}
-        <T color={colors.muted}>{EXERCISE_TYPE_LABEL[ex.type]} · {ex.equipment} · {ex.category}{own ? ' · your exercise' : ''}</T>
-        <T variant="small">Primary: {ex.primaryMuscles.map((m) => MUSCLE_LABEL[m] ?? m).join(', ') || 'none tagged'}</T>
-        <T variant="small" color={colors.muted}>Secondary: {ex.secondaryMuscles.map((m) => MUSCLE_LABEL[m] ?? m).join(', ') || 'none listed'}</T>
-      </Card>
-      {ex.instructions ? (
-        <Section title="Instructions">
-          <Card>{ex.instructions.split('\n').map((line, i) => <T key={i} variant="small">{i + 1}. {line}</T>)}</Card>
-        </Section>
-      ) : null}
+      <T variant="small" color={colors.muted}>{EXERCISE_TYPE_LABEL[ex.type]} · {ex.equipment} · {ex.category}{own ? ' · your exercise' : ''}</T>
+      {ex.archived ? <Banner tone="warning">Archived: hidden from search and pickers. History is kept.</Banner> : null}
+      <FormGuide exercise={ex} figure={settings.bodyFigure} />
       {ex.type !== 'seconds' && data.history.length ? (
         <Button title="Graph this exercise" variant="secondary" icon="chart.xyaxis.line" onPress={() => router.navigate({ pathname: '/progress', params: { exerciseId: ex.id } })} />
       ) : null}

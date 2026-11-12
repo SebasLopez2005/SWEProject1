@@ -1,6 +1,7 @@
 // Builds the bundled offline catalog and the Supabase catalog seed migration
 // from the pinned Free Exercise DB snapshot (Unlicense).
 // Usage: node scripts/build-catalog.mjs /path/to/exercises.json
+import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 
