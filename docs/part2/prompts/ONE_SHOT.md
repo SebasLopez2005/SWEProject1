@@ -1,59 +1,157 @@
-# Shared one-shot generation prompt
+You are the lead engineer, product designer, and QA engineer responsible for building our Software Engineering school project: a complete iOS application from scratch. Everything you'll need is under Apple/SWEProject1 it is a repo. 
 
-**Template only - not submitted to a coding model yet.** Before use, resolve the uppercase placeholders and archive the exact filled prompt per model/round. Give both models the same content and frozen design commit. Only MODEL_LABEL and the isolated output/environment identifiers differ.
+Your assignment is to IMPLEMENT THE APP, not merely propose an architecture or generate a scaffold. Deliver the strongest complete, coherent, demonstrable application supported by the attached documentation and diagrams.
 
-```text
-Implement the Fitness & Workout Log mobile app from the design at DESIGN_COMMIT.
-This is ROUND_NUMBER for MODEL_LABEL. Generate the complete application in
-OUTPUT_DIRECTORY, starting from an empty implementation. Do not read another
-model's app, an earlier generated implementation, or generated-code solutions.
+## Nonnegotiable: one autonomous execution
 
-Use docs/part2/design/README.md and every .mmd source in its diagrams directory.
-The selected product is Diego's reviewed Claude Fitness & Workout scope: all
-31 FW stories, not the 12-story ChatGPT alternative. SELECTED_STORIES.md and
-docs/part2/design/source/Fitness_Workout_Log_App_Revised_v2.docx are requirement
-context; this revised report supersedes the archived Part 1 final. SCOPE.md,
-CONTRACTS.md and TRACEABILITY.md explain the models; do not invent extra scope.
+Complete this assignment in ONE SHOT without asking me questions or waiting for my input.
 
-Generate an Expo React Native TypeScript application with Expo Router,
-expo-sqlite local persistence and a Supabase hosted backend. Implement the
-screens, controllers, services, repository boundaries, domain types,
-presenters and database/RPC responsibilities in the class and sequence models.
-Equivalent idiomatic hooks/modules are acceptable; preserve the responsibilities.
+“One shot” means one uninterrupted autonomous work session. You SHOULD repeatedly build, run, inspect, test, debug, and refine your implementation within that session. It does not mean writing everything once without verification.
 
-Follow every story diagram, including offline durable writes, resume,
-immutable outbox/idempotent upload, owner isolation, safe conflict resolution,
-typed exercise sets, templates, correction/deletion, graphs, settings and unit
-conversion. Do not substitute in-memory storage or mock successful uploads.
-All confirmed writes must survive process restart. Graphs and previous
-performance must reflect local edits. Use stable exercise identities.
+•⁠  ⁠Do not stop after planning, scaffolding, or implementing a subset of the requirements.
+•⁠  ⁠Do not ask me to choose frameworks, designs, architecture, naming, or implementation details.
+•⁠  ⁠Resolve ambiguity using the documentation, sound engineering judgment, and the simplest reasonable assumption.
+•⁠  ⁠Record consequential assumptions and continue.
+•⁠  ⁠Give brief progress updates when appropriate, but never make progress depend on a reply.
+•⁠  ⁠If something is blocked by your environment, complete everything else and implement the best honest, runnable fallback.
+•⁠  ⁠Only AFTER completing and validating the app may you request external accounts, credentials, provisioning, or service setup.
 
-Generate local SQLite migrations, Supabase migrations/constraints/RLS/RPC
-functions and a small realistic seed catalog without claiming a fixed catalog
-size. Include .env.example with public configuration placeholders only, a
-lockfile with compatible Expo dependencies, and EAS production build/submit
-configuration for eventual iOS TestFlight distribution. Never include private
-keys, real tokens, passwords or fabricated service identifiers.
+You have discretion to install dependencies, create files, implement the backend and database, run local services, generate seed data, and use available tools within the workspace. Do not incur charges, expose secrets, delete unrelated work, or publish externally without authorization.
 
-Include tests for actual domain/integration risks: typed-set validation,
-durable save/resume, transaction rollback, duplicate retry, conflict
-preservation, owner isolation, template independence, date buckets,
-unit round-trip display and graph/source agreement. Explain manual native
-checks for text scaling, keyboard, offline lifecycle and deployment.
-Run the checks you can during this single autonomous generation invocation.
-Do not deploy, create accounts, buy services or send messages.
+## 1. Read all project materials before implementation
 
-Preserve high-level quality requirements; do not invent capacity or timing
-promises. Follow the design's explicit functional validation rules and
-accessibility behaviors. Android-compatible source is expected; iOS is the
-requested distribution target.
+Inspect every supplied document, diagram, user story, acceptance criterion, wireframe, schema, and grading requirement. Inspect any existing repository and its instructions as well.
 
-Deliver all app/backend/config/test files, a runnable README with exact setup
-commands, checks actually executed, and known limitations. Mark external
-configuration or device checks not performed; do not claim they passed.
-Do not modify the supplied diagrams or design artifacts. If a model is
-ambiguous, state the assumption you used in the generated output so the team
-can consider a later diagram revision. Do not reduce story coverage silently.
-```
+Treat these materials as the source of truth. Do not replace our project with a generic app that merely shares its theme.
 
-Before invoking, record actual available model/version, runtime, output path and backend environment in the run log. The user has asked to finish diagram preparation before executing this prompt.
+Extract:
+
+•⁠  ⁠Actors and permissions.
+•⁠  ⁠Every user story and acceptance criterion.
+•⁠  ⁠Required screens and complete user journeys.
+•⁠  ⁠Entities, relationships, validation rules, and lifecycle states.
+•⁠  ⁠Required integrations and architectural constraints.
+•⁠  ⁠Nonfunctional requirements and grading expectations.
+
+Create ⁠ REQUIREMENTS.md ⁠ mapping each requirement to its implementation and verification. Preserve original story IDs where available; assign clearly labeled derived IDs otherwise. Include requirements found only in diagrams.
+
+Resolve conflicts by prioritizing explicit grading and acceptance requirements, then explicit user stories and business rules, then supporting diagrams and design suggestions. Document material conflicts and your chosen interpretation. Do not quietly omit difficult requirements.
+
+## 2. Choose the stack and build the complete system
+
+Follow any stack mandated by the project. If none is mandated, choose an appropriate iOS stack that is practical to run, maintain, and demonstrate. React Native with Expo and TypeScript is a reasonable default when compatible with the requirements.
+
+Implement all necessary layers:
+
+•⁠  ⁠Complete mobile interface and navigation.
+•⁠  ⁠Business logic and state management.
+•⁠  ⁠Persistent storage and data access.
+•⁠  ⁠Backend, database schema, migrations, and seed scripts where required.
+•⁠  ⁠Authentication and role-based authorization where required.
+•⁠  ⁠Documented configuration and reproducible setup.
+
+Use compatible, stable dependencies and include a lockfile. Prefer a small, coherent architecture over unnecessary infrastructure.
+
+Do not substitute local persistence for a required multiuser backend. If shared data or server-enforced permissions are required, implement them.
+
+## 3. Implement every documented user journey
+
+Every documented user story must have a complete path through the app, including its relevant success, validation, failure, and empty states.
+
+•⁠  ⁠Buttons and controls must perform their intended actions.
+•⁠  ⁠Forms must validate, save, and display meaningful feedback.
+•⁠  ⁠Saved data must survive the relevant restart or reload.
+•⁠  ⁠Related screens must reflect changes consistently.
+•⁠  ⁠Updates, deletions, cancellation, and other documented state transitions must work.
+•⁠  ⁠Permissions must be enforced in the trusted backend layer when a backend is required.
+•⁠  ⁠Navigation must support sensible back behavior and recovery from errors.
+•⁠  ⁠No dead links, fake success messages, placeholder screens, or TODO implementations for required features.
+
+Use realistic, internally consistent demonstration data. Make it easy for a professor to exercise all roles and important workflows without entering large amounts of data.
+
+Do not invent substantial unrelated features. Spend effort on completeness and polish of the documented scope.
+
+## 4. Make the app polished and iOS appropriate
+
+Create a consistent visual system with deliberate typography, spacing, color, reusable components, and clear hierarchy.
+
+Account for:
+
+•⁠  ⁠Safe areas and common iPhone screen sizes.
+•⁠  ⁠Keyboard avoidance and scrollable forms.
+•⁠  ⁠Accessible labels, readable contrast, and reasonable touch targets.
+•⁠  ⁠Loading, empty, error, and success states.
+•⁠  ⁠Clear confirmations for destructive actions.
+•⁠  ⁠Long text, missing optional values, and realistic data volume.
+
+Follow supplied branding and wireframes where specified. Where design is unspecified, make a cohesive decision and implement it throughout the app.
+
+The result should feel ready for a school demonstration, not like disconnected template screens.
+
+## 5. Do not let external services block completion
+
+You may install and integrate appropriate frameworks and SDKs during implementation without asking me.
+
+If a service such as Clerk, Resend, Supabase, Firebase, or another provider requires credentials or account configuration unavailable to you:
+
+•⁠  ⁠Implement a clean integration boundary and document the required configuration.
+•⁠  ⁠Provide a working local or development alternative when feasible.
+•⁠  ⁠Make the demonstration runnable without paid credentials.
+•⁠  ⁠Clearly distinguish simulated delivery or development authentication from a live production integration.
+•⁠  ⁠Never invent credentials, embed secrets, or claim an external action occurred when it did not.
+•⁠  ⁠Keep development bypasses explicitly gated so they cannot silently become production behavior.
+
+After finishing, explain which external services are actually necessary and which are optional improvements. Prefer implementing a complete local solution over adding a service without a concrete requirement.
+
+## 6. Verify, repair, and verify again
+
+You own validation. Do not hand me the first generated version.
+
+Run all checks available in your environment, including:
+
+•⁠  ⁠Dependency installation and configuration checks.
+•⁠  ⁠Type checking and linting where applicable.
+•⁠  ⁠Meaningful tests of critical business rules and permissions.
+•⁠  ⁠Integration checks for persistence and backend operations.
+•⁠  ⁠End-to-end or manual execution of the main documented workflows.
+•⁠  ⁠An iOS build or simulator launch when the environment supports it.
+
+Inspect the rendered interface if preview or simulator tools are available. Check for broken layouts, inaccessible controls, keyboard problems, and navigation failures.
+
+Fix issues discovered during validation, then rerun the affected checks.
+
+If native iOS verification requires macOS, Xcode, signing, or a physical device unavailable to you, state that precisely. Perform all available checks and provide exact remaining verification steps. A web preview alone is not evidence that an iOS build works.
+
+Update ⁠ REQUIREMENTS.md ⁠ with truthful status for each requirement: implemented and verified, implemented but unverified, or blocked. Name the actual verification performed. Do not claim perfection, passing tests, or complete coverage without evidence.
+
+## 7. Deliver a reproducible project
+
+Include:
+
+•⁠  ⁠All application and supporting backend source code.
+•⁠  ⁠Dependency manifests and lockfiles.
+•⁠  ⁠Database migrations and realistic seed data where applicable.
+•⁠  ⁠⁠ .env.example ⁠ containing placeholders only.
+•⁠  ⁠Relevant tests and runnable verification commands.
+•⁠  ⁠⁠ README.md ⁠ with exact setup and launch instructions.
+•⁠  ⁠⁠ REQUIREMENTS.md ⁠ with implementation and verification traceability.
+•⁠  ⁠⁠ ASSUMPTIONS.md ⁠ for consequential decisions and documentation conflicts.
+•⁠  ⁠⁠ DEMO.md ⁠ with a short professor-facing walkthrough covering the major stories and roles.
+
+Document test accounts or demo access where applicable. Specify any local service commands and their startup order.
+
+## Final response
+
+Only after implementation and validation, provide:
+
+1.⁠ ⁠What you built and where the project is located.
+2.⁠ ⁠Exact commands to install and run it.
+3.⁠ ⁠How to access the demonstration and exercise each role.
+4.⁠ ⁠User-story coverage, including any genuine gaps.
+5.⁠ ⁠Checks actually run and their results.
+6.⁠ ⁠Any remaining limitations or environment blockers.
+7.⁠ ⁠External setup needed from me, if any, with a clear reason for each item.
+
+Do not finish with “Would you like me to implement the rest?” Complete all work possible within this execution.
+
+Start by inspecting the provided materials, derive the complete requirements, and keep working through implementation, verification, and fixes until the app is ready to demonstrate.
