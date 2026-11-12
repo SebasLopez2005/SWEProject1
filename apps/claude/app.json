@@ -1,0 +1,96 @@
+{
+  "expo": {
+    "name": "Repwise",
+    "slug": "repwise-claude",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "repwise",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#121214",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.swiftlycr.repwise.claude",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSSupportsLiveActivities": true
+      }
+    },
+    "android": {
+      "package": "com.swiftlycr.repwise.claude",
+      "adaptiveIcon": {
+        "backgroundColor": "#121214",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-sharing",
+      "expo-secure-store",
+      [
+        "@react-native-community/datetimepicker",
+        {}
+      ],
+      [
+        "expo-widgets",
+        {
+          "enablePushNotifications": false,
+          "frequentUpdates": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#E3C58F"
+        }
+      ],
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#121214",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "ExpoWidgetsTarget",
+                  "bundleIdentifier": "com.swiftlycr.repwise.claude.ExpoWidgetsTarget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.swiftlycr.repwise.claude"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "4ef80775-1165-47fa-b5db-c9a36b0dfb2d"
+      }
+    },
+    "owner": "swiftlycrdev"
+  }
+}
